@@ -1,0 +1,136 @@
+{
+  "flights_csv_rows": 257896,
+  "flights_csv_columns": [
+    "flight",
+    "time",
+    "wind_speed",
+    "wind_angle",
+    "battery_voltage",
+    "battery_current",
+    "position_x",
+    "position_y",
+    "position_z",
+    "orientation_x",
+    "orientation_y",
+    "orientation_z",
+    "orientation_w",
+    "velocity_x",
+    "velocity_y",
+    "velocity_z",
+    "angular_x",
+    "angular_y",
+    "angular_z",
+    "linear_acceleration_x",
+    "linear_acceleration_y",
+    "linear_acceleration_z",
+    "speed",
+    "payload",
+    "altitude",
+    "date",
+    "time_day",
+    "route"
+  ],
+  "parameters_csv_rows": 209,
+  "flights_in_flights_csv": 209,
+  "flight_ids_only_in_parameters": [],
+  "flight_ids_only_in_flights_csv": [],
+  "missing_values_per_column": {},
+  "duplicate_rows": 0,
+  "route_counts": {
+    "A1": 3,
+    "A2": 3,
+    "A3": 3,
+    "H": 4,
+    "R1": 182,
+    "R2": 1,
+    "R3": 1,
+    "R4": 1,
+    "R5": 4,
+    "R6": 5,
+    "R7": 2
+  },
+  "cruise_flights": 196,
+  "date_range": [
+    "2019-04-07",
+    "2019-10-24"
+  ],
+  "distinct_flight_days": 18,
+  "flights_per_month": {
+    "2019-04": 6,
+    "2019-05": 11,
+    "2019-06": 63,
+    "2019-07": 97,
+    "2019-08": 21,
+    "2019-09": 6,
+    "2019-10": 5
+  },
+  "parameter_levels": {
+    "speed": [
+      0.0,
+      4.0,
+      6.0,
+      8.0,
+      10.0,
+      12.0
+    ],
+    "payload": [
+      0.0,
+      250.0,
+      500.0,
+      750.0
+    ],
+    "altitude": [
+      "0",
+      "3",
+      "25",
+      "50",
+      "75",
+      "100",
+      "25-50-100-25"
+    ]
+  },
+  "median_sample_interval_s": 0.12000000000000455,
+  "flights_with_non_monotonic_time": 0,
+  "flights_with_gap_over_2s": 3,
+  "flights_with_negative_current": 185,
+  "cruise_energy_wh": {
+    "count": 196.0,
+    "mean": 21.23,
+    "std": 4.891,
+    "min": 12.991,
+    "25%": 17.58,
+    "50%": 20.733,
+    "75%": 24.531,
+    "max": 37.747
+  },
+  "cruise_duration_s": {
+    "count": 196.0,
+    "mean": 189.7,
+    "std": 40.9,
+    "min": 106.1,
+    "25%": 163.2,
+    "50%": 184.0,
+    "75%": 212.5,
+    "max": 428.3
+  },
+  "cruise_energy_wh_by_payload": {
+    "0.0": 19.15,
+    "250.0": 21.43,
+    "500.0": 23.08,
+    "750.0": 25.84
+  },
+  "cruise_energy_wh_by_speed": {
+    "4.0": 26.98,
+    "6.0": 22.14,
+    "8.0": 19.81,
+    "10.0": 18.51,
+    "12.0": 18.53
+  },
+  "cruise_energy_wh_by_altitude": {
+    "100": 25.24,
+    "25": 17.56,
+    "25-50-100-25": 17.24,
+    "50": 20.42,
+    "75": 22.61
+  }
+}

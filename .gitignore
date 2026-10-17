@@ -1,0 +1,8 @@
+# Raw source data: untouched reference copy, not redistributed
+data/raw/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
