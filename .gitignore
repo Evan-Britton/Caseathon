@@ -1,5 +1,8 @@
-# Raw source data: untouched reference copy, not redistributed
-data/raw/
+# Raw data is committed so the whole team has it. The one exception is the
+# uncompressed flights.csv (107 MB), which exceeds GitHub's 100 MB file limit.
+# The committed flights.csv.gz is the identical file (same md5 once unzipped):
+#   gunzip -k data/raw/cmu_drone/flights.csv.gz
+data/raw/cmu_drone/flights.csv
 
 # Python
 __pycache__/
