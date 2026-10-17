@@ -1,0 +1,11 @@
+// Cloudflare Worker serving the built app as static assets.
+// Deploy with `npm run deploy` (runs `vite build` then `wrangler deploy`).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "caseathon-drone-replay",
+  "compatibility_date": "2026-06-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}
