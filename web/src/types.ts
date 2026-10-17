@@ -12,6 +12,11 @@ export interface FlightMeta {
   maxUpM: number;
   maxGapS: number;
   startVoltage: number;
+  /** Set only on flights we generated. Everything else is CMU data. */
+  simulated?: boolean;
+  outcome?: string;
+  failureS?: number; // s into the flight when power is lost
+  failureAltM?: number; // m above launch when power is lost
 }
 
 /** Columnar time series for one flight, one entry per sample (~5-8 Hz). */

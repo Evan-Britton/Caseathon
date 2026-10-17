@@ -3007,6 +3007,25 @@
    "maxUpM": 92.6,
    "maxGapS": 4.7,
    "startVoltage": 23.56
+  },
+  {
+   "id": 900,
+   "route": "R1",
+   "speed": 8.0,
+   "payload": 250.0,
+   "altitude": "75",
+   "date": "",
+   "time": "",
+   "durationS": 99.9,
+   "energyWh": 11.77,
+   "pathM": 331.1,
+   "maxUpM": 76.6,
+   "maxGapS": 0,
+   "startVoltage": 24.0,
+   "simulated": true,
+   "outcome": "Battery cutoff, power lost, crash",
+   "failureS": 91.7,
+   "failureAltM": 73.6
   }
  ]
 }

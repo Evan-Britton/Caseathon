@@ -11,7 +11,10 @@ export function TopBar() {
 
   const byDate = useMemo(() => {
     const out = new Map<string, FlightMeta[]>();
-    for (const f of index?.flights ?? []) out.set(f.date, [...(out.get(f.date) ?? []), f]);
+    for (const f of index?.flights ?? []) {
+      const key = f.simulated ? "simulated" : f.date;
+      out.set(key, [...(out.get(key) ?? []), f]);
+    }
     return [...out.entries()];
   }, [index]);
 
@@ -28,11 +31,11 @@ export function TopBar() {
           <span className="visually-hidden">Flight</span>
           <select value={meta?.id ?? ""} onChange={(e) => selectFlight(Number(e.target.value))}>
             {byDate.map(([date, list]) => (
-              <optgroup key={date} label={fmtDate(date)}>
+              <optgroup key={date} label={date === "simulated" ? "Simulated scenarios" : fmtDate(date)}>
                 {list.map((f) => (
                   <option key={f.id} value={f.id}>
-                    Flight {f.id}
-                    {f.route === "H" ? ", hover test" : `, ${f.speed} m/s, ${f.payload} g, ${fmtAltitude(f.altitude)}`}
+                    {f.simulated ? `Simulated ${f.id}, battery failure` : `Flight ${f.id}`}
+                    {f.simulated ? null : f.route === "H" ? ", hover test" : `, ${f.speed} m/s, ${f.payload} g, ${fmtAltitude(f.altitude)}`}
                   </option>
                 ))}
               </optgroup>
@@ -42,6 +45,12 @@ export function TopBar() {
         <button onClick={() => stepFlight(1)} aria-label="Next flight">{Icons.next}</button>
       </div>
 
+      {meta?.simulated && (
+        <div className="sim-banner glass" role="status">
+          <strong>Simulated, not CMU data.</strong> {meta.outcome} at {fmtClock(meta.failureS ?? 0)}, {fmtNum(meta.failureAltM ?? 0, 0)} m up.
+        </div>
+      )}
+
       {meta && (
         <dl className="chips">
           {meta.route !== "H" && <Chip icon={Icons.speed} label="Cruise" value={`${meta.speed} m/s`} />}
@@ -49,7 +58,11 @@ export function TopBar() {
           <Chip icon={Icons.altitude} label="Altitude" value={fmtAltitude(meta.altitude)} />
           <Chip icon={Icons.clock} label="Duration" value={fmtClock(meta.durationS)} />
           <Chip icon={Icons.bolt} label="Energy" value={`${fmtNum(meta.energyWh)} Wh`} />
-          <Chip icon={Icons.calendar} label="Flown" value={`${fmtDate(meta.date)}, ${meta.time}`} />
+          {meta.simulated ? (
+            <Chip icon={Icons.calendar} label="Source" value="Simulated" />
+          ) : (
+            <Chip icon={Icons.calendar} label="Flown" value={`${fmtDate(meta.date)}, ${meta.time}`} />
+          )}
         </dl>
       )}
     </header>

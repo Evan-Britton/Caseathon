@@ -12,6 +12,7 @@ export function Telemetry() {
   const at = (arr: number[]) => lerpAt(arr, i, f);
   const up = Math.max(at(series.up), 0);
   const airborne = up > 0.5;
+  const powerLost = !!meta.simulated && uiTime >= (meta.failureS ?? Infinity);
   const used = at(series.energyWh);
   const total = series.energyWh[series.energyWh.length - 1];
 
@@ -19,11 +20,13 @@ export function Telemetry() {
     <section className="telemetry glass" aria-label="Telemetry">
       <div className="panel-head">
         <h2>DJI Matrice 100</h2>
-        <span className={`state ${airborne ? "state-air" : "state-ground"}`}>{airborne ? "Airborne" : "On ground"}</span>
+        <span className={`state ${powerLost ? "state-fail" : airborne ? "state-air" : "state-ground"}`}>
+          {powerLost ? (airborne ? "Power lost" : "Crashed") : airborne ? "Airborne" : "On ground"}
+        </span>
       </div>
 
       <div className="tele-body">
-        <DroneGlyph spinning={airborne} />
+        <DroneGlyph spinning={airborne && !powerLost} />
         <dl className="readouts">
           <Readout label="Altitude" value={fmtNum(up)} unit="m" />
           <Readout label="Ground speed" value={fmtNum(at(series.groundSpeed))} unit="m/s" />
