@@ -11,7 +11,6 @@
     "data": "python3 ../scripts/build_web_data.py ../data/raw/cmu_drone public/data"
   },
   "dependencies": {
-    "@react-three/drei": "10.7.9",
     "@react-three/fiber": "9.8.2",
     "react": "19.3.1",
     "react-dom": "19.3.1",

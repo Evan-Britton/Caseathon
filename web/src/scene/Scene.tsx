@@ -1,7 +1,7 @@
-import { Grid, OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import { Vector3 } from "three";
+import { GridHelper, Vector3 } from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { clock, useStore } from "../store";
 import type { CameraMode, FlightMeta, FlightSeries } from "../types";
 import { Drone, dronePose } from "./Drone";
@@ -17,13 +17,13 @@ export function Scene() {
     <Canvas
       dpr={[1, 2]}
       camera={{ fov: 42, near: 0.5, far: 6000, position: [260, 180, 260] }}
-      gl={{ antialias: true, powerPreference: "high-performance" }}
+      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       aria-label="3D replay of the selected flight"
     >
-      <color attach="background" args={[SCENE.sky]} />
-      <fog attach="fog" args={[SCENE.sky, 500, 1600]} />
-      <hemisphereLight args={["#f4f7f8", "#9aa58f", 1.6]} />
-      <directionalLight position={[120, 300, 80]} intensity={1.4} />
+      <fog attach="fog" args={[SCENE.horizon, 380, 1400]} />
+      <hemisphereLight args={["#9fb4c4", "#0d141a", 1.1]} />
+      <directionalLight position={[120, 300, 80]} intensity={1.6} />
+      <directionalLight position={[-200, 80, -120]} intensity={0.5} color={SCENE.teal} />
       <Ticker />
       <Ground />
       <LaunchPad />
@@ -57,24 +57,22 @@ function Ticker() {
 }
 
 function Ground() {
+  const grids = useMemo(
+    () => ({
+      cells: new GridHelper(2000, 200, SCENE.gridCell, SCENE.gridCell),
+      sections: new GridHelper(2000, 40, SCENE.gridSection, SCENE.gridSection),
+    }),
+    [],
+  );
   return (
     <>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]}>
         <planeGeometry args={[8000, 8000]} />
         <meshBasicMaterial color={SCENE.ground} />
       </mesh>
-      <Grid
-        infiniteGrid
-        cellSize={10}
-        sectionSize={50}
-        cellThickness={0.6}
-        sectionThickness={1}
-        cellColor={SCENE.gridCell}
-        sectionColor={SCENE.gridSection}
-        fadeDistance={900}
-        fadeStrength={1.5}
-        position={[0, 0.01, 0]}
-      />
+      {/* 10 m cells with 50 m sections; fog fades them toward the horizon */}
+      <primitive object={grids.cells} position={[0, 0.01, 0]} />
+      <primitive object={grids.sections} position={[0, 0.02, 0]} />
     </>
   );
 }
@@ -83,12 +81,12 @@ function LaunchPad() {
   return (
     <group position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <mesh>
-        <ringGeometry args={[5, 6, 64]} />
-        <meshBasicMaterial color={SCENE.magenta} />
+        <ringGeometry args={[5, 5.6, 64]} />
+        <meshBasicMaterial color={SCENE.amber} />
       </mesh>
       <mesh>
         <circleGeometry args={[1.2, 32]} />
-        <meshBasicMaterial color={SCENE.magenta} />
+        <meshBasicMaterial color={SCENE.amber} />
       </mesh>
     </group>
   );
@@ -110,8 +108,15 @@ const tmpPos = new Vector3();
 const tmpLook = new Vector3();
 
 function CameraRig({ series, meta, mode }: { series: FlightSeries; meta: FlightMeta; mode: CameraMode }) {
-  const { camera } = useThree();
-  const controls = useRef<{ target: Vector3; update: () => void } | null>(null);
+  const { camera, size, gl } = useThree();
+  const controls = useMemo(() => {
+    const c = new OrbitControls(camera, gl.domElement);
+    Object.assign(c, { enableDamping: true, dampingFactor: 0.08, maxPolarAngle: Math.PI / 2 - 0.04, minDistance: 8, maxDistance: 1800 });
+    return c;
+  }, [camera, gl]);
+  useEffect(() => () => controls.dispose(), [controls]);
+  const aspect = useRef(1);
+  aspect.current = size.width / size.height;
   const bounds = useBounds(series);
   const look = useRef(new Vector3());
 
@@ -119,14 +124,22 @@ function CameraRig({ series, meta, mode }: { series: FlightSeries; meta: FlightM
   useEffect(() => {
     if (mode !== "orbit") return;
     const { center, radius, top } = bounds;
-    const d = radius * 2.1 + top;
-    camera.position.set(center.x + d * 0.75, top + d * 0.55, center.z + d * 0.95);
-    controls.current?.target.copy(center);
-    controls.current?.update();
-  }, [bounds, mode, camera, meta.id]);
+    // Pull back on tall, narrow screens so the whole route stays in frame.
+    const d = (radius * 1.7 + top * 0.8) * Math.max(1, 1.25 / aspect.current);
+    camera.position.set(center.x + d * 0.75, top + d * 0.5, center.z + d * 0.95);
+    controls.target.copy(center);
+    controls.update();
+  }, [bounds, mode, camera, controls, meta.id]);
+
+  useEffect(() => {
+    controls.enabled = mode === "orbit";
+  }, [controls, mode]);
 
   useFrame((_, delta) => {
-    if (mode === "orbit") return;
+    if (mode === "orbit") {
+      controls.update();
+      return;
+    }
     const k = 1 - Math.exp(-delta * 4);
     const [x, y, z] = [dronePose.x, dronePose.y, dronePose.z];
     if (mode === "chase") {
@@ -135,7 +148,7 @@ function CameraRig({ series, meta, mode }: { series: FlightSeries; meta: FlightM
       tmpLook.set(x, y + 1, z);
     } else {
       const { center, radius } = bounds;
-      tmpPos.set(center.x, Math.max(radius * 3.2, 260), center.z + 0.01);
+      tmpPos.set(center.x, radius * 4.2 + 80, center.z + 0.01);
       tmpLook.set(center.x, 0, center.z);
     }
     camera.position.lerp(tmpPos, k);
@@ -143,17 +156,6 @@ function CameraRig({ series, meta, mode }: { series: FlightSeries; meta: FlightM
     camera.lookAt(look.current);
   });
 
-  return (
-    <OrbitControls
-      ref={controls as never}
-      makeDefault
-      enabled={mode === "orbit"}
-      enableDamping
-      dampingFactor={0.08}
-      maxPolarAngle={Math.PI / 2 - 0.04}
-      minDistance={8}
-      maxDistance={1800}
-    />
-  );
+  return null;
 }
 

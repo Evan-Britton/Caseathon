@@ -1,18 +1,12 @@
 import { useEffect } from "react";
 import { powerRange } from "./scene/palette";
+import { reticle } from "./scene/Drone";
 import { Scene } from "./scene/Scene";
 import { useStore } from "./store";
-import type { CameraMode } from "./types";
-import { Console } from "./ui/Console";
-import { FlightList } from "./ui/FlightList";
-import { fmtAltitude, fmtClock, fmtDate, fmtNum } from "./ui/format";
-import { Timeline } from "./ui/Timeline";
-
-const CAMERAS: { id: CameraMode; label: string }[] = [
-  { id: "orbit", label: "Orbit" },
-  { id: "chase", label: "Chase" },
-  { id: "top", label: "Top" },
-];
+import { Dock } from "./ui/Dock";
+import { RouteMap } from "./ui/RouteMap";
+import { Telemetry } from "./ui/Telemetry";
+import { TopBar } from "./ui/TopBar";
 
 export default function App() {
   const init = useStore((s) => s.init);
@@ -30,51 +24,23 @@ export default function App() {
   }, [init]);
 
   return (
-    <div className="app">
-      <FlightList />
-      <main className="stage">
+    <div className="hud">
+      <main className="scene">
         <Scene />
-        <FlightTitle />
-        <CameraSwitch />
+        <div className="reticle-anchor" ref={(el) => void (reticle.el = el)} aria-hidden>
+          <div className="reticle">
+            <i /><i /><i /><i />
+            <span className="reticle-label" ref={(el) => void (reticle.label = el)} />
+          </div>
+        </div>
         <PowerLegend />
         <StageMessage />
       </main>
-      <Console />
-      <Timeline />
-    </div>
-  );
-}
-
-function FlightTitle() {
-  const meta = useStore((s) => s.meta);
-  if (!meta) return null;
-  const hover = meta.route === "H";
-  return (
-    <header className="flight-title">
-      <h1>Flight {meta.id}</h1>
-      <dl>
-        <div><dt>Route</dt><dd>{hover ? "Hover test" : meta.route}</dd></div>
-        {!hover && <div><dt>Cruise</dt><dd>{meta.speed} m/s</dd></div>}
-        <div><dt>Payload</dt><dd>{meta.payload} g</dd></div>
-        <div><dt>Altitude</dt><dd>{fmtAltitude(meta.altitude)}</dd></div>
-        <div><dt>Flown</dt><dd>{fmtDate(meta.date)}, {meta.time}</dd></div>
-        <div><dt>Length</dt><dd>{fmtClock(meta.durationS)}</dd></div>
-        <div><dt>Energy</dt><dd>{fmtNum(meta.energyWh)} Wh</dd></div>
-      </dl>
-    </header>
-  );
-}
-
-function CameraSwitch() {
-  const camera = useStore((s) => s.camera);
-  const setCamera = useStore((s) => s.setCamera);
-  return (
-    <div className="seg camera" role="group" aria-label="Camera">
-      {CAMERAS.map((c) => (
-        <button key={c.id} aria-pressed={camera === c.id} onClick={() => setCamera(c.id)}>
-          {c.label}
-        </button>
-      ))}
+      <TopBar />
+      <RouteMap />
+      <Telemetry />
+      <Dock />
+      <Attribution />
     </div>
   );
 }
@@ -87,7 +53,7 @@ function PowerLegend() {
     <div className="power-legend" aria-label={`Path colour shows power draw from ${Math.round(lo)} to ${Math.round(hi)} watts`}>
       <span>Path colour is power draw</span>
       <div className="ramp" />
-      <div className="ramp-ends">
+      <div className="ramp-ends num">
         <span>{Math.round(lo)} W</span>
         <span>{Math.round(hi)} W</span>
       </div>
@@ -101,4 +67,14 @@ function StageMessage() {
   if (error) return <p className="stage-msg error">{error}</p>;
   if (loading) return <p className="stage-msg">Loading flight…</p>;
   return null;
+}
+
+function Attribution() {
+  const source = useStore((s) => s.index?.source);
+  if (!source) return null;
+  return (
+    <p className="attribution">
+      Data: <a href={source.url} target="_blank" rel="noreferrer">{source.authors}</a>, {source.license}
+    </p>
+  );
 }

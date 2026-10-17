@@ -1,27 +1,23 @@
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
-import { CanvasTexture, Color, Group, Mesh, MeshStandardMaterial } from "three";
+import { CanvasTexture, Group, Mesh, Vector3 } from "three";
 import { lerpAt, sampleAt } from "../data";
-import { statusAt } from "../sim";
-import { clock, useStore } from "../store";
+import { clock } from "../store";
 import type { FlightMeta, FlightSeries } from "../types";
 import { SCENE, toWorld } from "./palette";
 
-// A real M100 spans ~0.65 m; drawn 4x so it stays readable against a ~150 m route.
-export const DRONE_SCALE = 4;
+// A real M100 spans ~0.65 m; drawn 6x so it stays readable against a ~150 m route.
+export const DRONE_SCALE = 6;
 const ARM_ANGLES = [45, 135, 225, 315].map((d) => (d * Math.PI) / 180);
 const ARM_REACH = 0.33;
 const reducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const STATUS_COLOR = {
-  continue: new Color(SCENE.chartBlue),
-  defer: new Color(SCENE.amber),
-  return: new Color(SCENE.amber),
-  depleted: new Color(SCENE.red),
-};
-
-/** Shared pose so the camera rig and ground marker can follow the drone. */
+/** Shared pose so the camera rig can follow the drone. */
 export const dronePose = { x: 0, y: 0, z: 0, headingRad: 0 };
+
+/** DOM targeting reticle drawn over the canvas; positioned each frame from the drone's screen position. */
+export const reticle: { el: HTMLDivElement | null; label: HTMLSpanElement | null } = { el: null, label: null };
+const projected = new Vector3();
 
 export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta }) {
   const group = useRef<Group>(null);
@@ -29,8 +25,8 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
   const rotors = useRef<(Mesh | null)[]>([]);
   const marker = useRef<Group>(null);
   const drop = useRef<Mesh>(null);
-  const light = useMemo(() => new MeshStandardMaterial({ color: SCENE.chartBlue, emissive: SCENE.chartBlue, emissiveIntensity: 1.4 }), []);
-  const shadowTex = useMemo(radialShadow, []);
+  const { camera, size } = useThree();
+  const shadowTex = useMemo(radialGlow, []);
 
   useFrame((_, delta) => {
     const { i, f } = sampleAt(series.t, clock.time);
@@ -41,31 +37,28 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
     const headingRad = ((h0 + dh * f) * Math.PI) / 180;
     Object.assign(dronePose, { x, y, z, headingRad });
 
-    if (group.current) {
-      group.current.position.set(x, y, z);
-      group.current.rotation.set(0, -headingRad, 0);
-    }
+    group.current?.position.set(x, y, z);
     if (body.current) {
       // Cosmetic forward lean proportional to ground speed (multirotors pitch into their direction of travel).
       const lean = Math.min(lerpAt(series.groundSpeed, i, f) * 1.3, 16) * (Math.PI / 180);
-      body.current.rotation.x = -lean;
+      body.current.rotation.set(-lean, -headingRad, 0, "YXZ");
     }
     const airborne = y > 0.5;
     if (!reducedMotion) {
       for (const [k, r] of rotors.current.entries()) if (r) r.rotation.y += (k % 2 ? 1 : -1) * delta * (airborne ? 60 : 8);
     }
-    if (marker.current) marker.current.position.set(x, 0.05, z);
+    marker.current?.position.set(x, 0.05, z);
     if (drop.current) {
       drop.current.scale.y = Math.max(y, 0.01);
       drop.current.position.y = -y / 2;
       drop.current.visible = airborne;
     }
-
-    const sim = useStore.getState().sim;
-    if (sim) {
-      const c = STATUS_COLOR[statusAt(sim, i, clock.time)];
-      light.color.copy(c);
-      light.emissive.copy(c);
+    if (reticle.el) {
+      projected.set(x, y, z).project(camera);
+      const visible = projected.z < 1;
+      reticle.el.style.opacity = visible ? "1" : "0";
+      reticle.el.style.transform = `translate(${((projected.x + 1) / 2) * size.width}px, ${((1 - projected.y) / 2) * size.height}px)`;
+      if (reticle.label) reticle.label.textContent = `${y.toFixed(0)} m above launch`;
     }
   });
 
@@ -75,50 +68,49 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
     <>
       <group ref={group}>
         <group ref={body} scale={DRONE_SCALE}>
-          {/* hub and battery */}
           <mesh position={[0, 0.02, 0]}>
             <cylinderGeometry args={[0.11, 0.12, 0.05, 24]} />
-            <meshStandardMaterial color="#2a2f36" roughness={0.55} metalness={0.2} />
+            <meshStandardMaterial color="#59636e" roughness={0.45} metalness={0.4} />
           </mesh>
           <mesh position={[0, 0.07, 0.01]}>
             <boxGeometry args={[0.09, 0.05, 0.16]} />
-            <meshStandardMaterial color="#3b424b" roughness={0.6} />
-          </mesh>
-          {/* status light on the nose (-z is forward) */}
-          <mesh position={[0, 0.03, -0.13]} material={light}>
-            <sphereGeometry args={[0.022, 16, 12]} />
+            <meshStandardMaterial color="#3a424c" roughness={0.5} />
           </mesh>
           {ARM_ANGLES.map((a, k) => {
             const mx = Math.sin(a) * ARM_REACH;
             const mz = -Math.cos(a) * ARM_REACH;
-            const front = mz < 0;
+            // Aviation nav lights: port (left) red, starboard (right) green; -z is forward.
+            const light = mz < 0 ? (mx < 0 ? "#ff4d4d" : "#5cff9a") : "#f5f7fa";
             return (
               <group key={k}>
                 <mesh position={[mx / 2, 0.02, mz / 2]} rotation={[0, -a, 0]}>
                   <boxGeometry args={[0.024, 0.018, ARM_REACH]} />
-                  <meshStandardMaterial color="#1f2328" roughness={0.4} metalness={0.3} />
+                  <meshStandardMaterial color="#454e58" roughness={0.4} metalness={0.4} />
                 </mesh>
                 <mesh position={[mx, 0.04, mz]}>
                   <cylinderGeometry args={[0.028, 0.028, 0.045, 16]} />
-                  <meshStandardMaterial color={front ? SCENE.magenta : "#6b7380"} roughness={0.35} metalness={0.5} />
+                  <meshStandardMaterial color="#8a95a3" roughness={0.3} metalness={0.6} />
+                </mesh>
+                <mesh position={[mx, 0.005, mz]}>
+                  <sphereGeometry args={[0.014, 10, 8]} />
+                  <meshBasicMaterial color={light} toneMapped={false} />
                 </mesh>
                 <mesh ref={(m) => void (rotors.current[k] = m)} position={[mx, 0.067, mz]}>
                   <cylinderGeometry args={[0.165, 0.165, 0.003, 32]} />
-                  <meshStandardMaterial color="#1b2430" transparent opacity={0.16} depthWrite={false} />
+                  <meshBasicMaterial color="#cfe9ef" transparent opacity={0.14} depthWrite={false} />
                 </mesh>
               </group>
             );
           })}
-          {/* landing gear */}
           {[-1, 1].map((s) => (
             <group key={s}>
               <mesh position={[s * 0.09, -0.07, 0]} rotation={[0, 0, s * 0.25]}>
                 <cylinderGeometry args={[0.008, 0.008, 0.16, 8]} />
-                <meshStandardMaterial color="#2a2f36" />
+                <meshStandardMaterial color="#454e58" />
               </mesh>
               <mesh position={[s * 0.11, -0.15, 0]} rotation={[Math.PI / 2, 0, 0]}>
                 <cylinderGeometry args={[0.009, 0.009, 0.22, 8]} />
-                <meshStandardMaterial color="#2a2f36" />
+                <meshStandardMaterial color="#454e58" />
               </mesh>
             </group>
           ))}
@@ -127,43 +119,41 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
             <group position={[0, -0.1, 0]} scale={payloadScale}>
               <mesh>
                 <boxGeometry args={[0.14, 0.04, 0.22]} />
-                <meshStandardMaterial color="#f2f2ee" roughness={0.8} />
+                <meshStandardMaterial color="#e9ecef" roughness={0.8} />
               </mesh>
-              <mesh position={[0, 0, 0]}>
+              <mesh>
                 <boxGeometry args={[0.142, 0.042, 0.04]} />
-                <meshStandardMaterial color="#2b5c8a" roughness={0.8} />
+                <meshStandardMaterial color="#2f5f9a" roughness={0.8} />
               </mesh>
             </group>
           )}
         </group>
-        {/* vertical drop line to the ground */}
         <mesh ref={drop}>
-          <cylinderGeometry args={[0.08, 0.08, 1, 6]} />
-          <meshBasicMaterial color={SCENE.ink} transparent opacity={0.35} />
+          <cylinderGeometry args={[0.06, 0.06, 1, 6]} />
+          <meshBasicMaterial color={SCENE.teal} transparent opacity={0.35} />
         </mesh>
       </group>
-      {/* ground shadow, in world space so it ignores heading */}
       <group ref={marker}>
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[7, 7]} />
+          <planeGeometry args={[9, 9]} />
           <meshBasicMaterial map={shadowTex} transparent depthWrite={false} />
         </mesh>
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[4.2, 4.6, 48]} />
-          <meshBasicMaterial color={SCENE.ink} transparent opacity={0.4} />
+          <ringGeometry args={[4.2, 4.5, 48]} />
+          <meshBasicMaterial color={SCENE.teal} transparent opacity={0.6} />
         </mesh>
       </group>
     </>
   );
 }
 
-function radialShadow() {
+function radialGlow() {
   const c = document.createElement("canvas");
   c.width = c.height = 64;
   const g = c.getContext("2d")!;
   const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-  grad.addColorStop(0, "rgba(27,36,48,0.45)");
-  grad.addColorStop(1, "rgba(27,36,48,0)");
+  grad.addColorStop(0, "rgba(63,182,201,0.45)");
+  grad.addColorStop(1, "rgba(63,182,201,0)");
   g.fillStyle = grad;
   g.fillRect(0, 0, 64, 64);
   return new CanvasTexture(c);

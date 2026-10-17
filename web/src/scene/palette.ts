@@ -2,10 +2,10 @@ import { Color } from "three";
 
 // Night-ops palette shared by the 3D scene and the CSS tokens in styles.css.
 export const SCENE = {
-  sky: "#0a1016",
-  ground: "#0d141a",
-  gridCell: "#17232c",
-  gridSection: "#24343f",
+  horizon: "#111c25",
+  ground: "#0c1319",
+  gridCell: "#1a2731",
+  gridSection: "#2b3e4b",
   text: "#e8edf2",
   teal: "#3fb6c9",
   amber: "#f2a33a",
