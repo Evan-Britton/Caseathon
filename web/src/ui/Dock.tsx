@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { powerRange } from "../scene/palette";
 import { useStore } from "../store";
-import type { CameraMode } from "../types";
+import { GOOGLE_MAPS_KEY } from "../scene/Basemap";
+import type { Basemap, CameraMode } from "../types";
 import { fmtClock } from "./format";
 import { Icons } from "./icons";
 
@@ -13,6 +14,17 @@ const CAMERAS: { id: CameraMode; label: string; icon: React.ReactNode }[] = [
   { id: "top", label: "Top", icon: Icons.top },
 ];
 
+const BASEMAPS: { id: Basemap; label: string; icon: React.ReactNode; disabledHint?: string }[] = [
+  { id: "grid", label: "Grid", icon: Icons.grid },
+  { id: "street", label: "Street", icon: Icons.map },
+  {
+    id: "photo",
+    label: "3D",
+    icon: Icons.terrain,
+    disabledHint: GOOGLE_MAPS_KEY ? undefined : "Add VITE_GOOGLE_MAPS_API_KEY to web/.env.local to turn on the 3D map",
+  },
+];
+
 /** Playback controls with a power-draw scrubber and camera modes. */
 export function Dock() {
   const series = useStore((s) => s.series);
@@ -20,7 +32,8 @@ export function Dock() {
   const playing = useStore((s) => s.playing);
   const rate = useStore((s) => s.rate);
   const camera = useStore((s) => s.camera);
-  const { seek, setPlaying, setRate, setCamera } = useStore.getState();
+  const basemap = useStore((s) => s.basemap);
+  const { seek, setPlaying, setRate, setCamera, setBasemap } = useStore.getState();
 
   const wrap = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(600);
@@ -122,6 +135,21 @@ export function Dock() {
           ))}
         </select>
       </label>
+
+      <div className="cams" role="group" aria-label="Map layer">
+        {BASEMAPS.map((b) => (
+          <button
+            key={b.id}
+            aria-pressed={basemap === b.id}
+            disabled={!!b.disabledHint}
+            onClick={() => setBasemap(b.id)}
+            title={b.disabledHint ?? `${b.label} map`}
+          >
+            {b.icon}
+            <span>{b.label}</span>
+          </button>
+        ))}
+      </div>
 
       <div className="cams" role="group" aria-label="Camera">
         {CAMERAS.map((c) => (

@@ -21,7 +21,12 @@
    "pathM": 509.2,
    "maxUpM": 26.3,
    "maxGapS": 0.22,
-   "startVoltage": 24.22
+   "startVoltage": 24.22,
+   "origin": {
+    "lat": 40.4580473,
+    "lon": -79.7823961,
+    "altM": 269.3
+   }
   },
   {
    "id": 2,
@@ -36,7 +41,12 @@
    "pathM": 607.2,
    "maxUpM": 52.6,
    "maxGapS": 0.3,
-   "startVoltage": 23.18
+   "startVoltage": 23.18,
+   "origin": {
+    "lat": 40.4580378,
+    "lon": -79.7823791,
+    "altM": 268.5
+   }
   },
   {
    "id": 3,
@@ -51,7 +61,12 @@
    "pathM": 541.4,
    "maxUpM": 24.7,
    "maxGapS": 0.3,
-   "startVoltage": 25.4
+   "startVoltage": 25.4,
+   "origin": {
+    "lat": 40.4580594,
+    "lon": -79.7823649,
+    "altM": 268.8
+   }
   },
   {
    "id": 4,
@@ -66,7 +81,12 @@
    "pathM": 522.9,
    "maxUpM": 25.6,
    "maxGapS": 0.3,
-   "startVoltage": 24.13
+   "startVoltage": 24.13,
+   "origin": {
+    "lat": 40.4580706,
+    "lon": -79.782393,
+    "altM": 267.6
+   }
   },
   {
    "id": 5,
@@ -81,7 +101,12 @@
    "pathM": 426.3,
    "maxUpM": 24.3,
    "maxGapS": 0.3,
-   "startVoltage": 23.46
+   "startVoltage": 23.46,
+   "origin": {
+    "lat": 40.4583653,
+    "lon": -79.7826,
+    "altM": 270.3
+   }
   },
   {
    "id": 6,
@@ -96,7 +121,12 @@
    "pathM": 465.2,
    "maxUpM": 23.9,
    "maxGapS": 0.29,
-   "startVoltage": 22.63
+   "startVoltage": 22.63,
+   "origin": {
+    "lat": 40.4583639,
+    "lon": -79.7826007,
+    "altM": 267.2
+   }
   },
   {
    "id": 7,
@@ -111,7 +141,12 @@
    "pathM": 473.7,
    "maxUpM": 24.4,
    "maxGapS": 0.21,
-   "startVoltage": 24.41
+   "startVoltage": 24.41,
+   "origin": {
+    "lat": 40.4590287,
+    "lon": -79.7827966,
+    "altM": 266.6
+   }
   },
   {
    "id": 8,
@@ -126,7 +161,12 @@
    "pathM": 468.6,
    "maxUpM": 23.4,
    "maxGapS": 0.22,
-   "startVoltage": 23.35
+   "startVoltage": 23.35,
+   "origin": {
+    "lat": 40.4590233,
+    "lon": -79.7827988,
+    "altM": 267.9
+   }
   },
   {
    "id": 10,
@@ -141,7 +181,12 @@
    "pathM": 466.4,
    "maxUpM": 26.2,
    "maxGapS": 0.23,
-   "startVoltage": 25.74
+   "startVoltage": 25.74,
+   "origin": {
+    "lat": 40.4590446,
+    "lon": -79.7828071,
+    "altM": 266.2
+   }
   },
   {
    "id": 12,
@@ -156,7 +201,12 @@
    "pathM": 471.8,
    "maxUpM": 26.0,
    "maxGapS": 0.21,
-   "startVoltage": 24.12
+   "startVoltage": 24.12,
+   "origin": {
+    "lat": 40.4590429,
+    "lon": -79.7828242,
+    "altM": 264.7
+   }
   },
   {
    "id": 14,
@@ -171,7 +221,12 @@
    "pathM": 482.1,
    "maxUpM": 24.1,
    "maxGapS": 0.21,
-   "startVoltage": 22.93
+   "startVoltage": 22.93,
+   "origin": {
+    "lat": 40.4590452,
+    "lon": -79.782826,
+    "altM": 267.2
+   }
   },
   {
    "id": 15,
@@ -186,7 +241,12 @@
    "pathM": 470.5,
    "maxUpM": 25.4,
    "maxGapS": 0.22,
-   "startVoltage": 24.99
+   "startVoltage": 24.99,
+   "origin": {
+    "lat": 40.4590162,
+    "lon": -79.782808,
+    "altM": 267.3
+   }
   },
   {
    "id": 16,
@@ -201,7 +261,12 @@
    "pathM": 468.6,
    "maxUpM": 25.0,
    "maxGapS": 0.22,
-   "startVoltage": 24.08
+   "startVoltage": 24.08,
+   "origin": {
+    "lat": 40.4590454,
+    "lon": -79.7828034,
+    "altM": 267.7
+   }
   },
   {
    "id": 17,
@@ -216,7 +281,12 @@
    "pathM": 467.9,
    "maxUpM": 25.3,
    "maxGapS": 0.21,
-   "startVoltage": 23.18
+   "startVoltage": 23.18,
+   "origin": {
+    "lat": 40.4590442,
+    "lon": -79.7827953,
+    "altM": 267.3
+   }
   },
   {
    "id": 18,
@@ -231,7 +301,12 @@
    "pathM": 469.5,
    "maxUpM": 25.1,
    "maxGapS": 0.31,
-   "startVoltage": 25.48
+   "startVoltage": 25.48,
+   "origin": {
+    "lat": 40.4590376,
+    "lon": -79.7828106,
+    "altM": 267.7
+   }
   },
   {
    "id": 20,
@@ -246,7 +321,12 @@
    "pathM": 475.0,
    "maxUpM": 48.8,
    "maxGapS": 0.3,
-   "startVoltage": 23.16
+   "startVoltage": 23.16,
+   "origin": {
+    "lat": 40.4590432,
+    "lon": -79.7828013,
+    "altM": 271.1
+   }
   },
   {
    "id": 23,
@@ -261,7 +341,12 @@
    "pathM": 473.3,
    "maxUpM": 50.0,
    "maxGapS": 0.22,
-   "startVoltage": 23.42
+   "startVoltage": 23.42,
+   "origin": {
+    "lat": 40.4590422,
+    "lon": -79.7827884,
+    "altM": 269.3
+   }
   },
   {
    "id": 59,
@@ -276,7 +361,12 @@
    "pathM": 469.1,
    "maxUpM": 51.7,
    "maxGapS": 0.29,
-   "startVoltage": 23.6
+   "startVoltage": 23.6,
+   "origin": {
+    "lat": 40.4589777,
+    "lon": -79.7827628,
+    "altM": 264.2
+   }
   },
   {
    "id": 60,
@@ -291,7 +381,12 @@
    "pathM": 470.2,
    "maxUpM": 77.8,
    "maxGapS": 0.21,
-   "startVoltage": 20.86
+   "startVoltage": 20.86,
+   "origin": {
+    "lat": 40.4589913,
+    "lon": -79.7827522,
+    "altM": 265.5
+   }
   },
   {
    "id": 68,
@@ -306,7 +401,12 @@
    "pathM": 476.9,
    "maxUpM": 100.3,
    "maxGapS": 0.29,
-   "startVoltage": 20.99
+   "startVoltage": 20.99,
+   "origin": {
+    "lat": 40.4590281,
+    "lon": -79.7827905,
+    "altM": 267.7
+   }
   },
   {
    "id": 76,
@@ -321,7 +421,12 @@
    "pathM": 467.7,
    "maxUpM": 25.3,
    "maxGapS": 0.29,
-   "startVoltage": 23.66
+   "startVoltage": 23.66,
+   "origin": {
+    "lat": 40.4589915,
+    "lon": -79.7827486,
+    "altM": 272.2
+   }
   },
   {
    "id": 77,
@@ -336,7 +441,12 @@
    "pathM": 470.0,
    "maxUpM": 25.9,
    "maxGapS": 0.3,
-   "startVoltage": 25.73
+   "startVoltage": 25.73,
+   "origin": {
+    "lat": 40.4589989,
+    "lon": -79.7827601,
+    "altM": 270.5
+   }
   },
   {
    "id": 78,
@@ -351,7 +461,12 @@
    "pathM": 471.7,
    "maxUpM": 56.3,
    "maxGapS": 0.3,
-   "startVoltage": 24.98
+   "startVoltage": 24.98,
+   "origin": {
+    "lat": 40.4589942,
+    "lon": -79.7828039,
+    "altM": 269.1
+   }
   },
   {
    "id": 79,
@@ -366,7 +481,12 @@
    "pathM": 473.8,
    "maxUpM": 49.0,
    "maxGapS": 0.3,
-   "startVoltage": 23.98
+   "startVoltage": 23.98,
+   "origin": {
+    "lat": 40.458991,
+    "lon": -79.7827744,
+    "altM": 270.3
+   }
   },
   {
    "id": 80,
@@ -381,7 +501,12 @@
    "pathM": 481.5,
    "maxUpM": 49.4,
    "maxGapS": 0.21,
-   "startVoltage": 23.25
+   "startVoltage": 23.25,
+   "origin": {
+    "lat": 40.458996,
+    "lon": -79.782815,
+    "altM": 270.1
+   }
   },
   {
    "id": 81,
@@ -396,7 +521,12 @@
    "pathM": 473.8,
    "maxUpM": 74.2,
    "maxGapS": 0.21,
-   "startVoltage": 25.35
+   "startVoltage": 25.35,
+   "origin": {
+    "lat": 40.4589968,
+    "lon": -79.7827904,
+    "altM": 269.2
+   }
   },
   {
    "id": 82,
@@ -411,7 +541,12 @@
    "pathM": 468.7,
    "maxUpM": 74.6,
    "maxGapS": 0.23,
-   "startVoltage": 24.12
+   "startVoltage": 24.12,
+   "origin": {
+    "lat": 40.458968,
+    "lon": -79.7827727,
+    "altM": 269.0
+   }
   },
   {
    "id": 83,
@@ -426,7 +561,12 @@
    "pathM": 474.3,
    "maxUpM": 73.0,
    "maxGapS": 0.32,
-   "startVoltage": 23.16
+   "startVoltage": 23.16,
+   "origin": {
+    "lat": 40.4589628,
+    "lon": -79.7827781,
+    "altM": 269.3
+   }
   },
   {
    "id": 84,
@@ -441,7 +581,12 @@
    "pathM": 473.1,
    "maxUpM": 96.4,
    "maxGapS": 0.3,
-   "startVoltage": 25.71
+   "startVoltage": 25.71,
+   "origin": {
+    "lat": 40.4589656,
+    "lon": -79.7827725,
+    "altM": 271.1
+   }
   },
   {
    "id": 85,
@@ -456,7 +601,12 @@
    "pathM": 479.7,
    "maxUpM": 98.2,
    "maxGapS": 0.3,
-   "startVoltage": 24.44
+   "startVoltage": 24.44,
+   "origin": {
+    "lat": 40.4589967,
+    "lon": -79.7827763,
+    "altM": 272.6
+   }
   },
   {
    "id": 86,
@@ -471,7 +621,12 @@
    "pathM": 478.8,
    "maxUpM": 97.4,
    "maxGapS": 0.29,
-   "startVoltage": 23.4
+   "startVoltage": 23.4,
+   "origin": {
+    "lat": 40.4589938,
+    "lon": -79.7827833,
+    "altM": 273.4
+   }
   },
   {
    "id": 87,
@@ -486,7 +641,12 @@
    "pathM": 474.6,
    "maxUpM": 100.6,
    "maxGapS": 0.3,
-   "startVoltage": 25.67
+   "startVoltage": 25.67,
+   "origin": {
+    "lat": 40.4589772,
+    "lon": -79.7827926,
+    "altM": 268.6
+   }
   },
   {
    "id": 88,
@@ -501,7 +661,12 @@
    "pathM": 477.6,
    "maxUpM": 96.5,
    "maxGapS": 0.22,
-   "startVoltage": 23.79
+   "startVoltage": 23.79,
+   "origin": {
+    "lat": 40.4589875,
+    "lon": -79.7828175,
+    "altM": 273.4
+   }
   },
   {
    "id": 91,
@@ -516,7 +681,12 @@
    "pathM": 475.2,
    "maxUpM": 75.1,
    "maxGapS": 0.22,
-   "startVoltage": 25.04
+   "startVoltage": 25.04,
+   "origin": {
+    "lat": 40.4589923,
+    "lon": -79.7827752,
+    "altM": 266.3
+   }
   },
   {
    "id": 92,
@@ -531,7 +701,12 @@
    "pathM": 479.6,
    "maxUpM": 75.7,
    "maxGapS": 0.3,
-   "startVoltage": 23.69
+   "startVoltage": 23.69,
+   "origin": {
+    "lat": 40.4589975,
+    "lon": -79.7827677,
+    "altM": 267.1
+   }
   },
   {
    "id": 93,
@@ -546,7 +721,12 @@
    "pathM": 468.7,
    "maxUpM": 51.5,
    "maxGapS": 0.21,
-   "startVoltage": 25.45
+   "startVoltage": 25.45,
+   "origin": {
+    "lat": 40.4589909,
+    "lon": -79.7827648,
+    "altM": 265.3
+   }
   },
   {
    "id": 94,
@@ -561,7 +741,12 @@
    "pathM": 463.1,
    "maxUpM": 50.8,
    "maxGapS": 0.29,
-   "startVoltage": 24.3
+   "startVoltage": 24.3,
+   "origin": {
+    "lat": 40.459003,
+    "lon": -79.7827838,
+    "altM": 262.8
+   }
   },
   {
    "id": 95,
@@ -576,7 +761,12 @@
    "pathM": 470.4,
    "maxUpM": 54.7,
    "maxGapS": 0.31,
-   "startVoltage": 23.1
+   "startVoltage": 23.1,
+   "origin": {
+    "lat": 40.4589947,
+    "lon": -79.7827766,
+    "altM": 260.1
+   }
   },
   {
    "id": 96,
@@ -591,7 +781,12 @@
    "pathM": 467.6,
    "maxUpM": 79.5,
    "maxGapS": 0.3,
-   "startVoltage": 25.74
+   "startVoltage": 25.74,
+   "origin": {
+    "lat": 40.4590025,
+    "lon": -79.7827941,
+    "altM": 261.4
+   }
   },
   {
    "id": 97,
@@ -606,7 +801,12 @@
    "pathM": 468.0,
    "maxUpM": 81.2,
    "maxGapS": 0.22,
-   "startVoltage": 24.39
+   "startVoltage": 24.39,
+   "origin": {
+    "lat": 40.4589639,
+    "lon": -79.7828062,
+    "altM": 258.4
+   }
   },
   {
    "id": 98,
@@ -621,7 +821,12 @@
    "pathM": 469.5,
    "maxUpM": 23.8,
    "maxGapS": 0.22,
-   "startVoltage": 22.98
+   "startVoltage": 22.98,
+   "origin": {
+    "lat": 40.4589628,
+    "lon": -79.7827952,
+    "altM": 266.1
+   }
   },
   {
    "id": 99,
@@ -636,7 +841,12 @@
    "pathM": 472.1,
    "maxUpM": 76.7,
    "maxGapS": 0.29,
-   "startVoltage": 25.57
+   "startVoltage": 25.57,
+   "origin": {
+    "lat": 40.4589799,
+    "lon": -79.7827814,
+    "altM": 264.9
+   }
   },
   {
    "id": 100,
@@ -651,7 +861,12 @@
    "pathM": 469.8,
    "maxUpM": 54.1,
    "maxGapS": 0.3,
-   "startVoltage": 24.34
+   "startVoltage": 24.34,
+   "origin": {
+    "lat": 40.4589738,
+    "lon": -79.7827805,
+    "altM": 261.3
+   }
   },
   {
    "id": 101,
@@ -666,7 +881,12 @@
    "pathM": 466.1,
    "maxUpM": 51.2,
    "maxGapS": 0.29,
-   "startVoltage": 23.49
+   "startVoltage": 23.49,
+   "origin": {
+    "lat": 40.4589744,
+    "lon": -79.7827586,
+    "altM": 265.5
+   }
   },
   {
    "id": 102,
@@ -681,7 +901,12 @@
    "pathM": 460.7,
    "maxUpM": 103.6,
    "maxGapS": 0.22,
-   "startVoltage": 25.36
+   "startVoltage": 25.36,
+   "origin": {
+    "lat": 40.4589732,
+    "lon": -79.782786,
+    "altM": 262.9
+   }
   },
   {
    "id": 105,
@@ -696,7 +921,12 @@
    "pathM": 466.3,
    "maxUpM": 100.6,
    "maxGapS": 0.32,
-   "startVoltage": 25.66
+   "startVoltage": 25.66,
+   "origin": {
+    "lat": 40.4589739,
+    "lon": -79.7827505,
+    "altM": 267.7
+   }
   },
   {
    "id": 106,
@@ -711,7 +941,12 @@
    "pathM": 471.8,
    "maxUpM": 100.3,
    "maxGapS": 0.3,
-   "startVoltage": 24.17
+   "startVoltage": 24.17,
+   "origin": {
+    "lat": 40.4589704,
+    "lon": -79.7828017,
+    "altM": 269.0
+   }
   },
   {
    "id": 107,
@@ -726,7 +961,12 @@
    "pathM": 480.1,
    "maxUpM": 101.0,
    "maxGapS": 0.32,
-   "startVoltage": 23.08
+   "startVoltage": 23.08,
+   "origin": {
+    "lat": 40.4589802,
+    "lon": -79.7828035,
+    "altM": 269.0
+   }
   },
   {
    "id": 112,
@@ -741,7 +981,12 @@
    "pathM": 464.0,
    "maxUpM": 75.1,
    "maxGapS": 0.9,
-   "startVoltage": 23.74
+   "startVoltage": 23.74,
+   "origin": {
+    "lat": 40.458939,
+    "lon": -79.7828172,
+    "altM": 268.8
+   }
   },
   {
    "id": 109,
@@ -756,7 +1001,12 @@
    "pathM": 466.7,
    "maxUpM": 75.5,
    "maxGapS": 1.1,
-   "startVoltage": 24.0
+   "startVoltage": 24.0,
+   "origin": {
+    "lat": 40.4589314,
+    "lon": -79.7828324,
+    "altM": 269.1
+   }
   },
   {
    "id": 110,
@@ -771,7 +1021,12 @@
    "pathM": 464.3,
    "maxUpM": 76.3,
    "maxGapS": 1.7,
-   "startVoltage": 25.76
+   "startVoltage": 25.76,
+   "origin": {
+    "lat": 40.4589173,
+    "lon": -79.7828398,
+    "altM": 269.4
+   }
   },
   {
    "id": 111,
@@ -786,7 +1041,12 @@
    "pathM": 470.7,
    "maxUpM": 27.3,
    "maxGapS": 0.22,
-   "startVoltage": 24.47
+   "startVoltage": 24.47,
+   "origin": {
+    "lat": 40.458935,
+    "lon": -79.7828322,
+    "altM": 266.3
+   }
   },
   {
    "id": 113,
@@ -801,7 +1061,12 @@
    "pathM": 469.7,
    "maxUpM": 101.0,
    "maxGapS": 1.8,
-   "startVoltage": 25.79
+   "startVoltage": 25.79,
+   "origin": {
+    "lat": 40.4589183,
+    "lon": -79.7828261,
+    "altM": 268.8
+   }
   },
   {
    "id": 114,
@@ -816,7 +1081,12 @@
    "pathM": 470.7,
    "maxUpM": 75.3,
    "maxGapS": 0.79,
-   "startVoltage": 24.63
+   "startVoltage": 24.63,
+   "origin": {
+    "lat": 40.4589167,
+    "lon": -79.7828229,
+    "altM": 268.0
+   }
   },
   {
    "id": 115,
@@ -831,7 +1101,12 @@
    "pathM": 471.5,
    "maxUpM": 26.6,
    "maxGapS": 0.3,
-   "startVoltage": 23.67
+   "startVoltage": 23.67,
+   "origin": {
+    "lat": 40.4589158,
+    "lon": -79.7828211,
+    "altM": 266.3
+   }
   },
   {
    "id": 116,
@@ -846,7 +1121,12 @@
    "pathM": 467.8,
    "maxUpM": 26.3,
    "maxGapS": 0.3,
-   "startVoltage": 22.99
+   "startVoltage": 22.99,
+   "origin": {
+    "lat": 40.458911,
+    "lon": -79.7828203,
+    "altM": 266.5
+   }
   },
   {
    "id": 117,
@@ -861,7 +1141,12 @@
    "pathM": 475.8,
    "maxUpM": 49.4,
    "maxGapS": 0.32,
-   "startVoltage": 22.61
+   "startVoltage": 22.61,
+   "origin": {
+    "lat": 40.4589042,
+    "lon": -79.782827,
+    "altM": 269.1
+   }
   },
   {
    "id": 118,
@@ -876,7 +1161,12 @@
    "pathM": 468.6,
    "maxUpM": 100.5,
    "maxGapS": 0.8,
-   "startVoltage": 25.65
+   "startVoltage": 25.65,
+   "origin": {
+    "lat": 40.458896,
+    "lon": -79.7828506,
+    "altM": 269.2
+   }
   },
   {
    "id": 119,
@@ -891,7 +1181,12 @@
    "pathM": 471.0,
    "maxUpM": 51.9,
    "maxGapS": 0.31,
-   "startVoltage": 23.89
+   "startVoltage": 23.89,
+   "origin": {
+    "lat": 40.4588915,
+    "lon": -79.7828579,
+    "altM": 267.9
+   }
   },
   {
    "id": 108,
@@ -906,7 +1201,12 @@
    "pathM": 466.4,
    "maxUpM": 25.3,
    "maxGapS": 1.4,
-   "startVoltage": 25.01
+   "startVoltage": 25.01,
+   "origin": {
+    "lat": 40.4589274,
+    "lon": -79.7828486,
+    "altM": 270.6
+   }
   },
   {
    "id": 120,
@@ -921,7 +1221,12 @@
    "pathM": 467.2,
    "maxUpM": 25.3,
    "maxGapS": 0.51,
-   "startVoltage": 25.14
+   "startVoltage": 25.14,
+   "origin": {
+    "lat": 40.458953,
+    "lon": -79.7827752,
+    "altM": 269.1
+   }
   },
   {
    "id": 121,
@@ -936,7 +1241,12 @@
    "pathM": 465.5,
    "maxUpM": 50.2,
    "maxGapS": 0.3,
-   "startVoltage": 24.22
+   "startVoltage": 24.22,
+   "origin": {
+    "lat": 40.4589389,
+    "lon": -79.7827542,
+    "altM": 267.4
+   }
   },
   {
    "id": 122,
@@ -951,7 +1261,12 @@
    "pathM": 480.3,
    "maxUpM": 75.7,
    "maxGapS": 0.3,
-   "startVoltage": 25.75
+   "startVoltage": 25.75,
+   "origin": {
+    "lat": 40.4589173,
+    "lon": -79.7828386,
+    "altM": 268.9
+   }
   },
   {
    "id": 123,
@@ -966,7 +1281,12 @@
    "pathM": 474.2,
    "maxUpM": 105.0,
    "maxGapS": 0.6,
-   "startVoltage": 24.62
+   "startVoltage": 24.62,
+   "origin": {
+    "lat": 40.458909,
+    "lon": -79.7828484,
+    "altM": 263.5
+   }
   },
   {
    "id": 124,
@@ -981,7 +1301,12 @@
    "pathM": 473.6,
    "maxUpM": 27.4,
    "maxGapS": 0.4,
-   "startVoltage": 23.34
+   "startVoltage": 23.34,
+   "origin": {
+    "lat": 40.4588917,
+    "lon": -79.7828642,
+    "altM": 265.5
+   }
   },
   {
    "id": 125,
@@ -996,7 +1321,12 @@
    "pathM": 465.9,
    "maxUpM": 81.3,
    "maxGapS": 1.0,
-   "startVoltage": 25.81
+   "startVoltage": 25.81,
+   "origin": {
+    "lat": 40.4589059,
+    "lon": -79.782843,
+    "altM": 263.9
+   }
   },
   {
    "id": 126,
@@ -1011,7 +1341,12 @@
    "pathM": 479.5,
    "maxUpM": 101.3,
    "maxGapS": 1.0,
-   "startVoltage": 24.4
+   "startVoltage": 24.4,
+   "origin": {
+    "lat": 40.4589016,
+    "lon": -79.7828328,
+    "altM": 269.5
+   }
   },
   {
    "id": 127,
@@ -1026,7 +1361,12 @@
    "pathM": 471.6,
    "maxUpM": 52.4,
    "maxGapS": 0.3,
-   "startVoltage": 25.68
+   "startVoltage": 25.68,
+   "origin": {
+    "lat": 40.458912,
+    "lon": -79.7828293,
+    "altM": 268.7
+   }
   },
   {
    "id": 128,
@@ -1041,7 +1381,12 @@
    "pathM": 474.4,
    "maxUpM": 101.4,
    "maxGapS": 0.79,
-   "startVoltage": 24.66
+   "startVoltage": 24.66,
+   "origin": {
+    "lat": 40.4588943,
+    "lon": -79.7828373,
+    "altM": 269.8
+   }
   },
   {
    "id": 129,
@@ -1056,7 +1401,12 @@
    "pathM": 480.0,
    "maxUpM": 76.2,
    "maxGapS": 0.39,
-   "startVoltage": 23.6
+   "startVoltage": 23.6,
+   "origin": {
+    "lat": 40.4589146,
+    "lon": -79.7828312,
+    "altM": 269.1
+   }
   },
   {
    "id": 130,
@@ -1071,7 +1421,12 @@
    "pathM": 471.9,
    "maxUpM": 49.0,
    "maxGapS": 0.4,
-   "startVoltage": 25.79
+   "startVoltage": 25.79,
+   "origin": {
+    "lat": 40.4589052,
+    "lon": -79.782859,
+    "altM": 270.3
+   }
   },
   {
    "id": 131,
@@ -1086,7 +1441,12 @@
    "pathM": 470.6,
    "maxUpM": 104.0,
    "maxGapS": 0.7,
-   "startVoltage": 24.75
+   "startVoltage": 24.75,
+   "origin": {
+    "lat": 40.4588976,
+    "lon": -79.7828518,
+    "altM": 268.5
+   }
   },
   {
    "id": 134,
@@ -1101,7 +1461,12 @@
    "pathM": 462.0,
    "maxUpM": 53.3,
    "maxGapS": 0.3,
-   "startVoltage": 25.62
+   "startVoltage": 25.62,
+   "origin": {
+    "lat": 40.4589936,
+    "lon": -79.7827328,
+    "altM": 262.9
+   }
   },
   {
    "id": 135,
@@ -1116,7 +1481,12 @@
    "pathM": 455.1,
    "maxUpM": 26.3,
    "maxGapS": 0.31,
-   "startVoltage": 24.62
+   "startVoltage": 24.62,
+   "origin": {
+    "lat": 40.4589985,
+    "lon": -79.782726,
+    "altM": 266.5
+   }
   },
   {
    "id": 136,
@@ -1131,7 +1501,12 @@
    "pathM": 460.0,
    "maxUpM": 25.1,
    "maxGapS": 0.22,
-   "startVoltage": 23.45
+   "startVoltage": 23.45,
+   "origin": {
+    "lat": 40.4589832,
+    "lon": -79.7827106,
+    "altM": 267.8
+   }
   },
   {
    "id": 137,
@@ -1146,7 +1521,12 @@
    "pathM": 469.2,
    "maxUpM": 102.3,
    "maxGapS": 0.3,
-   "startVoltage": 25.71
+   "startVoltage": 25.71,
+   "origin": {
+    "lat": 40.4589975,
+    "lon": -79.7827405,
+    "altM": 268.9
+   }
   },
   {
    "id": 138,
@@ -1161,7 +1541,12 @@
    "pathM": 475.3,
    "maxUpM": 102.3,
    "maxGapS": 0.31,
-   "startVoltage": 24.34
+   "startVoltage": 24.34,
+   "origin": {
+    "lat": 40.4590138,
+    "lon": -79.7827395,
+    "altM": 270.1
+   }
   },
   {
    "id": 139,
@@ -1176,7 +1561,12 @@
    "pathM": 465.4,
    "maxUpM": 48.6,
    "maxGapS": 0.3,
-   "startVoltage": 23.18
+   "startVoltage": 23.18,
+   "origin": {
+    "lat": 40.4590608,
+    "lon": -79.7826836,
+    "altM": 274.6
+   }
   },
   {
    "id": 140,
@@ -1191,7 +1581,12 @@
    "pathM": 455.9,
    "maxUpM": 24.1,
    "maxGapS": 1.1,
-   "startVoltage": 25.62
+   "startVoltage": 25.62,
+   "origin": {
+    "lat": 40.4590411,
+    "lon": -79.7826872,
+    "altM": 275.0
+   }
   },
   {
    "id": 141,
@@ -1206,7 +1601,12 @@
    "pathM": 480.4,
    "maxUpM": 77.5,
    "maxGapS": 0.89,
-   "startVoltage": 24.33
+   "startVoltage": 24.33,
+   "origin": {
+    "lat": 40.4590333,
+    "lon": -79.7827031,
+    "altM": 271.4
+   }
   },
   {
    "id": 142,
@@ -1221,7 +1621,12 @@
    "pathM": 466.5,
    "maxUpM": 76.6,
    "maxGapS": 0.22,
-   "startVoltage": 25.01
+   "startVoltage": 25.01,
+   "origin": {
+    "lat": 40.4589752,
+    "lon": -79.7827698,
+    "altM": 268.4
+   }
   },
   {
    "id": 143,
@@ -1236,7 +1641,12 @@
    "pathM": 469.6,
    "maxUpM": 71.1,
    "maxGapS": 0.22,
-   "startVoltage": 23.91
+   "startVoltage": 23.91,
+   "origin": {
+    "lat": 40.4589905,
+    "lon": -79.782746,
+    "altM": 279.5
+   }
   },
   {
    "id": 144,
@@ -1251,7 +1661,12 @@
    "pathM": 465.8,
    "maxUpM": 49.3,
    "maxGapS": 0.3,
-   "startVoltage": 23.11
+   "startVoltage": 23.11,
+   "origin": {
+    "lat": 40.458983,
+    "lon": -79.7827193,
+    "altM": 272.6
+   }
   },
   {
    "id": 145,
@@ -1266,7 +1681,12 @@
    "pathM": 467.0,
    "maxUpM": 101.8,
    "maxGapS": 0.4,
-   "startVoltage": 25.84
+   "startVoltage": 25.84,
+   "origin": {
+    "lat": 40.4589753,
+    "lon": -79.7827788,
+    "altM": 270.1
+   }
   },
   {
    "id": 146,
@@ -1281,7 +1701,12 @@
    "pathM": 464.1,
    "maxUpM": 21.5,
    "maxGapS": 0.3,
-   "startVoltage": 24.36
+   "startVoltage": 24.36,
+   "origin": {
+    "lat": 40.4589585,
+    "lon": -79.782755,
+    "altM": 277.2
+   }
   },
   {
    "id": 147,
@@ -1296,7 +1721,12 @@
    "pathM": 465.0,
    "maxUpM": 76.8,
    "maxGapS": 0.22,
-   "startVoltage": 23.72
+   "startVoltage": 23.72,
+   "origin": {
+    "lat": 40.4589622,
+    "lon": -79.7827399,
+    "altM": 269.8
+   }
   },
   {
    "id": 148,
@@ -1311,7 +1741,12 @@
    "pathM": 466.1,
    "maxUpM": 51.7,
    "maxGapS": 0.22,
-   "startVoltage": 22.84
+   "startVoltage": 22.84,
+   "origin": {
+    "lat": 40.4589871,
+    "lon": -79.7827532,
+    "altM": 268.9
+   }
   },
   {
    "id": 150,
@@ -1326,7 +1761,12 @@
    "pathM": 468.6,
    "maxUpM": 101.9,
    "maxGapS": 0.3,
-   "startVoltage": 24.58
+   "startVoltage": 24.58,
+   "origin": {
+    "lat": 40.4589472,
+    "lon": -79.7827781,
+    "altM": 271.3
+   }
   },
   {
    "id": 149,
@@ -1341,7 +1781,12 @@
    "pathM": 468.1,
    "maxUpM": 77.1,
    "maxGapS": 0.22,
-   "startVoltage": 25.62
+   "startVoltage": 25.62,
+   "origin": {
+    "lat": 40.4589591,
+    "lon": -79.7827942,
+    "altM": 271.0
+   }
   },
   {
    "id": 151,
@@ -1356,7 +1801,12 @@
    "pathM": 465.1,
    "maxUpM": 50.7,
    "maxGapS": 0.24,
-   "startVoltage": 23.63
+   "startVoltage": 23.63,
+   "origin": {
+    "lat": 40.4589595,
+    "lon": -79.7827649,
+    "altM": 272.3
+   }
   },
   {
    "id": 152,
@@ -1371,7 +1821,12 @@
    "pathM": 473.6,
    "maxUpM": 102.5,
    "maxGapS": 0.3,
-   "startVoltage": 22.99
+   "startVoltage": 22.99,
+   "origin": {
+    "lat": 40.4589589,
+    "lon": -79.7827783,
+    "altM": 270.5
+   }
   },
   {
    "id": 153,
@@ -1386,7 +1841,12 @@
    "pathM": 472.2,
    "maxUpM": 103.1,
    "maxGapS": 0.3,
-   "startVoltage": 25.71
+   "startVoltage": 25.71,
+   "origin": {
+    "lat": 40.4589816,
+    "lon": -79.7827921,
+    "altM": 270.3
+   }
   },
   {
    "id": 154,
@@ -1401,7 +1861,12 @@
    "pathM": 462.2,
    "maxUpM": 52.2,
    "maxGapS": 0.3,
-   "startVoltage": 24.55
+   "startVoltage": 24.55,
+   "origin": {
+    "lat": 40.4589837,
+    "lon": -79.7827692,
+    "altM": 269.1
+   }
   },
   {
    "id": 155,
@@ -1416,7 +1881,12 @@
    "pathM": 474.6,
    "maxUpM": 101.8,
    "maxGapS": 0.21,
-   "startVoltage": 23.53
+   "startVoltage": 23.53,
+   "origin": {
+    "lat": 40.4589854,
+    "lon": -79.7827609,
+    "altM": 270.7
+   }
   },
   {
    "id": 156,
@@ -1431,7 +1901,12 @@
    "pathM": 463.4,
    "maxUpM": 51.1,
    "maxGapS": 0.31,
-   "startVoltage": 25.76
+   "startVoltage": 25.76,
+   "origin": {
+    "lat": 40.4589915,
+    "lon": -79.7827688,
+    "altM": 271.2
+   }
   },
   {
    "id": 157,
@@ -1446,7 +1921,12 @@
    "pathM": 465.8,
    "maxUpM": 50.7,
    "maxGapS": 0.31,
-   "startVoltage": 24.31
+   "startVoltage": 24.31,
+   "origin": {
+    "lat": 40.4589882,
+    "lon": -79.7827595,
+    "altM": 272.1
+   }
   },
   {
    "id": 158,
@@ -1461,7 +1941,12 @@
    "pathM": 468.7,
    "maxUpM": 78.4,
    "maxGapS": 0.22,
-   "startVoltage": 23.48
+   "startVoltage": 23.48,
+   "origin": {
+    "lat": 40.458979,
+    "lon": -79.782763,
+    "altM": 269.5
+   }
   },
   {
    "id": 159,
@@ -1476,7 +1961,12 @@
    "pathM": 461.9,
    "maxUpM": 22.9,
    "maxGapS": 0.31,
-   "startVoltage": 25.45
+   "startVoltage": 25.45,
+   "origin": {
+    "lat": 40.4589923,
+    "lon": -79.7827451,
+    "altM": 276.2
+   }
   },
   {
    "id": 160,
@@ -1491,7 +1981,12 @@
    "pathM": 462.2,
    "maxUpM": 49.0,
    "maxGapS": 0.29,
-   "startVoltage": 24.39
+   "startVoltage": 24.39,
+   "origin": {
+    "lat": 40.4589943,
+    "lon": -79.7827209,
+    "altM": 275.5
+   }
   },
   {
    "id": 162,
@@ -1506,7 +2001,12 @@
    "pathM": 468.9,
    "maxUpM": 75.0,
    "maxGapS": 0.32,
-   "startVoltage": 23.19
+   "startVoltage": 23.19,
+   "origin": {
+    "lat": 40.458991,
+    "lon": -79.7827379,
+    "altM": 276.5
+   }
   },
   {
    "id": 163,
@@ -1521,7 +2021,12 @@
    "pathM": 468.2,
    "maxUpM": 77.4,
    "maxGapS": 0.31,
-   "startVoltage": 25.75
+   "startVoltage": 25.75,
+   "origin": {
+    "lat": 40.4589902,
+    "lon": -79.7827445,
+    "altM": 271.8
+   }
   },
   {
    "id": 164,
@@ -1536,7 +2041,12 @@
    "pathM": 476.0,
    "maxUpM": 102.7,
    "maxGapS": 0.3,
-   "startVoltage": 24.41
+   "startVoltage": 24.41,
+   "origin": {
+    "lat": 40.4589959,
+    "lon": -79.7827518,
+    "altM": 271.0
+   }
   },
   {
    "id": 165,
@@ -1551,7 +2061,12 @@
    "pathM": 473.2,
    "maxUpM": 77.2,
    "maxGapS": 0.3,
-   "startVoltage": 23.2
+   "startVoltage": 23.2,
+   "origin": {
+    "lat": 40.4590161,
+    "lon": -79.782751,
+    "altM": 272.3
+   }
   },
   {
    "id": 173,
@@ -1566,7 +2081,12 @@
    "pathM": 475.3,
    "maxUpM": 102.9,
    "maxGapS": 0.31,
-   "startVoltage": 24.32
+   "startVoltage": 24.32,
+   "origin": {
+    "lat": 40.4590133,
+    "lon": -79.7828133,
+    "altM": 267.8
+   }
   },
   {
    "id": 166,
@@ -1581,7 +2101,12 @@
    "pathM": 467.4,
    "maxUpM": 48.6,
    "maxGapS": 0.31,
-   "startVoltage": 25.62
+   "startVoltage": 25.62,
+   "origin": {
+    "lat": 40.4589839,
+    "lon": -79.7827773,
+    "altM": 270.8
+   }
   },
   {
    "id": 167,
@@ -1596,7 +2121,12 @@
    "pathM": 468.1,
    "maxUpM": 26.0,
    "maxGapS": 0.22,
-   "startVoltage": 24.4
+   "startVoltage": 24.4,
+   "origin": {
+    "lat": 40.4589955,
+    "lon": -79.7827811,
+    "altM": 269.1
+   }
   },
   {
    "id": 168,
@@ -1611,7 +2141,12 @@
    "pathM": 485.5,
    "maxUpM": 75.5,
    "maxGapS": 0.3,
-   "startVoltage": 23.59
+   "startVoltage": 23.59,
+   "origin": {
+    "lat": 40.4589828,
+    "lon": -79.7828018,
+    "altM": 267.7
+   }
   },
   {
    "id": 169,
@@ -1626,7 +2161,12 @@
    "pathM": 468.6,
    "maxUpM": 51.5,
    "maxGapS": 0.23,
-   "startVoltage": 25.37
+   "startVoltage": 25.37,
+   "origin": {
+    "lat": 40.4590207,
+    "lon": -79.7828021,
+    "altM": 266.2
+   }
   },
   {
    "id": 170,
@@ -1641,7 +2181,12 @@
    "pathM": 468.8,
    "maxUpM": 27.3,
    "maxGapS": 0.24,
-   "startVoltage": 24.36
+   "startVoltage": 24.36,
+   "origin": {
+    "lat": 40.4590315,
+    "lon": -79.7827895,
+    "altM": 269.0
+   }
   },
   {
    "id": 171,
@@ -1656,7 +2201,12 @@
    "pathM": 475.6,
    "maxUpM": 25.6,
    "maxGapS": 0.21,
-   "startVoltage": 23.57
+   "startVoltage": 23.57,
+   "origin": {
+    "lat": 40.4590206,
+    "lon": -79.7827961,
+    "altM": 270.1
+   }
   },
   {
    "id": 172,
@@ -1671,7 +2221,12 @@
    "pathM": 476.1,
    "maxUpM": 102.1,
    "maxGapS": 0.23,
-   "startVoltage": 25.52
+   "startVoltage": 25.52,
+   "origin": {
+    "lat": 40.4590309,
+    "lon": -79.7827998,
+    "altM": 269.1
+   }
   },
   {
    "id": 174,
@@ -1686,7 +2241,12 @@
    "pathM": 476.6,
    "maxUpM": 76.6,
    "maxGapS": 0.3,
-   "startVoltage": 23.17
+   "startVoltage": 23.17,
+   "origin": {
+    "lat": 40.4590154,
+    "lon": -79.7827816,
+    "altM": 270.8
+   }
   },
   {
    "id": 175,
@@ -1701,7 +2261,12 @@
    "pathM": 473.7,
    "maxUpM": 77.5,
    "maxGapS": 0.21,
-   "startVoltage": 25.75
+   "startVoltage": 25.75,
+   "origin": {
+    "lat": 40.4590434,
+    "lon": -79.7827967,
+    "altM": 268.8
+   }
   },
   {
    "id": 176,
@@ -1716,7 +2281,12 @@
    "pathM": 474.5,
    "maxUpM": 101.0,
    "maxGapS": 0.22,
-   "startVoltage": 24.68
+   "startVoltage": 24.68,
+   "origin": {
+    "lat": 40.459029,
+    "lon": -79.782787,
+    "altM": 271.0
+   }
   },
   {
    "id": 177,
@@ -1731,7 +2301,12 @@
    "pathM": 472.0,
    "maxUpM": 27.0,
    "maxGapS": 0.31,
-   "startVoltage": 23.6
+   "startVoltage": 23.6,
+   "origin": {
+    "lat": 40.4590347,
+    "lon": -79.7828127,
+    "altM": 266.9
+   }
   },
   {
    "id": 178,
@@ -1746,7 +2321,12 @@
    "pathM": 468.9,
    "maxUpM": 25.1,
    "maxGapS": 0.3,
-   "startVoltage": 25.48
+   "startVoltage": 25.48,
+   "origin": {
+    "lat": 40.4589377,
+    "lon": -79.7827957,
+    "altM": 270.5
+   }
   },
   {
    "id": 179,
@@ -1761,7 +2341,12 @@
    "pathM": 464.2,
    "maxUpM": 101.8,
    "maxGapS": 0.23,
-   "startVoltage": 24.67
+   "startVoltage": 24.67,
+   "origin": {
+    "lat": 40.4589207,
+    "lon": -79.7827934,
+    "altM": 268.4
+   }
   },
   {
    "id": 180,
@@ -1776,7 +2361,12 @@
    "pathM": 471.9,
    "maxUpM": 77.1,
    "maxGapS": 0.31,
-   "startVoltage": 23.35
+   "startVoltage": 23.35,
+   "origin": {
+    "lat": 40.4589222,
+    "lon": -79.7828027,
+    "altM": 268.5
+   }
   },
   {
    "id": 181,
@@ -1791,7 +2381,12 @@
    "pathM": 465.0,
    "maxUpM": 53.4,
    "maxGapS": 0.3,
-   "startVoltage": 25.68
+   "startVoltage": 25.68,
+   "origin": {
+    "lat": 40.4589446,
+    "lon": -79.7828323,
+    "altM": 267.2
+   }
   },
   {
    "id": 182,
@@ -1806,7 +2401,12 @@
    "pathM": 466.9,
    "maxUpM": 48.8,
    "maxGapS": 0.3,
-   "startVoltage": 24.47
+   "startVoltage": 24.47,
+   "origin": {
+    "lat": 40.4589254,
+    "lon": -79.7828158,
+    "altM": 270.6
+   }
   },
   {
    "id": 183,
@@ -1821,7 +2421,12 @@
    "pathM": 467.9,
    "maxUpM": 26.3,
    "maxGapS": 0.21,
-   "startVoltage": 23.47
+   "startVoltage": 23.47,
+   "origin": {
+    "lat": 40.4589273,
+    "lon": -79.7828041,
+    "altM": 267.7
+   }
   },
   {
    "id": 184,
@@ -1836,7 +2441,12 @@
    "pathM": 465.2,
    "maxUpM": 101.3,
    "maxGapS": 0.3,
-   "startVoltage": 25.8
+   "startVoltage": 25.8,
+   "origin": {
+    "lat": 40.458931,
+    "lon": -79.7828103,
+    "altM": 269.8
+   }
   },
   {
    "id": 185,
@@ -1851,7 +2461,12 @@
    "pathM": 469.7,
    "maxUpM": 51.2,
    "maxGapS": 0.22,
-   "startVoltage": 24.09
+   "startVoltage": 24.09,
+   "origin": {
+    "lat": 40.458931,
+    "lon": -79.7828167,
+    "altM": 268.4
+   }
   },
   {
    "id": 186,
@@ -1866,7 +2481,12 @@
    "pathM": 469.3,
    "maxUpM": 74.5,
    "maxGapS": 0.21,
-   "startVoltage": 23.28
+   "startVoltage": 23.28,
+   "origin": {
+    "lat": 40.4589224,
+    "lon": -79.7828208,
+    "altM": 269.6
+   }
   },
   {
    "id": 187,
@@ -1881,7 +2501,12 @@
    "pathM": 469.7,
    "maxUpM": 24.3,
    "maxGapS": 0.31,
-   "startVoltage": 25.71
+   "startVoltage": 25.71,
+   "origin": {
+    "lat": 40.4589293,
+    "lon": -79.7828203,
+    "altM": 269.9
+   }
   },
   {
    "id": 188,
@@ -1896,7 +2521,12 @@
    "pathM": 466.9,
    "maxUpM": 101.5,
    "maxGapS": 0.31,
-   "startVoltage": 24.75
+   "startVoltage": 24.75,
+   "origin": {
+    "lat": 40.4589319,
+    "lon": -79.782822,
+    "altM": 269.0
+   }
   },
   {
    "id": 189,
@@ -1911,7 +2541,12 @@
    "pathM": 469.0,
    "maxUpM": 30.7,
    "maxGapS": 0.21,
-   "startVoltage": 25.17
+   "startVoltage": 25.17,
+   "origin": {
+    "lat": 40.4589341,
+    "lon": -79.7828359,
+    "altM": 261.2
+   }
   },
   {
    "id": 190,
@@ -1926,7 +2561,12 @@
    "pathM": 475.8,
    "maxUpM": 100.0,
    "maxGapS": 0.22,
-   "startVoltage": 24.13
+   "startVoltage": 24.13,
+   "origin": {
+    "lat": 40.4589144,
+    "lon": -79.7828352,
+    "altM": 268.1
+   }
   },
   {
    "id": 191,
@@ -1941,7 +2581,12 @@
    "pathM": 474.3,
    "maxUpM": 98.7,
    "maxGapS": 0.22,
-   "startVoltage": 24.31
+   "startVoltage": 24.31,
+   "origin": {
+    "lat": 40.4590152,
+    "lon": -79.7827684,
+    "altM": 267.9
+   }
   },
   {
    "id": 192,
@@ -1956,7 +2601,12 @@
    "pathM": 474.6,
    "maxUpM": 49.6,
    "maxGapS": 0.22,
-   "startVoltage": 23.24
+   "startVoltage": 23.24,
+   "origin": {
+    "lat": 40.4590149,
+    "lon": -79.7827785,
+    "altM": 268.4
+   }
   },
   {
    "id": 193,
@@ -1971,7 +2621,12 @@
    "pathM": 470.2,
    "maxUpM": 49.8,
    "maxGapS": 0.3,
-   "startVoltage": 25.31
+   "startVoltage": 25.31,
+   "origin": {
+    "lat": 40.4590472,
+    "lon": -79.7827951,
+    "altM": 270.5
+   }
   },
   {
    "id": 194,
@@ -1986,7 +2641,12 @@
    "pathM": 474.2,
    "maxUpM": 102.3,
    "maxGapS": 0.22,
-   "startVoltage": 23.65
+   "startVoltage": 23.65,
+   "origin": {
+    "lat": 40.4590406,
+    "lon": -79.7827562,
+    "altM": 267.7
+   }
   },
   {
    "id": 195,
@@ -2001,7 +2661,12 @@
    "pathM": 470.3,
    "maxUpM": 98.0,
    "maxGapS": 0.29,
-   "startVoltage": 25.73
+   "startVoltage": 25.73,
+   "origin": {
+    "lat": 40.4590424,
+    "lon": -79.7827571,
+    "altM": 271.0
+   }
   },
   {
    "id": 196,
@@ -2016,7 +2681,12 @@
    "pathM": 479.9,
    "maxUpM": 49.8,
    "maxGapS": 0.3,
-   "startVoltage": 24.52
+   "startVoltage": 24.52,
+   "origin": {
+    "lat": 40.4590476,
+    "lon": -79.7827547,
+    "altM": 271.3
+   }
   },
   {
    "id": 197,
@@ -2031,7 +2701,12 @@
    "pathM": 466.6,
    "maxUpM": 23.9,
    "maxGapS": 0.29,
-   "startVoltage": 23.65
+   "startVoltage": 23.65,
+   "origin": {
+    "lat": 40.4590427,
+    "lon": -79.7827492,
+    "altM": 272.7
+   }
   },
   {
    "id": 198,
@@ -2046,7 +2721,12 @@
    "pathM": 469.2,
    "maxUpM": 50.5,
    "maxGapS": 0.22,
-   "startVoltage": 23.07
+   "startVoltage": 23.07,
+   "origin": {
+    "lat": 40.4590347,
+    "lon": -79.7827711,
+    "altM": 270.0
+   }
   },
   {
    "id": 199,
@@ -2061,7 +2741,12 @@
    "pathM": 464.8,
    "maxUpM": 52.7,
    "maxGapS": 0.31,
-   "startVoltage": 25.76
+   "startVoltage": 25.76,
+   "origin": {
+    "lat": 40.4590606,
+    "lon": -79.7827718,
+    "altM": 269.2
+   }
   },
   {
    "id": 200,
@@ -2076,7 +2761,12 @@
    "pathM": 465.9,
    "maxUpM": 27.6,
    "maxGapS": 0.22,
-   "startVoltage": 24.14
+   "startVoltage": 24.14,
+   "origin": {
+    "lat": 40.459024,
+    "lon": -79.7827934,
+    "altM": 272.1
+   }
   },
   {
    "id": 201,
@@ -2091,7 +2781,12 @@
    "pathM": 467.0,
    "maxUpM": 73.9,
    "maxGapS": 0.31,
-   "startVoltage": 25.79
+   "startVoltage": 25.79,
+   "origin": {
+    "lat": 40.4590044,
+    "lon": -79.7827986,
+    "altM": 274.1
+   }
   },
   {
    "id": 202,
@@ -2106,7 +2801,12 @@
    "pathM": 466.9,
    "maxUpM": 22.5,
    "maxGapS": 0.3,
-   "startVoltage": 24.33
+   "startVoltage": 24.33,
+   "origin": {
+    "lat": 40.4590174,
+    "lon": -79.7827858,
+    "altM": 276.0
+   }
   },
   {
    "id": 203,
@@ -2121,7 +2821,12 @@
    "pathM": 466.8,
    "maxUpM": 25.3,
    "maxGapS": 0.22,
-   "startVoltage": 23.29
+   "startVoltage": 23.29,
+   "origin": {
+    "lat": 40.4589989,
+    "lon": -79.7827679,
+    "altM": 273.1
+   }
   },
   {
    "id": 204,
@@ -2136,7 +2841,12 @@
    "pathM": 473.2,
    "maxUpM": 23.4,
    "maxGapS": 0.22,
-   "startVoltage": 24.81
+   "startVoltage": 24.81,
+   "origin": {
+    "lat": 40.4589983,
+    "lon": -79.7828124,
+    "altM": 277.3
+   }
   },
   {
    "id": 205,
@@ -2151,7 +2861,12 @@
    "pathM": 471.4,
    "maxUpM": 24.5,
    "maxGapS": 0.3,
-   "startVoltage": 23.9
+   "startVoltage": 23.9,
+   "origin": {
+    "lat": 40.4590253,
+    "lon": -79.7827831,
+    "altM": 272.4
+   }
   },
   {
    "id": 206,
@@ -2166,7 +2881,12 @@
    "pathM": 472.6,
    "maxUpM": 74.9,
    "maxGapS": 0.21,
-   "startVoltage": 25.79
+   "startVoltage": 25.79,
+   "origin": {
+    "lat": 40.459031,
+    "lon": -79.7827612,
+    "altM": 272.4
+   }
   },
   {
    "id": 207,
@@ -2181,7 +2901,12 @@
    "pathM": 472.5,
    "maxUpM": 47.3,
    "maxGapS": 0.22,
-   "startVoltage": 24.69
+   "startVoltage": 24.69,
+   "origin": {
+    "lat": 40.4590057,
+    "lon": -79.7827771,
+    "altM": 277.4
+   }
   },
   {
    "id": 208,
@@ -2196,7 +2921,12 @@
    "pathM": 470.5,
    "maxUpM": 75.3,
    "maxGapS": 0.31,
-   "startVoltage": 23.82
+   "startVoltage": 23.82,
+   "origin": {
+    "lat": 40.4589815,
+    "lon": -79.7827864,
+    "altM": 274.9
+   }
   },
   {
    "id": 209,
@@ -2211,7 +2941,12 @@
    "pathM": 465.3,
    "maxUpM": 52.3,
    "maxGapS": 0.22,
-   "startVoltage": 25.55
+   "startVoltage": 25.55,
+   "origin": {
+    "lat": 40.4590026,
+    "lon": -79.7827525,
+    "altM": 268.4
+   }
   },
   {
    "id": 210,
@@ -2226,7 +2961,12 @@
    "pathM": 468.3,
    "maxUpM": 97.7,
    "maxGapS": 0.22,
-   "startVoltage": 24.36
+   "startVoltage": 24.36,
+   "origin": {
+    "lat": 40.4590101,
+    "lon": -79.7827936,
+    "altM": 271.2
+   }
   },
   {
    "id": 221,
@@ -2241,7 +2981,12 @@
    "pathM": 16.8,
    "maxUpM": 1.1,
    "maxGapS": 0.22,
-   "startVoltage": 22.24
+   "startVoltage": 22.24,
+   "origin": {
+    "lat": 40.4434343,
+    "lon": -79.9465077,
+    "altM": 252.6
+   }
   },
   {
    "id": 222,
@@ -2256,7 +3001,12 @@
    "pathM": 21.8,
    "maxUpM": 0.8,
    "maxGapS": 0.29,
-   "startVoltage": 22.47
+   "startVoltage": 22.47,
+   "origin": {
+    "lat": 40.4434368,
+    "lon": -79.9465029,
+    "altM": 253.7
+   }
   },
   {
    "id": 223,
@@ -2271,7 +3021,12 @@
    "pathM": 19.6,
    "maxUpM": 0.0,
    "maxGapS": 0.22,
-   "startVoltage": 22.38
+   "startVoltage": 22.38,
+   "origin": {
+    "lat": 40.4434657,
+    "lon": -79.9464887,
+    "altM": 249.2
+   }
   },
   {
    "id": 224,
@@ -2286,7 +3041,12 @@
    "pathM": 29.3,
    "maxUpM": 3.5,
    "maxGapS": 0.29,
-   "startVoltage": 22.01
+   "startVoltage": 22.01,
+   "origin": {
+    "lat": 40.4434924,
+    "lon": -79.9464778,
+    "altM": 245.0
+   }
   },
   {
    "id": 225,
@@ -2301,7 +3061,12 @@
    "pathM": 470.6,
    "maxUpM": 73.1,
    "maxGapS": 0.22,
-   "startVoltage": 25.52
+   "startVoltage": 25.52,
+   "origin": {
+    "lat": 40.4590851,
+    "lon": -79.7827813,
+    "altM": 269.3
+   }
   },
   {
    "id": 226,
@@ -2316,7 +3081,12 @@
    "pathM": 469.6,
    "maxUpM": 76.2,
    "maxGapS": 0.21,
-   "startVoltage": 24.43
+   "startVoltage": 24.43,
+   "origin": {
+    "lat": 40.4590566,
+    "lon": -79.7827432,
+    "altM": 267.6
+   }
   },
   {
    "id": 227,
@@ -2331,7 +3101,12 @@
    "pathM": 473.0,
    "maxUpM": 101.7,
    "maxGapS": 0.22,
-   "startVoltage": 23.34
+   "startVoltage": 23.34,
+   "origin": {
+    "lat": 40.4590588,
+    "lon": -79.7827536,
+    "altM": 264.9
+   }
   },
   {
    "id": 228,
@@ -2346,7 +3121,12 @@
    "pathM": 476.8,
    "maxUpM": 102.3,
    "maxGapS": 0.3,
-   "startVoltage": 25.59
+   "startVoltage": 25.59,
+   "origin": {
+    "lat": 40.4590712,
+    "lon": -79.7827784,
+    "altM": 264.1
+   }
   },
   {
    "id": 229,
@@ -2361,7 +3141,12 @@
    "pathM": 471.6,
    "maxUpM": 53.3,
    "maxGapS": 0.3,
-   "startVoltage": 24.02
+   "startVoltage": 24.02,
+   "origin": {
+    "lat": 40.4590603,
+    "lon": -79.7827663,
+    "altM": 264.1
+   }
   },
   {
    "id": 230,
@@ -2376,7 +3161,12 @@
    "pathM": 464.6,
    "maxUpM": 25.0,
    "maxGapS": 0.3,
-   "startVoltage": 23.15
+   "startVoltage": 23.15,
+   "origin": {
+    "lat": 40.4590787,
+    "lon": -79.7827507,
+    "altM": 267.5
+   }
   },
   {
    "id": 231,
@@ -2391,7 +3181,12 @@
    "pathM": 475.1,
    "maxUpM": 102.1,
    "maxGapS": 0.23,
-   "startVoltage": 25.41
+   "startVoltage": 25.41,
+   "origin": {
+    "lat": 40.4590836,
+    "lon": -79.7827633,
+    "altM": 265.3
+   }
   },
   {
    "id": 232,
@@ -2406,7 +3201,12 @@
    "pathM": 479.0,
    "maxUpM": 107.7,
    "maxGapS": 0.21,
-   "startVoltage": 24.04
+   "startVoltage": 24.04,
+   "origin": {
+    "lat": 40.4591189,
+    "lon": -79.782773,
+    "altM": 260.4
+   }
   },
   {
    "id": 233,
@@ -2421,7 +3221,12 @@
    "pathM": 470.3,
    "maxUpM": 52.1,
    "maxGapS": 0.3,
-   "startVoltage": 23.06
+   "startVoltage": 23.06,
+   "origin": {
+    "lat": 40.4590676,
+    "lon": -79.7828173,
+    "altM": 267.3
+   }
   },
   {
    "id": 234,
@@ -2436,7 +3241,12 @@
    "pathM": 482.8,
    "maxUpM": 102.0,
    "maxGapS": 0.3,
-   "startVoltage": 25.34
+   "startVoltage": 25.34,
+   "origin": {
+    "lat": 40.4590675,
+    "lon": -79.782802,
+    "altM": 269.3
+   }
   },
   {
    "id": 235,
@@ -2451,7 +3261,12 @@
    "pathM": 481.8,
    "maxUpM": 25.3,
    "maxGapS": 0.22,
-   "startVoltage": 24.0
+   "startVoltage": 24.0,
+   "origin": {
+    "lat": 40.4590416,
+    "lon": -79.7828002,
+    "altM": 276.8
+   }
   },
   {
    "id": 236,
@@ -2466,7 +3281,12 @@
    "pathM": 479.5,
    "maxUpM": 45.3,
    "maxGapS": 0.31,
-   "startVoltage": 23.11
+   "startVoltage": 23.11,
+   "origin": {
+    "lat": 40.4589936,
+    "lon": -79.782748,
+    "altM": 284.1
+   }
   },
   {
    "id": 237,
@@ -2481,7 +3301,12 @@
    "pathM": 478.7,
    "maxUpM": 100.1,
    "maxGapS": 0.22,
-   "startVoltage": 25.47
+   "startVoltage": 25.47,
+   "origin": {
+    "lat": 40.4590621,
+    "lon": -79.7827612,
+    "altM": 276.1
+   }
   },
   {
    "id": 238,
@@ -2496,7 +3321,12 @@
    "pathM": 471.4,
    "maxUpM": 47.2,
    "maxGapS": 0.3,
-   "startVoltage": 23.96
+   "startVoltage": 23.96,
+   "origin": {
+    "lat": 40.4590329,
+    "lon": -79.7827726,
+    "altM": 275.0
+   }
   },
   {
    "id": 239,
@@ -2511,7 +3341,12 @@
    "pathM": 478.9,
    "maxUpM": 75.6,
    "maxGapS": 0.3,
-   "startVoltage": 25.62
+   "startVoltage": 25.62,
+   "origin": {
+    "lat": 40.4590498,
+    "lon": -79.7827613,
+    "altM": 272.2
+   }
   },
   {
    "id": 240,
@@ -2526,7 +3361,12 @@
    "pathM": 476.0,
    "maxUpM": 73.6,
    "maxGapS": 0.23,
-   "startVoltage": 24.05
+   "startVoltage": 24.05,
+   "origin": {
+    "lat": 40.4590408,
+    "lon": -79.7827389,
+    "altM": 274.4
+   }
   },
   {
    "id": 241,
@@ -2541,7 +3381,12 @@
    "pathM": 471.7,
    "maxUpM": 78.7,
    "maxGapS": 0.3,
-   "startVoltage": 25.51
+   "startVoltage": 25.51,
+   "origin": {
+    "lat": 40.459028,
+    "lon": -79.7827664,
+    "altM": 266.1
+   }
   },
   {
    "id": 242,
@@ -2556,7 +3401,12 @@
    "pathM": 485.1,
    "maxUpM": 95.6,
    "maxGapS": 0.3,
-   "startVoltage": 24.54
+   "startVoltage": 24.54,
+   "origin": {
+    "lat": 40.4589916,
+    "lon": -79.7828049,
+    "altM": 279.7
+   }
   },
   {
    "id": 243,
@@ -2571,7 +3421,12 @@
    "pathM": 471.7,
    "maxUpM": 26.9,
    "maxGapS": 0.31,
-   "startVoltage": 23.16
+   "startVoltage": 23.16,
+   "origin": {
+    "lat": 40.4590327,
+    "lon": -79.7828103,
+    "altM": 275.8
+   }
   },
   {
    "id": 246,
@@ -2586,7 +3441,12 @@
    "pathM": 480.2,
    "maxUpM": 100.8,
    "maxGapS": 0.23,
-   "startVoltage": 24.32
+   "startVoltage": 24.32,
+   "origin": {
+    "lat": 40.4590829,
+    "lon": -79.7827751,
+    "altM": 270.9
+   }
   },
   {
    "id": 247,
@@ -2601,7 +3461,12 @@
    "pathM": 479.7,
    "maxUpM": 72.5,
    "maxGapS": 0.22,
-   "startVoltage": 23.16
+   "startVoltage": 23.16,
+   "origin": {
+    "lat": 40.4590459,
+    "lon": -79.7827813,
+    "altM": 273.5
+   }
   },
   {
    "id": 248,
@@ -2616,7 +3481,12 @@
    "pathM": 474.8,
    "maxUpM": 75.6,
    "maxGapS": 0.3,
-   "startVoltage": 25.52
+   "startVoltage": 25.52,
+   "origin": {
+    "lat": 40.4590819,
+    "lon": -79.782794,
+    "altM": 271.3
+   }
   },
   {
    "id": 249,
@@ -2631,7 +3501,12 @@
    "pathM": 473.5,
    "maxUpM": 54.1,
    "maxGapS": 0.3,
-   "startVoltage": 23.75
+   "startVoltage": 23.75,
+   "origin": {
+    "lat": 40.4590516,
+    "lon": -79.7827899,
+    "altM": 266.0
+   }
   },
   {
    "id": 250,
@@ -2646,7 +3521,12 @@
    "pathM": 474.1,
    "maxUpM": 99.4,
    "maxGapS": 0.29,
-   "startVoltage": 25.89
+   "startVoltage": 25.89,
+   "origin": {
+    "lat": 40.4590782,
+    "lon": -79.7827679,
+    "altM": 271.5
+   }
   },
   {
    "id": 251,
@@ -2661,7 +3541,12 @@
    "pathM": 472.6,
    "maxUpM": 51.2,
    "maxGapS": 0.22,
-   "startVoltage": 24.71
+   "startVoltage": 24.71,
+   "origin": {
+    "lat": 40.4590686,
+    "lon": -79.7827465,
+    "altM": 270.9
+   }
   },
   {
    "id": 252,
@@ -2676,7 +3561,12 @@
    "pathM": 476.0,
    "maxUpM": 76.8,
    "maxGapS": 0.21,
-   "startVoltage": 23.76
+   "startVoltage": 23.76,
+   "origin": {
+    "lat": 40.4590518,
+    "lon": -79.7827592,
+    "altM": 270.7
+   }
   },
   {
    "id": 253,
@@ -2691,7 +3581,12 @@
    "pathM": 472.1,
    "maxUpM": 25.8,
    "maxGapS": 0.22,
-   "startVoltage": 22.95
+   "startVoltage": 22.95,
+   "origin": {
+    "lat": 40.4590672,
+    "lon": -79.7827703,
+    "altM": 272.0
+   }
   },
   {
    "id": 254,
@@ -2706,7 +3601,12 @@
    "pathM": 472.7,
    "maxUpM": 52.5,
    "maxGapS": 0.22,
-   "startVoltage": 25.53
+   "startVoltage": 25.53,
+   "origin": {
+    "lat": 40.4590946,
+    "lon": -79.7827748,
+    "altM": 270.4
+   }
   },
   {
    "id": 255,
@@ -2721,7 +3621,12 @@
    "pathM": 468.2,
    "maxUpM": 26.1,
    "maxGapS": 0.3,
-   "startVoltage": 24.51
+   "startVoltage": 24.51,
+   "origin": {
+    "lat": 40.4590903,
+    "lon": -79.7827691,
+    "altM": 270.4
+   }
   },
   {
    "id": 256,
@@ -2736,7 +3641,12 @@
    "pathM": 472.9,
    "maxUpM": 76.1,
    "maxGapS": 0.22,
-   "startVoltage": 23.53
+   "startVoltage": 23.53,
+   "origin": {
+    "lat": 40.4590641,
+    "lon": -79.7827722,
+    "altM": 269.8
+   }
   },
   {
    "id": 257,
@@ -2751,7 +3661,12 @@
    "pathM": 474.5,
    "maxUpM": 75.4,
    "maxGapS": 0.29,
-   "startVoltage": 22.83
+   "startVoltage": 22.83,
+   "origin": {
+    "lat": 40.4590634,
+    "lon": -79.782753,
+    "altM": 270.7
+   }
   },
   {
    "id": 258,
@@ -2766,7 +3681,12 @@
    "pathM": 470.8,
    "maxUpM": 49.9,
    "maxGapS": 0.3,
-   "startVoltage": 25.54
+   "startVoltage": 25.54,
+   "origin": {
+    "lat": 40.45907,
+    "lon": -79.7827616,
+    "altM": 270.5
+   }
   },
   {
    "id": 260,
@@ -2781,7 +3701,12 @@
    "pathM": 465.9,
    "maxUpM": 75.3,
    "maxGapS": 0.3,
-   "startVoltage": 25.53
+   "startVoltage": 25.53,
+   "origin": {
+    "lat": 40.4590567,
+    "lon": -79.7827449,
+    "altM": 271.3
+   }
   },
   {
    "id": 261,
@@ -2796,7 +3721,12 @@
    "pathM": 471.1,
    "maxUpM": 50.2,
    "maxGapS": 0.31,
-   "startVoltage": 24.19
+   "startVoltage": 24.19,
+   "origin": {
+    "lat": 40.4590575,
+    "lon": -79.7827569,
+    "altM": 269.6
+   }
   },
   {
    "id": 262,
@@ -2811,7 +3741,12 @@
    "pathM": 479.3,
    "maxUpM": 77.4,
    "maxGapS": 0.22,
-   "startVoltage": 23.2
+   "startVoltage": 23.2,
+   "origin": {
+    "lat": 40.4590609,
+    "lon": -79.7827551,
+    "altM": 266.1
+   }
   },
   {
    "id": 263,
@@ -2826,7 +3761,12 @@
    "pathM": 466.9,
    "maxUpM": 72.3,
    "maxGapS": 0.3,
-   "startVoltage": 25.19
+   "startVoltage": 25.19,
+   "origin": {
+    "lat": 40.4590791,
+    "lon": -79.78274,
+    "altM": 272.7
+   }
   },
   {
    "id": 264,
@@ -2841,7 +3781,12 @@
    "pathM": 467.3,
    "maxUpM": 102.0,
    "maxGapS": 0.31,
-   "startVoltage": 23.56
+   "startVoltage": 23.56,
+   "origin": {
+    "lat": 40.4590778,
+    "lon": -79.7827276,
+    "altM": 267.1
+   }
   },
   {
    "id": 267,
@@ -2856,7 +3801,12 @@
    "pathM": 475.5,
    "maxUpM": 26.8,
    "maxGapS": 0.89,
-   "startVoltage": 24.11
+   "startVoltage": 24.11,
+   "origin": {
+    "lat": 40.4590658,
+    "lon": -79.7828201,
+    "altM": 268.3
+   }
   },
   {
    "id": 268,
@@ -2871,7 +3821,12 @@
    "pathM": 827.5,
    "maxUpM": 24.1,
    "maxGapS": 1.12,
-   "startVoltage": 25.07
+   "startVoltage": 25.07,
+   "origin": {
+    "lat": 40.4590571,
+    "lon": -79.7828208,
+    "altM": 267.9
+   }
   },
   {
    "id": 269,
@@ -2886,7 +3841,12 @@
    "pathM": 833.8,
    "maxUpM": 24.4,
    "maxGapS": 2.1,
-   "startVoltage": 25.46
+   "startVoltage": 25.46,
+   "origin": {
+    "lat": 40.459051,
+    "lon": -79.7828046,
+    "altM": 267.1
+   }
   },
   {
    "id": 270,
@@ -2901,7 +3861,12 @@
    "pathM": 834.3,
    "maxUpM": 73.3,
    "maxGapS": 0.51,
-   "startVoltage": 24.16
+   "startVoltage": 24.16,
+   "origin": {
+    "lat": 40.4590798,
+    "lon": -79.7828251,
+    "altM": 266.3
+   }
   },
   {
    "id": 271,
@@ -2916,7 +3881,12 @@
    "pathM": 831.5,
    "maxUpM": 23.8,
    "maxGapS": 0.5,
-   "startVoltage": 25.53
+   "startVoltage": 25.53,
+   "origin": {
+    "lat": 40.4590421,
+    "lon": -79.7828312,
+    "altM": 265.7
+   }
   },
   {
    "id": 272,
@@ -2931,7 +3901,12 @@
    "pathM": 838.3,
    "maxUpM": 48.6,
    "maxGapS": 0.22,
-   "startVoltage": 24.56
+   "startVoltage": 24.56,
+   "origin": {
+    "lat": 40.4590271,
+    "lon": -79.7828343,
+    "altM": 266.6
+   }
   },
   {
    "id": 275,
@@ -2946,7 +3921,12 @@
    "pathM": 477.5,
    "maxUpM": 22.0,
    "maxGapS": 0.9,
-   "startVoltage": 24.58
+   "startVoltage": 24.58,
+   "origin": {
+    "lat": 40.4590622,
+    "lon": -79.7827869,
+    "altM": 270.7
+   }
   },
   {
    "id": 276,
@@ -2961,7 +3941,12 @@
    "pathM": 473.4,
    "maxUpM": 22.6,
    "maxGapS": 0.39,
-   "startVoltage": 23.38
+   "startVoltage": 23.38,
+   "origin": {
+    "lat": 40.4590603,
+    "lon": -79.78282,
+    "altM": 268.7
+   }
   },
   {
    "id": 277,
@@ -2976,7 +3961,12 @@
    "pathM": 472.7,
    "maxUpM": 24.2,
    "maxGapS": 1.3,
-   "startVoltage": 25.49
+   "startVoltage": 25.49,
+   "origin": {
+    "lat": 40.4590478,
+    "lon": -79.7827871,
+    "altM": 270.5
+   }
   },
   {
    "id": 278,
@@ -2991,7 +3981,12 @@
    "pathM": 469.9,
    "maxUpM": 95.0,
    "maxGapS": 5.28,
-   "startVoltage": 24.57
+   "startVoltage": 24.57,
+   "origin": {
+    "lat": 40.459045,
+    "lon": -79.7827866,
+    "altM": 270.5
+   }
   },
   {
    "id": 279,
@@ -3006,7 +4001,12 @@
    "pathM": 469.9,
    "maxUpM": 92.6,
    "maxGapS": 4.7,
-   "startVoltage": 23.56
+   "startVoltage": 23.56,
+   "origin": {
+    "lat": 40.4590207,
+    "lon": -79.7827711,
+    "altM": 273.4
+   }
   },
   {
    "id": 900,
@@ -3022,6 +4022,11 @@
    "maxUpM": 76.6,
    "maxGapS": 0,
    "startVoltage": 24.0,
+   "origin": {
+    "lat": 40.4589752,
+    "lon": -79.7827698,
+    "altM": 268.4
+   },
    "simulated": true,
    "outcome": "Battery cutoff, power lost, crash",
    "failureS": 91.7,

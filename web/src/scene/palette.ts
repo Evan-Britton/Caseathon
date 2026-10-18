@@ -26,9 +26,12 @@ export function powerCss(p: number, lo: number, hi: number): string {
   return `#${powerColor(p, lo, hi).getHexString()}`;
 }
 
-/** Robust power range for colouring: 5th to 95th percentile of airborne samples. */
+// Below this the motors aren't driving the aircraft (ground idle, or power lost in a simulated failure).
+const MOTORS_ON_W = 50;
+
+/** Robust power range for colouring: 5th to 95th percentile of airborne samples with motors running. */
 export function powerRange(power: number[], up: number[]): [number, number] {
-  const airborne = power.filter((_, i) => up[i] > 2).sort((a, b) => a - b);
+  const airborne = power.filter((p, i) => up[i] > 2 && p > MOTORS_ON_W).sort((a, b) => a - b);
   const src = airborne.length > 10 ? airborne : [...power].sort((a, b) => a - b);
   return [src[Math.floor(src.length * 0.05)], src[Math.floor(src.length * 0.95)]];
 }

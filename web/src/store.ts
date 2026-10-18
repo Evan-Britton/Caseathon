@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { loadFlight, loadIndex } from "./data";
-import type { CameraMode, DataIndex, FlightMeta, FlightSeries } from "./types";
+import type { Basemap, CameraMode, DataIndex, FlightMeta, FlightSeries } from "./types";
 
 /**
  * Playback time lives outside React so the 3D scene can advance it every frame
@@ -18,6 +18,9 @@ interface State {
   playing: boolean;
   rate: number;
   camera: CameraMode;
+  basemap: Basemap;
+  mapCredits: string;
+  mapError: string | null;
   init: () => Promise<void>;
   selectFlight: (id: number) => Promise<void>;
   stepFlight: (dir: 1 | -1) => void;
@@ -26,7 +29,13 @@ interface State {
   setPlaying: (playing: boolean) => void;
   setRate: (rate: number) => void;
   setCamera: (mode: CameraMode) => void;
+  setBasemap: (basemap: Basemap) => void;
+  setMapCredits: (credits: string) => void;
+  /** The Google 3D map failed to load: explain why and fall back to the street map. */
+  failPhotoMap: (message: string) => void;
 }
+
+const HAS_GOOGLE_KEY = Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY);
 
 const DEFAULT_FLIGHT = 142;
 
@@ -45,6 +54,9 @@ export const useStore = create<State>((set, get) => ({
   playing: false,
   rate: 4,
   camera: "orbit",
+  basemap: HAS_GOOGLE_KEY ? "photo" : "street",
+  mapCredits: "",
+  mapError: null,
 
   init: async () => {
     try {
@@ -81,6 +93,7 @@ export const useStore = create<State>((set, get) => ({
   },
 
   seek: (time) => {
+    if (!Number.isFinite(time)) return;
     const end = get().series?.t.at(-1) ?? 0;
     clock.time = Math.min(Math.max(time, 0), end);
     set({ uiTime: clock.time });
@@ -93,4 +106,7 @@ export const useStore = create<State>((set, get) => ({
   },
   setRate: (rate) => set({ rate }),
   setCamera: (camera) => set({ camera }),
+  setBasemap: (basemap) => set({ basemap, mapCredits: "", mapError: null }),
+  setMapCredits: (mapCredits) => set({ mapCredits }),
+  failPhotoMap: (message) => set({ basemap: "street", mapCredits: "", mapError: message }),
 }));

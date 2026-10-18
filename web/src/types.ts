@@ -12,6 +12,7 @@ export interface FlightMeta {
   maxUpM: number;
   maxGapS: number;
   startVoltage: number;
+  origin: { lat: number; lon: number; altM: number }; // launch point (deg, deg, m above sea level)
   /** Set only on flights we generated. Everything else is CMU data. */
   simulated?: boolean;
   outcome?: string;
@@ -51,3 +52,6 @@ export interface DataIndex {
 }
 
 export type CameraMode = "orbit" | "chase" | "top";
+
+/** Ground layer: dark grid, OpenStreetMap street tiles, or Google photorealistic 3D tiles. */
+export type Basemap = "grid" | "street" | "photo";

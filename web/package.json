@@ -8,10 +8,11 @@
     "build": "tsc --noEmit && vite build",
     "preview": "npm run build && wrangler dev",
     "deploy": "npm run build && wrangler deploy",
-    "data": "python3 ../scripts/build_web_data.py ../data/raw/cmu_drone public/data"
+    "data": "python3 ../scripts/build_web_data.py ../data/raw/cmu_drone public/data && cd .. && python3 scripts/make_sim_failure.py"
   },
   "dependencies": {
     "@react-three/fiber": "9.8.2",
+    "3d-tiles-renderer": "0.5.3",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "three": "0.186.1",

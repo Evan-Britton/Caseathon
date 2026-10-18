@@ -60,6 +60,21 @@ export const Icons = {
       <rect x="4" y="4" width="16" height="16" rx="2" /><path d="M12 8v8M8 12h8" />
     </Icon>
   ),
+  grid: (
+    <Icon>
+      <path d="M4 9h16M4 15h16M9 4v16M15 4v16" /><rect x="4" y="4" width="16" height="16" rx="2" />
+    </Icon>
+  ),
+  map: (
+    <Icon>
+      <path d="M9 4L3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5L9 4z" /><path d="M9 4v13.5M15 6.5V20" />
+    </Icon>
+  ),
+  terrain: (
+    <Icon>
+      <path d="M3 19l6-9 4 5 3-4 5 8H3z" /><circle cx="17" cy="6" r="2" />
+    </Icon>
+  ),
   prev: (
     <Icon>
       <path d="M15 6l-6 6 6 6" />

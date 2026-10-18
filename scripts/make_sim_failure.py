@@ -13,7 +13,7 @@ changes only the battery story, so the failure is a labelled scenario we control
 
 Assumptions are guesses, not measurements: the cutoff, terminal speed and drag constant are
 not in the dataset. Writes web/public/data/flights/900.json and adds or replaces id 900 in
-web/public/data/index.json. Re-run it after "npm run data", which rebuilds the index.
+web/public/data/index.json. "npm run data" runs it after rebuilding the index.
 
 Usage: python3 scripts/make_sim_failure.py
 """
@@ -90,8 +90,8 @@ def main() -> None:
         else:
             vh = 0.0
         v = REBOUND_V
-        cur = -AVIONICS_A
-        energy += abs(v * cur) * DT / 3600
+        cur = AVIONICS_A
+        energy += v * cur * DT / 3600
         out["t"].append(r(t, 3))
         out["east"].append(r(e))
         out["north"].append(r(nn))

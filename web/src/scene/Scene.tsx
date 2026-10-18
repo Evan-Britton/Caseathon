@@ -4,6 +4,7 @@ import { GridHelper, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { clock, useStore } from "../store";
 import type { CameraMode, FlightMeta, FlightSeries } from "../types";
+import { GOOGLE_MAPS_KEY, PhotoTiles, StreetMap } from "./Basemap";
 import { Drone, dronePose } from "./Drone";
 import { FlightPath } from "./FlightPath";
 import { SCENE } from "./palette";
@@ -12,6 +13,8 @@ export function Scene() {
   const series = useStore((s) => s.series);
   const meta = useStore((s) => s.meta);
   const camera = useStore((s) => s.camera);
+  const basemap = useStore((s) => s.basemap);
+  const onMap = basemap !== "grid";
 
   return (
     <Canvas
@@ -20,16 +23,19 @@ export function Scene() {
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       aria-label="3D replay of the selected flight"
     >
-      <fog attach="fog" args={[SCENE.horizon, 380, 1400]} />
+      {/* Push the fog back over real maps so distant terrain stays readable */}
+      <fog attach="fog" args={onMap ? [SCENE.horizon, 900, 3200] : [SCENE.horizon, 380, 1400]} />
       <hemisphereLight args={["#9fb4c4", "#0d141a", 1.1]} />
       <directionalLight position={[120, 300, 80]} intensity={1.6} />
       <directionalLight position={[-200, 80, -120]} intensity={0.5} color={SCENE.teal} />
       <Ticker />
-      <Ground />
+      {basemap === "grid" && <Ground />}
       <LaunchPad />
+      {meta && basemap === "street" && <StreetMap meta={meta} />}
+      {meta && basemap === "photo" && GOOGLE_MAPS_KEY && <PhotoTiles meta={meta} apiKey={GOOGLE_MAPS_KEY} />}
       {series && meta && (
         <>
-          <FlightPath series={series} />
+          <FlightPath series={series} glow={!onMap} />
           <Drone series={series} meta={meta} />
           <CameraRig series={series} meta={meta} mode={camera} />
         </>
@@ -110,11 +116,15 @@ const tmpLook = new Vector3();
 function CameraRig({ series, meta, mode }: { series: FlightSeries; meta: FlightMeta; mode: CameraMode }) {
   const { camera, size, gl } = useThree();
   const controls = useMemo(() => {
-    const c = new OrbitControls(camera, gl.domElement);
+    const c = new OrbitControls(camera);
     Object.assign(c, { enableDamping: true, dampingFactor: 0.08, maxPolarAngle: Math.PI / 2 - 0.04, minDistance: 8, maxDistance: 1800 });
     return c;
-  }, [camera, gl]);
-  useEffect(() => () => controls.dispose(), [controls]);
+  }, [camera]);
+  // Connect in an effect (not at creation) so React's dev double-mount reconnects the pointer listeners.
+  useEffect(() => {
+    controls.connect(gl.domElement);
+    return () => controls.disconnect();
+  }, [controls, gl]);
   const aspect = useRef(1);
   aspect.current = size.width / size.height;
   const bounds = useBounds(series);

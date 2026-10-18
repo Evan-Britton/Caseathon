@@ -40,6 +40,7 @@ export default function App() {
       <RouteMap />
       <Telemetry />
       <Dock />
+      <MapError />
       <Attribution />
     </div>
   );
@@ -69,12 +70,32 @@ function StageMessage() {
   return null;
 }
 
+function MapError() {
+  const mapError = useStore((s) => s.mapError);
+  const setBasemap = useStore((s) => s.setBasemap);
+  if (!mapError) return null;
+  return (
+    <div className="map-error glass" role="alert">
+      <p>{mapError}</p>
+      <button onClick={() => setBasemap("street")}>Dismiss</button>
+    </div>
+  );
+}
+
 function Attribution() {
   const source = useStore((s) => s.index?.source);
+  const basemap = useStore((s) => s.basemap);
+  const mapCredits = useStore((s) => s.mapCredits);
   if (!source) return null;
   return (
     <p className="attribution">
       Data: <a href={source.url} target="_blank" rel="noreferrer">{source.authors}</a>, {source.license}
+      {basemap === "street" && (
+        <>
+          {" "}Map: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a>
+        </>
+      )}
+      {basemap === "photo" && <> Map: Google{mapCredits && `, ${mapCredits}`}</>}
     </p>
   );
 }

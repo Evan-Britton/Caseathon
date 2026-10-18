@@ -74,6 +74,8 @@ def build_flight(g: pd.DataFrame) -> tuple[dict, dict]:
         "maxUpM": round(float(up.max()), 1),
         "maxGapS": round(float(np.diff(t).max()), 2),
         "startVoltage": round(float(volts[:10].mean()), 2),
+        # Launch point, so the app can place the flight on a real map.
+        "origin": {"lat": round(float(lat0), 7), "lon": round(float(lon0), 7), "altM": round(float(alt0), 1)},
     }
     series = {
         "t": rounded(t, 2),

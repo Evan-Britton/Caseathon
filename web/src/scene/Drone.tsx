@@ -44,7 +44,9 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
       body.current.rotation.set(-lean, -headingRad, 0, "YXZ");
     }
     const airborne = y > 0.5;
-    if (!reducedMotion) {
+    // Simulated failure flights: motors stop once power is lost.
+    const powerLost = !!meta.simulated && clock.time >= (meta.failureS ?? Infinity);
+    if (!reducedMotion && !powerLost) {
       for (const [k, r] of rotors.current.entries()) if (r) r.rotation.y += (k % 2 ? 1 : -1) * delta * (airborne ? 60 : 8);
     }
     marker.current?.position.set(x, 0.05, z);
@@ -58,7 +60,8 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
       const visible = projected.z < 1;
       reticle.el.style.opacity = visible ? "1" : "0";
       reticle.el.style.transform = `translate(${((projected.x + 1) / 2) * size.width}px, ${((1 - projected.y) / 2) * size.height}px)`;
-      if (reticle.label) reticle.label.textContent = `${y.toFixed(0)} m above launch`;
+      reticle.el.classList.toggle("reticle-fail", powerLost);
+      if (reticle.label) reticle.label.textContent = powerLost ? `Power lost, ${y.toFixed(0)} m` : `${y.toFixed(0)} m above launch`;
     }
   });
 
