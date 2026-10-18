@@ -29,6 +29,8 @@ Layer 2, decision safeguards (decision stage)
                       choice. Deferrals are counted separately as human workload.
 """
 
+from __future__ import annotations
+
 import numpy as np
 import pandas as pd
 

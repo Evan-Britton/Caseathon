@@ -19,6 +19,8 @@ Conditions
 Seeds run in parallel processes. Usage: python3 scripts/run_countermeasure.py [raw_dir] [out_dir]
 """
 
+from __future__ import annotations
+
 import json
 import os
 import sys

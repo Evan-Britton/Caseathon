@@ -8,6 +8,8 @@ repeats the boosted models over several seeds, and writes:
 Usage: python3 scripts/run_baseline.py [raw_dir] [out_dir]
 """
 
+from __future__ import annotations
+
 import hashlib
 import json
 import os
