@@ -1,0 +1,6330 @@
+{
+  "description": "Countermeasure vs no countermeasure on the SIMULATED timeline. Same windows, flights and seeds in every pair.",
+  "countermeasure": {
+    "layer1_data_health_gate": "3 reference flights per window logged by both A and B and uploaded manually; per-window audit of B against A on them (95% t-interval on the energy ratio): recalibrate B if the interval excludes 1, keep if it sits within 1 +/- 0.05, otherwise keep at weight 0.2. No records discarded. Freshness flag on the automatic A upload.",
+    "layer2_decision_safeguards": "P90 calibrated on held-out trusted flights (reference flights and accurate-logger flights) from the last 3 windows. CONTINUE / RETURN / DEFER: defer when the P50-P90 band straddles the budget, or when health is red and the P90 clears the budget by less than 1.0 Wh. Deferred flights are scored as returned (the operator's safe choice) and counted as human workload. auto_* counts score the plain P90 rule on the fixed model.",
+    "cost": "3 dual-logged reference flights per window (about 12% of flights)"
+  },
+  "after_outage_windows": [
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "main_grid_after_outage": {
+    "combined/no_fix": {
+      "unsafe_16": {
+        "mean": 1.0,
+        "sd": 0.6325
+      },
+      "abort_16": {
+        "mean": 3.0,
+        "sd": 1.4142
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_18": {
+        "mean": 0.6,
+        "sd": 0.4899
+      },
+      "abort_18": {
+        "mean": 1.4,
+        "sd": 0.8
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_20": {
+        "mean": 1.4,
+        "sd": 0.8
+      },
+      "abort_20": {
+        "mean": 8.8,
+        "sd": 1.1662
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_22": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 8.8,
+        "sd": 0.7483
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 6.0,
+        "sd": 2.6833
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 11.4,
+        "sd": 1.4967
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autounsafe_16": {
+        "mean": 1.0,
+        "sd": 0.6325
+      },
+      "autoabort_16": {
+        "mean": 3.0,
+        "sd": 1.4142
+      },
+      "autounsafe_18": {
+        "mean": 0.6,
+        "sd": 0.4899
+      },
+      "autoabort_18": {
+        "mean": 1.4,
+        "sd": 0.8
+      },
+      "autounsafe_20": {
+        "mean": 1.4,
+        "sd": 0.8
+      },
+      "autoabort_20": {
+        "mean": 8.8,
+        "sd": 1.1662
+      },
+      "autounsafe_22": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 8.8,
+        "sd": 0.7483
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 6.0,
+        "sd": 2.6833
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 11.4,
+        "sd": 1.4967
+      },
+      "mae_wh": {
+        "mean": 0.8422,
+        "sd": 0.0205
+      },
+      "bias_wh": {
+        "mean": -0.653,
+        "sd": 0.0408
+      },
+      "p90_coverage": {
+        "mean": 0.5125,
+        "sd": 0.0286
+      },
+      "low_quality_share": {
+        "mean": 0.5763,
+        "sd": 0.029
+      },
+      "unsafe_all": {
+        "mean": 4.0,
+        "sd": 0.8944
+      },
+      "abort_all": {
+        "mean": 39.4,
+        "sd": 5.4991
+      },
+      "deferred_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 4.0,
+        "sd": 0.8944
+      },
+      "auto_abort_all": {
+        "mean": 39.4,
+        "sd": 5.4991
+      }
+    },
+    "combined/fix": {
+      "unsafe_16": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "abort_16": {
+        "mean": 10.8,
+        "sd": 0.9798
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 13.8,
+        "sd": 0.7483
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 6.0,
+        "sd": 0.8944
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 8.0,
+        "sd": 1.6733
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 14.4,
+        "sd": 0.8
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 14.2,
+        "sd": 1.9391
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 13.0,
+        "sd": 1.7889
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 12.6,
+        "sd": 1.6248
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 14.8,
+        "sd": 2.4
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 16.0,
+        "sd": 1.8974
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 17.4,
+        "sd": 0.8
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 18.0,
+        "sd": 0.8944
+      },
+      "autounsafe_16": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "autoabort_16": {
+        "mean": 10.8,
+        "sd": 0.9798
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 6.0,
+        "sd": 0.8944
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 14.4,
+        "sd": 0.8
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 13.0,
+        "sd": 1.7889
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 14.8,
+        "sd": 2.4
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 17.4,
+        "sd": 0.8
+      },
+      "mae_wh": {
+        "mean": 0.4125,
+        "sd": 0.0042
+      },
+      "bias_wh": {
+        "mean": 0.0053,
+        "sd": 0.0098
+      },
+      "p90_coverage": {
+        "mean": 0.9227,
+        "sd": 0.0135
+      },
+      "low_quality_share": {
+        "mean": 0.5068,
+        "sd": 0.0252
+      },
+      "unsafe_all": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "abort_all": {
+        "mean": 76.4,
+        "sd": 5.8856
+      },
+      "deferred_all": {
+        "mean": 82.6,
+        "sd": 3.8781
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "auto_abort_all": {
+        "mean": 76.4,
+        "sd": 5.8856
+      }
+    },
+    "low_quality/no_fix": {
+      "unsafe_16": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "abort_16": {
+        "mean": 6.4,
+        "sd": 0.8
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 2.6,
+        "sd": 1.0198
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 12.0,
+        "sd": 1.5492
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 9.8,
+        "sd": 0.9798
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 9.8,
+        "sd": 1.6
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 13.6,
+        "sd": 1.0198
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autounsafe_16": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "autoabort_16": {
+        "mean": 6.4,
+        "sd": 0.8
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 2.6,
+        "sd": 1.0198
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 12.0,
+        "sd": 1.5492
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 9.8,
+        "sd": 0.9798
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 9.8,
+        "sd": 1.6
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 13.6,
+        "sd": 1.0198
+      },
+      "mae_wh": {
+        "mean": 0.559,
+        "sd": 0.0339
+      },
+      "bias_wh": {
+        "mean": -0.3368,
+        "sd": 0.0373
+      },
+      "p90_coverage": {
+        "mean": 0.7241,
+        "sd": 0.0374
+      },
+      "low_quality_share": {
+        "mean": 0.4535,
+        "sd": 0.0312
+      },
+      "unsafe_all": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "abort_all": {
+        "mean": 54.2,
+        "sd": 5.1147
+      },
+      "deferred_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "auto_abort_all": {
+        "mean": 54.2,
+        "sd": 5.1147
+      }
+    },
+    "low_quality/fix": {
+      "unsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_16": {
+        "mean": 10.4,
+        "sd": 0.8
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 13.4,
+        "sd": 0.8
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 5.4,
+        "sd": 1.2
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 6.0,
+        "sd": 1.2649
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 14.4,
+        "sd": 0.8
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 12.2,
+        "sd": 0.9798
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 12.8,
+        "sd": 1.7205
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 11.2,
+        "sd": 1.9391
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 12.0,
+        "sd": 2.2804
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 12.8,
+        "sd": 1.7205
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 14.4,
+        "sd": 1.6248
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 14.2,
+        "sd": 1.6
+      },
+      "autounsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_16": {
+        "mean": 10.4,
+        "sd": 0.8
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 5.4,
+        "sd": 1.2
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 14.4,
+        "sd": 0.8
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 12.8,
+        "sd": 1.7205
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 12.0,
+        "sd": 2.2804
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 14.4,
+        "sd": 1.6248
+      },
+      "mae_wh": {
+        "mean": 0.3956,
+        "sd": 0.0056
+      },
+      "bias_wh": {
+        "mean": 0.029,
+        "sd": 0.0034
+      },
+      "p90_coverage": {
+        "mean": 0.909,
+        "sd": 0.0164
+      },
+      "low_quality_share": {
+        "mean": 0.4106,
+        "sd": 0.0266
+      },
+      "unsafe_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_all": {
+        "mean": 69.4,
+        "sd": 6.4374
+      },
+      "deferred_all": {
+        "mean": 69.8,
+        "sd": 6.6753
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "auto_abort_all": {
+        "mean": 69.4,
+        "sd": 6.4374
+      }
+    },
+    "reference/no_fix": {
+      "unsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_16": {
+        "mean": 8.8,
+        "sd": 0.7483
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 4.0,
+        "sd": 0.6325
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 14.4,
+        "sd": 0.4899
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 9.2,
+        "sd": 0.4
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 13.4,
+        "sd": 0.4899
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 15.6,
+        "sd": 0.4899
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autounsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_16": {
+        "mean": 8.8,
+        "sd": 0.7483
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 4.0,
+        "sd": 0.6325
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 14.4,
+        "sd": 0.4899
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 9.2,
+        "sd": 0.4
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 13.4,
+        "sd": 0.4899
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 15.6,
+        "sd": 0.4899
+      },
+      "mae_wh": {
+        "mean": 0.3886,
+        "sd": 0.0017
+      },
+      "bias_wh": {
+        "mean": 0.0326,
+        "sd": 0.0017
+      },
+      "p90_coverage": {
+        "mean": 0.8954,
+        "sd": 0.0055
+      },
+      "low_quality_share": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_all": {
+        "mean": 65.4,
+        "sd": 1.0198
+      },
+      "deferred_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "auto_abort_all": {
+        "mean": 65.4,
+        "sd": 1.0198
+      }
+    },
+    "reference/fix": {
+      "unsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_16": {
+        "mean": 9.8,
+        "sd": 1.1662
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 12.8,
+        "sd": 1.1662
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 3.8,
+        "sd": 1.1662
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 4.4,
+        "sd": 1.7436
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 13.8,
+        "sd": 0.9798
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 11.6,
+        "sd": 1.3565
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 10.6,
+        "sd": 0.4899
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 8.8,
+        "sd": 0.7483
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 13.6,
+        "sd": 0.8
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 13.6,
+        "sd": 1.0198
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 14.8,
+        "sd": 0.9798
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 14.8,
+        "sd": 1.1662
+      },
+      "autounsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_16": {
+        "mean": 9.8,
+        "sd": 1.1662
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 3.8,
+        "sd": 1.1662
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 13.8,
+        "sd": 0.9798
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 10.6,
+        "sd": 0.4899
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 13.6,
+        "sd": 0.8
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 14.8,
+        "sd": 0.9798
+      },
+      "mae_wh": {
+        "mean": 0.3874,
+        "sd": 0.0032
+      },
+      "bias_wh": {
+        "mean": 0.0267,
+        "sd": 0.0039
+      },
+      "p90_coverage": {
+        "mean": 0.8889,
+        "sd": 0.0057
+      },
+      "low_quality_share": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_all": {
+        "mean": 66.4,
+        "sd": 2.0591
+      },
+      "deferred_all": {
+        "mean": 66.0,
+        "sd": 2.6833
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "auto_abort_all": {
+        "mean": 66.4,
+        "sd": 2.0591
+      }
+    },
+    "stale/no_fix": {
+      "unsafe_16": {
+        "mean": 0.8,
+        "sd": 0.4
+      },
+      "abort_16": {
+        "mean": 11.0,
+        "sd": 0.0
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 8.0,
+        "sd": 0.6325
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 19.0,
+        "sd": 0.8944
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 20.0,
+        "sd": 1.0954
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 18.2,
+        "sd": 1.1662
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 21.2,
+        "sd": 0.4
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autounsafe_16": {
+        "mean": 0.8,
+        "sd": 0.4
+      },
+      "autoabort_16": {
+        "mean": 11.0,
+        "sd": 0.0
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 8.0,
+        "sd": 0.6325
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 19.0,
+        "sd": 0.8944
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 20.0,
+        "sd": 1.0954
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 18.2,
+        "sd": 1.1662
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 21.2,
+        "sd": 0.4
+      },
+      "mae_wh": {
+        "mean": 0.4689,
+        "sd": 0.0044
+      },
+      "bias_wh": {
+        "mean": 0.0739,
+        "sd": 0.0186
+      },
+      "p90_coverage": {
+        "mean": 0.9524,
+        "sd": 0.0077
+      },
+      "low_quality_share": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_all": {
+        "mean": 0.8,
+        "sd": 0.4
+      },
+      "abort_all": {
+        "mean": 97.4,
+        "sd": 3.1369
+      },
+      "deferred_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 0.8,
+        "sd": 0.4
+      },
+      "auto_abort_all": {
+        "mean": 97.4,
+        "sd": 3.1369
+      }
+    },
+    "stale/fix": {
+      "unsafe_16": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "abort_16": {
+        "mean": 11.0,
+        "sd": 0.0
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 15.0,
+        "sd": 1.4142
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 9.4,
+        "sd": 2.6533
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 14.0,
+        "sd": 3.1623
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 18.0,
+        "sd": 1.4142
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 18.6,
+        "sd": 2.1541
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 18.0,
+        "sd": 3.6332
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 17.6,
+        "sd": 4.128
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 17.0,
+        "sd": 3.9497
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 19.0,
+        "sd": 4.6904
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 20.4,
+        "sd": 3.2619
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 20.8,
+        "sd": 3.0594
+      },
+      "autounsafe_16": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "autoabort_16": {
+        "mean": 11.0,
+        "sd": 0.0
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 9.4,
+        "sd": 2.6533
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 18.0,
+        "sd": 1.4142
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 18.0,
+        "sd": 3.6332
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 17.0,
+        "sd": 3.9497
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 20.4,
+        "sd": 3.2619
+      },
+      "mae_wh": {
+        "mean": 0.4561,
+        "sd": 0.0115
+      },
+      "bias_wh": {
+        "mean": 0.0125,
+        "sd": 0.0534
+      },
+      "p90_coverage": {
+        "mean": 0.9191,
+        "sd": 0.0361
+      },
+      "low_quality_share": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_all": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "abort_all": {
+        "mean": 93.8,
+        "sd": 12.7185
+      },
+      "deferred_all": {
+        "mean": 105.0,
+        "sd": 15.2971
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "auto_abort_all": {
+        "mean": 93.8,
+        "sd": 12.7185
+      }
+    }
+  },
+  "main_grid_all_windows": {
+    "combined/no_fix": {
+      "unsafe_16": {
+        "mean": 1.0,
+        "sd": 0.6325
+      },
+      "abort_16": {
+        "mean": 6.4,
+        "sd": 1.3565
+      },
+      "positives_16": {
+        "mean": 144.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 27.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_18": {
+        "mean": 0.6,
+        "sd": 0.4899
+      },
+      "abort_18": {
+        "mean": 3.4,
+        "sd": 0.8
+      },
+      "positives_18": {
+        "mean": 128.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 43.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_20": {
+        "mean": 1.4,
+        "sd": 0.8
+      },
+      "abort_20": {
+        "mean": 12.6,
+        "sd": 1.4967
+      },
+      "positives_20": {
+        "mean": 99.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 72.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_22": {
+        "mean": 2.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 20.6,
+        "sd": 0.8
+      },
+      "positives_22": {
+        "mean": 70.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 101.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 12.8,
+        "sd": 3.0594
+      },
+      "positives_24": {
+        "mean": 50.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 121.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 19.4,
+        "sd": 1.8547
+      },
+      "positives_26": {
+        "mean": 26.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 145.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autounsafe_16": {
+        "mean": 1.0,
+        "sd": 0.6325
+      },
+      "autoabort_16": {
+        "mean": 6.4,
+        "sd": 1.3565
+      },
+      "autounsafe_18": {
+        "mean": 0.6,
+        "sd": 0.4899
+      },
+      "autoabort_18": {
+        "mean": 3.4,
+        "sd": 0.8
+      },
+      "autounsafe_20": {
+        "mean": 1.4,
+        "sd": 0.8
+      },
+      "autoabort_20": {
+        "mean": 12.6,
+        "sd": 1.4967
+      },
+      "autounsafe_22": {
+        "mean": 2.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 20.6,
+        "sd": 0.8
+      },
+      "autounsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 12.8,
+        "sd": 3.0594
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 19.4,
+        "sd": 1.8547
+      },
+      "mae_wh": {
+        "mean": 0.7489,
+        "sd": 0.0145
+      },
+      "bias_wh": {
+        "mean": -0.5182,
+        "sd": 0.0296
+      },
+      "p90_coverage": {
+        "mean": 0.6179,
+        "sd": 0.0257
+      },
+      "low_quality_share": {
+        "mean": 0.4333,
+        "sd": 0.0271
+      },
+      "unsafe_all": {
+        "mean": 6.0,
+        "sd": 0.8944
+      },
+      "abort_all": {
+        "mean": 75.2,
+        "sd": 7.0257
+      },
+      "deferred_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "positives_all": {
+        "mean": 517.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 509.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 6.0,
+        "sd": 0.8944
+      },
+      "auto_abort_all": {
+        "mean": 75.2,
+        "sd": 7.0257
+      }
+    },
+    "combined/fix": {
+      "unsafe_16": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "abort_16": {
+        "mean": 14.2,
+        "sd": 1.3266
+      },
+      "positives_16": {
+        "mean": 144.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 27.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 18.2,
+        "sd": 1.1662
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 9.0,
+        "sd": 0.8944
+      },
+      "positives_18": {
+        "mean": 128.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 43.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 12.2,
+        "sd": 1.7205
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 18.0,
+        "sd": 0.6325
+      },
+      "positives_20": {
+        "mean": 99.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 72.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 20.4,
+        "sd": 2.245
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 26.0,
+        "sd": 1.7889
+      },
+      "positives_22": {
+        "mean": 70.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 101.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 26.6,
+        "sd": 1.6248
+      },
+      "unsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 28.0,
+        "sd": 2.9665
+      },
+      "positives_24": {
+        "mean": 50.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 121.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 31.2,
+        "sd": 2.4819
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 28.4,
+        "sd": 0.8
+      },
+      "positives_26": {
+        "mean": 26.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 145.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 28.4,
+        "sd": 1.0198
+      },
+      "autounsafe_16": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "autoabort_16": {
+        "mean": 14.2,
+        "sd": 1.3266
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 9.0,
+        "sd": 0.8944
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 18.0,
+        "sd": 0.6325
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 26.0,
+        "sd": 1.7889
+      },
+      "autounsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 28.0,
+        "sd": 2.9665
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 28.4,
+        "sd": 0.8
+      },
+      "mae_wh": {
+        "mean": 0.4363,
+        "sd": 0.0037
+      },
+      "bias_wh": {
+        "mean": -0.0431,
+        "sd": 0.0076
+      },
+      "p90_coverage": {
+        "mean": 0.9236,
+        "sd": 0.0165
+      },
+      "low_quality_share": {
+        "mean": 0.379,
+        "sd": 0.0236
+      },
+      "unsafe_all": {
+        "mean": 1.4,
+        "sd": 0.4899
+      },
+      "abort_all": {
+        "mean": 123.6,
+        "sd": 7.0597
+      },
+      "deferred_all": {
+        "mean": 137.0,
+        "sd": 4.6043
+      },
+      "positives_all": {
+        "mean": 517.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 509.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 1.4,
+        "sd": 0.4899
+      },
+      "auto_abort_all": {
+        "mean": 123.6,
+        "sd": 7.0597
+      }
+    },
+    "low_quality/no_fix": {
+      "unsafe_16": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "abort_16": {
+        "mean": 9.8,
+        "sd": 0.9798
+      },
+      "positives_16": {
+        "mean": 144.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 27.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 4.6,
+        "sd": 1.0198
+      },
+      "positives_18": {
+        "mean": 128.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 43.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 15.8,
+        "sd": 1.6
+      },
+      "positives_20": {
+        "mean": 99.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 72.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_22": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 21.6,
+        "sd": 0.8
+      },
+      "positives_22": {
+        "mean": 70.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 101.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 16.6,
+        "sd": 1.3565
+      },
+      "positives_24": {
+        "mean": 50.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 121.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 21.6,
+        "sd": 1.0198
+      },
+      "positives_26": {
+        "mean": 26.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 145.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autounsafe_16": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "autoabort_16": {
+        "mean": 9.8,
+        "sd": 0.9798
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 4.6,
+        "sd": 1.0198
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 15.8,
+        "sd": 1.6
+      },
+      "autounsafe_22": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 21.6,
+        "sd": 0.8
+      },
+      "autounsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 16.6,
+        "sd": 1.3565
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 21.6,
+        "sd": 1.0198
+      },
+      "mae_wh": {
+        "mean": 0.5466,
+        "sd": 0.0213
+      },
+      "bias_wh": {
+        "mean": -0.2923,
+        "sd": 0.0295
+      },
+      "p90_coverage": {
+        "mean": 0.7691,
+        "sd": 0.0226
+      },
+      "low_quality_share": {
+        "mean": 0.3456,
+        "sd": 0.0285
+      },
+      "unsafe_all": {
+        "mean": 2.2,
+        "sd": 0.4
+      },
+      "abort_all": {
+        "mean": 90.0,
+        "sd": 4.3359
+      },
+      "deferred_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "positives_all": {
+        "mean": 517.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 509.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 2.2,
+        "sd": 0.4
+      },
+      "auto_abort_all": {
+        "mean": 90.0,
+        "sd": 4.3359
+      }
+    },
+    "low_quality/fix": {
+      "unsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_16": {
+        "mean": 13.8,
+        "sd": 0.7483
+      },
+      "positives_16": {
+        "mean": 144.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 27.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 17.8,
+        "sd": 0.7483
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 8.4,
+        "sd": 1.2
+      },
+      "positives_18": {
+        "mean": 128.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 43.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 10.2,
+        "sd": 0.9798
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 18.0,
+        "sd": 0.6325
+      },
+      "positives_20": {
+        "mean": 99.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 72.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 18.4,
+        "sd": 1.3565
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 25.8,
+        "sd": 1.7205
+      },
+      "positives_22": {
+        "mean": 70.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 101.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 25.2,
+        "sd": 1.9391
+      },
+      "unsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 25.2,
+        "sd": 2.4819
+      },
+      "positives_24": {
+        "mean": 50.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 121.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 28.0,
+        "sd": 1.8974
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 25.4,
+        "sd": 1.6248
+      },
+      "positives_26": {
+        "mean": 26.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 145.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 24.6,
+        "sd": 1.8547
+      },
+      "autounsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_16": {
+        "mean": 13.8,
+        "sd": 0.7483
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 8.4,
+        "sd": 1.2
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 18.0,
+        "sd": 0.6325
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 25.8,
+        "sd": 1.7205
+      },
+      "autounsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 25.2,
+        "sd": 2.4819
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 25.4,
+        "sd": 1.6248
+      },
+      "mae_wh": {
+        "mean": 0.4243,
+        "sd": 0.0027
+      },
+      "bias_wh": {
+        "mean": -0.0261,
+        "sd": 0.003
+      },
+      "p90_coverage": {
+        "mean": 0.9138,
+        "sd": 0.018
+      },
+      "low_quality_share": {
+        "mean": 0.3103,
+        "sd": 0.0242
+      },
+      "unsafe_all": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_all": {
+        "mean": 116.6,
+        "sd": 6.4992
+      },
+      "deferred_all": {
+        "mean": 124.2,
+        "sd": 6.6151
+      },
+      "positives_all": {
+        "mean": 517.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 509.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "auto_abort_all": {
+        "mean": 116.6,
+        "sd": 6.4992
+      }
+    },
+    "reference/no_fix": {
+      "unsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_16": {
+        "mean": 12.8,
+        "sd": 0.7483
+      },
+      "positives_16": {
+        "mean": 144.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 27.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 6.0,
+        "sd": 0.6325
+      },
+      "positives_18": {
+        "mean": 128.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 43.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 18.2,
+        "sd": 0.4
+      },
+      "positives_20": {
+        "mean": 99.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 72.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_22": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 21.2,
+        "sd": 0.4
+      },
+      "positives_22": {
+        "mean": 70.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 101.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 20.4,
+        "sd": 1.3565
+      },
+      "positives_24": {
+        "mean": 50.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 121.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 23.8,
+        "sd": 0.7483
+      },
+      "positives_26": {
+        "mean": 26.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 145.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autounsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_16": {
+        "mean": 12.8,
+        "sd": 0.7483
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 6.0,
+        "sd": 0.6325
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 18.2,
+        "sd": 0.4
+      },
+      "autounsafe_22": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 21.2,
+        "sd": 0.4
+      },
+      "autounsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 20.4,
+        "sd": 1.3565
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 23.8,
+        "sd": 0.7483
+      },
+      "mae_wh": {
+        "mean": 0.4174,
+        "sd": 0.0012
+      },
+      "bias_wh": {
+        "mean": -0.0218,
+        "sd": 0.002
+      },
+      "p90_coverage": {
+        "mean": 0.896,
+        "sd": 0.0048
+      },
+      "low_quality_share": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_all": {
+        "mean": 2.0,
+        "sd": 0.0
+      },
+      "abort_all": {
+        "mean": 102.4,
+        "sd": 2.245
+      },
+      "deferred_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "positives_all": {
+        "mean": 517.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 509.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 2.0,
+        "sd": 0.0
+      },
+      "auto_abort_all": {
+        "mean": 102.4,
+        "sd": 2.245
+      }
+    },
+    "reference/fix": {
+      "unsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_16": {
+        "mean": 13.8,
+        "sd": 1.1662
+      },
+      "positives_16": {
+        "mean": 144.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 27.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 17.8,
+        "sd": 1.1662
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 6.8,
+        "sd": 1.1662
+      },
+      "positives_18": {
+        "mean": 128.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 43.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 8.8,
+        "sd": 1.6
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 17.2,
+        "sd": 1.3266
+      },
+      "positives_20": {
+        "mean": 99.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 72.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 17.8,
+        "sd": 1.3266
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 23.6,
+        "sd": 0.4899
+      },
+      "positives_22": {
+        "mean": 70.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 101.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 22.8,
+        "sd": 0.7483
+      },
+      "unsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 27.4,
+        "sd": 1.0198
+      },
+      "positives_24": {
+        "mean": 50.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 121.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 29.4,
+        "sd": 1.3565
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 25.8,
+        "sd": 0.9798
+      },
+      "positives_26": {
+        "mean": 26.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 145.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 24.8,
+        "sd": 0.7483
+      },
+      "autounsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_16": {
+        "mean": 13.8,
+        "sd": 1.1662
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 6.8,
+        "sd": 1.1662
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 17.2,
+        "sd": 1.3266
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 23.6,
+        "sd": 0.4899
+      },
+      "autounsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 27.4,
+        "sd": 1.0198
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 25.8,
+        "sd": 0.9798
+      },
+      "mae_wh": {
+        "mean": 0.4169,
+        "sd": 0.0027
+      },
+      "bias_wh": {
+        "mean": -0.0269,
+        "sd": 0.0027
+      },
+      "p90_coverage": {
+        "mean": 0.8966,
+        "sd": 0.0044
+      },
+      "low_quality_share": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_all": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_all": {
+        "mean": 114.6,
+        "sd": 2.8
+      },
+      "deferred_all": {
+        "mean": 121.4,
+        "sd": 2.7276
+      },
+      "positives_all": {
+        "mean": 517.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 509.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "auto_abort_all": {
+        "mean": 114.6,
+        "sd": 2.8
+      }
+    },
+    "stale/no_fix": {
+      "unsafe_16": {
+        "mean": 0.8,
+        "sd": 0.4
+      },
+      "abort_16": {
+        "mean": 15.0,
+        "sd": 0.0
+      },
+      "positives_16": {
+        "mean": 144.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 27.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 10.0,
+        "sd": 0.6325
+      },
+      "positives_18": {
+        "mean": 128.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 43.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 22.8,
+        "sd": 1.1662
+      },
+      "positives_20": {
+        "mean": 99.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 72.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_22": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 32.0,
+        "sd": 1.0954
+      },
+      "positives_22": {
+        "mean": 70.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 101.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 25.2,
+        "sd": 1.7205
+      },
+      "positives_24": {
+        "mean": 50.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 121.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 29.4,
+        "sd": 0.4899
+      },
+      "positives_26": {
+        "mean": 26.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 145.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autounsafe_16": {
+        "mean": 0.8,
+        "sd": 0.4
+      },
+      "autoabort_16": {
+        "mean": 15.0,
+        "sd": 0.0
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 10.0,
+        "sd": 0.6325
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 22.8,
+        "sd": 1.1662
+      },
+      "autounsafe_22": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 32.0,
+        "sd": 1.0954
+      },
+      "autounsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 25.2,
+        "sd": 1.7205
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 29.4,
+        "sd": 0.4899
+      },
+      "mae_wh": {
+        "mean": 0.4748,
+        "sd": 0.0034
+      },
+      "bias_wh": {
+        "mean": 0.0078,
+        "sd": 0.0124
+      },
+      "p90_coverage": {
+        "mean": 0.9367,
+        "sd": 0.0084
+      },
+      "low_quality_share": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_all": {
+        "mean": 2.8,
+        "sd": 0.4
+      },
+      "abort_all": {
+        "mean": 134.4,
+        "sd": 4.0792
+      },
+      "deferred_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "positives_all": {
+        "mean": 517.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 509.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 2.8,
+        "sd": 0.4
+      },
+      "auto_abort_all": {
+        "mean": 134.4,
+        "sd": 4.0792
+      }
+    },
+    "stale/fix": {
+      "unsafe_16": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "abort_16": {
+        "mean": 15.0,
+        "sd": 0.0
+      },
+      "positives_16": {
+        "mean": 144.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 27.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 20.0,
+        "sd": 1.4142
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 12.4,
+        "sd": 2.6533
+      },
+      "positives_18": {
+        "mean": 128.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 43.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 18.4,
+        "sd": 3.3823
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 21.4,
+        "sd": 1.2
+      },
+      "positives_20": {
+        "mean": 99.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 72.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 24.8,
+        "sd": 2.1354
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 31.0,
+        "sd": 3.6332
+      },
+      "positives_22": {
+        "mean": 70.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 101.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 31.6,
+        "sd": 4.128
+      },
+      "unsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 30.8,
+        "sd": 3.8678
+      },
+      "positives_24": {
+        "mean": 50.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 121.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 34.8,
+        "sd": 4.5782
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 31.4,
+        "sd": 3.2619
+      },
+      "positives_26": {
+        "mean": 26.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 145.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 30.8,
+        "sd": 2.7857
+      },
+      "autounsafe_16": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "autoabort_16": {
+        "mean": 15.0,
+        "sd": 0.0
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 12.4,
+        "sd": 2.6533
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 21.4,
+        "sd": 1.2
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 31.0,
+        "sd": 3.6332
+      },
+      "autounsafe_24": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 30.8,
+        "sd": 3.8678
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 31.4,
+        "sd": 3.2619
+      },
+      "mae_wh": {
+        "mean": 0.466,
+        "sd": 0.0073
+      },
+      "bias_wh": {
+        "mean": -0.037,
+        "sd": 0.0383
+      },
+      "p90_coverage": {
+        "mean": 0.9181,
+        "sd": 0.0243
+      },
+      "low_quality_share": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_all": {
+        "mean": 1.4,
+        "sd": 0.4899
+      },
+      "abort_all": {
+        "mean": 142.0,
+        "sd": 12.4097
+      },
+      "deferred_all": {
+        "mean": 160.4,
+        "sd": 14.6369
+      },
+      "positives_all": {
+        "mean": 517.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 509.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 1.4,
+        "sd": 0.4899
+      },
+      "auto_abort_all": {
+        "mean": 142.0,
+        "sd": 12.4097
+      }
+    }
+  },
+  "unseen_and_failure_after_outage": {
+    "failure_no_reference_flights/no_fix": {
+      "unsafe_16": {
+        "mean": 1.0,
+        "sd": 0.6325
+      },
+      "abort_16": {
+        "mean": 3.0,
+        "sd": 1.4142
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_18": {
+        "mean": 0.6,
+        "sd": 0.4899
+      },
+      "abort_18": {
+        "mean": 1.4,
+        "sd": 0.8
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_20": {
+        "mean": 1.4,
+        "sd": 0.8
+      },
+      "abort_20": {
+        "mean": 8.8,
+        "sd": 1.1662
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_22": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 8.8,
+        "sd": 0.7483
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 6.0,
+        "sd": 2.6833
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 11.4,
+        "sd": 1.4967
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autounsafe_16": {
+        "mean": 1.0,
+        "sd": 0.6325
+      },
+      "autoabort_16": {
+        "mean": 3.0,
+        "sd": 1.4142
+      },
+      "autounsafe_18": {
+        "mean": 0.6,
+        "sd": 0.4899
+      },
+      "autoabort_18": {
+        "mean": 1.4,
+        "sd": 0.8
+      },
+      "autounsafe_20": {
+        "mean": 1.4,
+        "sd": 0.8
+      },
+      "autoabort_20": {
+        "mean": 8.8,
+        "sd": 1.1662
+      },
+      "autounsafe_22": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 8.8,
+        "sd": 0.7483
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 6.0,
+        "sd": 2.6833
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 11.4,
+        "sd": 1.4967
+      },
+      "mae_wh": {
+        "mean": 0.8422,
+        "sd": 0.0205
+      },
+      "bias_wh": {
+        "mean": -0.653,
+        "sd": 0.0408
+      },
+      "p90_coverage": {
+        "mean": 0.5125,
+        "sd": 0.0286
+      },
+      "low_quality_share": {
+        "mean": 0.5763,
+        "sd": 0.029
+      },
+      "unsafe_all": {
+        "mean": 4.0,
+        "sd": 0.8944
+      },
+      "abort_all": {
+        "mean": 39.4,
+        "sd": 5.4991
+      },
+      "deferred_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 4.0,
+        "sd": 0.8944
+      },
+      "auto_abort_all": {
+        "mean": 39.4,
+        "sd": 5.4991
+      }
+    },
+    "failure_no_reference_flights/fix": {
+      "unsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_16": {
+        "mean": 12.0,
+        "sd": 1.0954
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 21.8,
+        "sd": 2.4819
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 12.0,
+        "sd": 2.7568
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 28.0,
+        "sd": 3.2863
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 17.6,
+        "sd": 2.6533
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 28.2,
+        "sd": 4.7074
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 19.6,
+        "sd": 1.6248
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 32.8,
+        "sd": 2.3152
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 20.4,
+        "sd": 2.9394
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 36.0,
+        "sd": 3.4641
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 18.6,
+        "sd": 2.1541
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 27.0,
+        "sd": 2.8983
+      },
+      "autounsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_16": {
+        "mean": 6.8,
+        "sd": 1.1662
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 8.4,
+        "sd": 1.0198
+      },
+      "autounsafe_20": {
+        "mean": 1.2,
+        "sd": 0.4
+      },
+      "autoabort_20": {
+        "mean": 8.2,
+        "sd": 0.9798
+      },
+      "autounsafe_22": {
+        "mean": 0.6,
+        "sd": 0.4899
+      },
+      "autoabort_22": {
+        "mean": 15.2,
+        "sd": 0.4
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 11.0,
+        "sd": 1.6733
+      },
+      "autounsafe_26": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "autoabort_26": {
+        "mean": 12.6,
+        "sd": 2.3324
+      },
+      "mae_wh": {
+        "mean": 0.7449,
+        "sd": 0.0349
+      },
+      "bias_wh": {
+        "mean": -0.5166,
+        "sd": 0.0664
+      },
+      "p90_coverage": {
+        "mean": 0.6323,
+        "sd": 0.0267
+      },
+      "low_quality_share": {
+        "mean": 0.5763,
+        "sd": 0.029
+      },
+      "unsafe_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_all": {
+        "mean": 100.2,
+        "sd": 10.8701
+      },
+      "deferred_all": {
+        "mean": 173.8,
+        "sd": 17.5203
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 2.0,
+        "sd": 0.8944
+      },
+      "auto_abort_all": {
+        "mean": 62.2,
+        "sd": 4.5343
+      }
+    },
+    "unseen_bias_20pct/no_fix": {
+      "unsafe_16": {
+        "mean": 1.6,
+        "sd": 0.4899
+      },
+      "abort_16": {
+        "mean": 4.0,
+        "sd": 0.6325
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_18": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "abort_18": {
+        "mean": 3.0,
+        "sd": 0.6325
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_20": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "abort_20": {
+        "mean": 13.4,
+        "sd": 0.4899
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 10.0,
+        "sd": 1.4142
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 11.8,
+        "sd": 1.6
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 13.2,
+        "sd": 2.4819
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autounsafe_16": {
+        "mean": 1.6,
+        "sd": 0.4899
+      },
+      "autoabort_16": {
+        "mean": 4.0,
+        "sd": 0.6325
+      },
+      "autounsafe_18": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "autoabort_18": {
+        "mean": 3.0,
+        "sd": 0.6325
+      },
+      "autounsafe_20": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "autoabort_20": {
+        "mean": 13.4,
+        "sd": 0.4899
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 10.0,
+        "sd": 1.4142
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 11.8,
+        "sd": 1.6
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 13.2,
+        "sd": 2.4819
+      },
+      "mae_wh": {
+        "mean": 0.8653,
+        "sd": 0.0279
+      },
+      "bias_wh": {
+        "mean": -0.6164,
+        "sd": 0.0529
+      },
+      "p90_coverage": {
+        "mean": 0.6288,
+        "sd": 0.0264
+      },
+      "low_quality_share": {
+        "mean": 0.5763,
+        "sd": 0.029
+      },
+      "unsafe_all": {
+        "mean": 2.2,
+        "sd": 0.7483
+      },
+      "abort_all": {
+        "mean": 55.4,
+        "sd": 5.004
+      },
+      "deferred_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 2.2,
+        "sd": 0.7483
+      },
+      "auto_abort_all": {
+        "mean": 55.4,
+        "sd": 5.004
+      }
+    },
+    "unseen_bias_20pct/fix": {
+      "unsafe_16": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "abort_16": {
+        "mean": 10.8,
+        "sd": 0.9798
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 13.8,
+        "sd": 0.7483
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 6.6,
+        "sd": 1.0198
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 7.6,
+        "sd": 1.4967
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 14.6,
+        "sd": 1.8547
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 13.6,
+        "sd": 2.4166
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 12.6,
+        "sd": 1.7436
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 12.0,
+        "sd": 1.6733
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 14.6,
+        "sd": 2.245
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 15.6,
+        "sd": 1.8547
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 17.4,
+        "sd": 1.2
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 17.6,
+        "sd": 1.3565
+      },
+      "autounsafe_16": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "autoabort_16": {
+        "mean": 10.8,
+        "sd": 0.9798
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 6.6,
+        "sd": 1.0198
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 14.6,
+        "sd": 1.8547
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 12.6,
+        "sd": 1.7436
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 14.6,
+        "sd": 2.245
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 17.4,
+        "sd": 1.2
+      },
+      "mae_wh": {
+        "mean": 0.4088,
+        "sd": 0.0043
+      },
+      "bias_wh": {
+        "mean": 0.0071,
+        "sd": 0.0118
+      },
+      "p90_coverage": {
+        "mean": 0.9251,
+        "sd": 0.0138
+      },
+      "low_quality_share": {
+        "mean": 0.5068,
+        "sd": 0.0252
+      },
+      "unsafe_all": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "abort_all": {
+        "mean": 76.6,
+        "sd": 6.7409
+      },
+      "deferred_all": {
+        "mean": 80.2,
+        "sd": 5.4185
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 0.4,
+        "sd": 0.4899
+      },
+      "auto_abort_all": {
+        "mean": 76.6,
+        "sd": 6.7409
+      }
+    },
+    "unseen_drifting_bias/no_fix": {
+      "unsafe_16": {
+        "mean": 1.0,
+        "sd": 0.6325
+      },
+      "abort_16": {
+        "mean": 1.8,
+        "sd": 1.1662
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_18": {
+        "mean": 1.0,
+        "sd": 0.6325
+      },
+      "abort_18": {
+        "mean": 1.8,
+        "sd": 1.3266
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_20": {
+        "mean": 1.8,
+        "sd": 0.7483
+      },
+      "abort_20": {
+        "mean": 4.4,
+        "sd": 1.0198
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_22": {
+        "mean": 1.0,
+        "sd": 0.6325
+      },
+      "abort_22": {
+        "mean": 8.4,
+        "sd": 0.8
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_24": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "abort_24": {
+        "mean": 5.0,
+        "sd": 1.4142
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_26": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "abort_26": {
+        "mean": 8.6,
+        "sd": 1.4967
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autounsafe_16": {
+        "mean": 1.0,
+        "sd": 0.6325
+      },
+      "autoabort_16": {
+        "mean": 1.8,
+        "sd": 1.1662
+      },
+      "autounsafe_18": {
+        "mean": 1.0,
+        "sd": 0.6325
+      },
+      "autoabort_18": {
+        "mean": 1.8,
+        "sd": 1.3266
+      },
+      "autounsafe_20": {
+        "mean": 1.8,
+        "sd": 0.7483
+      },
+      "autoabort_20": {
+        "mean": 4.4,
+        "sd": 1.0198
+      },
+      "autounsafe_22": {
+        "mean": 1.0,
+        "sd": 0.6325
+      },
+      "autoabort_22": {
+        "mean": 8.4,
+        "sd": 0.8
+      },
+      "autounsafe_24": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "autoabort_24": {
+        "mean": 5.0,
+        "sd": 1.4142
+      },
+      "autounsafe_26": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "autoabort_26": {
+        "mean": 8.6,
+        "sd": 1.4967
+      },
+      "mae_wh": {
+        "mean": 0.8286,
+        "sd": 0.0119
+      },
+      "bias_wh": {
+        "mean": -0.6216,
+        "sd": 0.0318
+      },
+      "p90_coverage": {
+        "mean": 0.4612,
+        "sd": 0.0314
+      },
+      "low_quality_share": {
+        "mean": 0.5763,
+        "sd": 0.029
+      },
+      "unsafe_all": {
+        "mean": 5.2,
+        "sd": 1.7205
+      },
+      "abort_all": {
+        "mean": 30.0,
+        "sd": 4.7749
+      },
+      "deferred_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 5.2,
+        "sd": 1.7205
+      },
+      "auto_abort_all": {
+        "mean": 30.0,
+        "sd": 4.7749
+      }
+    },
+    "unseen_drifting_bias/fix": {
+      "unsafe_16": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "abort_16": {
+        "mean": 11.0,
+        "sd": 0.6325
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 14.2,
+        "sd": 0.7483
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 6.0,
+        "sd": 1.0954
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 7.6,
+        "sd": 2.1541
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 14.4,
+        "sd": 2.0591
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 14.8,
+        "sd": 3.3705
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 13.6,
+        "sd": 1.8547
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 13.4,
+        "sd": 1.7436
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 15.0,
+        "sd": 1.6733
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 16.8,
+        "sd": 1.1662
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 17.0,
+        "sd": 0.6325
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 17.8,
+        "sd": 1.1662
+      },
+      "autounsafe_16": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "autoabort_16": {
+        "mean": 11.0,
+        "sd": 0.6325
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 6.0,
+        "sd": 1.0954
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 14.4,
+        "sd": 2.0591
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 13.6,
+        "sd": 1.8547
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 15.0,
+        "sd": 1.6733
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 17.0,
+        "sd": 0.6325
+      },
+      "mae_wh": {
+        "mean": 0.4144,
+        "sd": 0.0052
+      },
+      "bias_wh": {
+        "mean": 0.0063,
+        "sd": 0.0118
+      },
+      "p90_coverage": {
+        "mean": 0.9214,
+        "sd": 0.0136
+      },
+      "low_quality_share": {
+        "mean": 0.5068,
+        "sd": 0.0252
+      },
+      "unsafe_all": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "abort_all": {
+        "mean": 77.0,
+        "sd": 5.02
+      },
+      "deferred_all": {
+        "mean": 84.6,
+        "sd": 6.3435
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "auto_abort_all": {
+        "mean": 77.0,
+        "sd": 5.02
+      }
+    },
+    "unseen_offset/no_fix": {
+      "unsafe_16": {
+        "mean": 1.4,
+        "sd": 0.4899
+      },
+      "abort_16": {
+        "mean": 3.2,
+        "sd": 1.1662
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_18": {
+        "mean": 0.6,
+        "sd": 0.4899
+      },
+      "abort_18": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_20": {
+        "mean": 2.2,
+        "sd": 0.7483
+      },
+      "abort_20": {
+        "mean": 6.8,
+        "sd": 0.9798
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_22": {
+        "mean": 1.2,
+        "sd": 0.4
+      },
+      "abort_22": {
+        "mean": 8.8,
+        "sd": 0.7483
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 5.4,
+        "sd": 1.3565
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 9.2,
+        "sd": 0.9798
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autounsafe_16": {
+        "mean": 1.4,
+        "sd": 0.4899
+      },
+      "autoabort_16": {
+        "mean": 3.2,
+        "sd": 1.1662
+      },
+      "autounsafe_18": {
+        "mean": 0.6,
+        "sd": 0.4899
+      },
+      "autoabort_18": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "autounsafe_20": {
+        "mean": 2.2,
+        "sd": 0.7483
+      },
+      "autoabort_20": {
+        "mean": 6.8,
+        "sd": 0.9798
+      },
+      "autounsafe_22": {
+        "mean": 1.2,
+        "sd": 0.4
+      },
+      "autoabort_22": {
+        "mean": 8.8,
+        "sd": 0.7483
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 5.4,
+        "sd": 1.3565
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 9.2,
+        "sd": 0.9798
+      },
+      "mae_wh": {
+        "mean": 0.7952,
+        "sd": 0.0183
+      },
+      "bias_wh": {
+        "mean": -0.6182,
+        "sd": 0.0472
+      },
+      "p90_coverage": {
+        "mean": 0.4981,
+        "sd": 0.0227
+      },
+      "low_quality_share": {
+        "mean": 0.5763,
+        "sd": 0.029
+      },
+      "unsafe_all": {
+        "mean": 5.4,
+        "sd": 1.0198
+      },
+      "abort_all": {
+        "mean": 34.4,
+        "sd": 2.1541
+      },
+      "deferred_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 5.4,
+        "sd": 1.0198
+      },
+      "auto_abort_all": {
+        "mean": 34.4,
+        "sd": 2.1541
+      }
+    },
+    "unseen_offset/fix": {
+      "unsafe_16": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "abort_16": {
+        "mean": 11.2,
+        "sd": 0.4
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 14.4,
+        "sd": 0.8
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 7.2,
+        "sd": 1.6
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 8.8,
+        "sd": 2.2271
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 14.2,
+        "sd": 2.0396
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 12.4,
+        "sd": 3.6111
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 13.6,
+        "sd": 1.3565
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 12.2,
+        "sd": 2.0396
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 15.2,
+        "sd": 2.4819
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 16.0,
+        "sd": 2.2804
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 16.8,
+        "sd": 0.9798
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 17.4,
+        "sd": 1.0198
+      },
+      "autounsafe_16": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "autoabort_16": {
+        "mean": 11.2,
+        "sd": 0.4
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 7.2,
+        "sd": 1.6
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 14.2,
+        "sd": 2.0396
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 13.6,
+        "sd": 1.3565
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 15.2,
+        "sd": 2.4819
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 16.8,
+        "sd": 0.9798
+      },
+      "mae_wh": {
+        "mean": 0.4138,
+        "sd": 0.0059
+      },
+      "bias_wh": {
+        "mean": 0.0178,
+        "sd": 0.0132
+      },
+      "p90_coverage": {
+        "mean": 0.928,
+        "sd": 0.016
+      },
+      "low_quality_share": {
+        "mean": 0.5068,
+        "sd": 0.0252
+      },
+      "unsafe_all": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "abort_all": {
+        "mean": 78.2,
+        "sd": 6.2418
+      },
+      "deferred_all": {
+        "mean": 81.2,
+        "sd": 7.6785
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "auto_abort_all": {
+        "mean": 78.2,
+        "sd": 6.2418
+      }
+    },
+    "unseen_overreading/no_fix": {
+      "unsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_16": {
+        "mean": 14.8,
+        "sd": 0.4
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 18.4,
+        "sd": 1.4967
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 27.0,
+        "sd": 1.6733
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 28.8,
+        "sd": 0.7483
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 25.6,
+        "sd": 1.4967
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 30.4,
+        "sd": 2.5768
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autounsafe_16": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_16": {
+        "mean": 14.8,
+        "sd": 0.4
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 18.4,
+        "sd": 1.4967
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 27.0,
+        "sd": 1.6733
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 28.8,
+        "sd": 0.7483
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 25.6,
+        "sd": 1.4967
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 30.4,
+        "sd": 2.5768
+      },
+      "mae_wh": {
+        "mean": 0.8298,
+        "sd": 0.0344
+      },
+      "bias_wh": {
+        "mean": 0.7016,
+        "sd": 0.0405
+      },
+      "p90_coverage": {
+        "mean": 0.9865,
+        "sd": 0.0048
+      },
+      "low_quality_share": {
+        "mean": 0.5763,
+        "sd": 0.029
+      },
+      "unsafe_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_all": {
+        "mean": 145.0,
+        "sd": 3.2249
+      },
+      "deferred_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "auto_abort_all": {
+        "mean": 145.0,
+        "sd": 3.2249
+      }
+    },
+    "unseen_overreading/fix": {
+      "unsafe_16": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "abort_16": {
+        "mean": 11.0,
+        "sd": 0.6325
+      },
+      "positives_16": {
+        "mean": 105.0,
+        "sd": 0.0
+      },
+      "negatives_16": {
+        "mean": 17.0,
+        "sd": 0.0
+      },
+      "deferred_16": {
+        "mean": 14.0,
+        "sd": 0.6325
+      },
+      "unsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_18": {
+        "mean": 6.0,
+        "sd": 1.0954
+      },
+      "positives_18": {
+        "mean": 92.0,
+        "sd": 0.0
+      },
+      "negatives_18": {
+        "mean": 30.0,
+        "sd": 0.0
+      },
+      "deferred_18": {
+        "mean": 6.8,
+        "sd": 1.3266
+      },
+      "unsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_20": {
+        "mean": 14.8,
+        "sd": 1.7205
+      },
+      "positives_20": {
+        "mean": 71.0,
+        "sd": 0.0
+      },
+      "negatives_20": {
+        "mean": 51.0,
+        "sd": 0.0
+      },
+      "deferred_20": {
+        "mean": 14.8,
+        "sd": 2.4819
+      },
+      "unsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_22": {
+        "mean": 14.0,
+        "sd": 2.0976
+      },
+      "positives_22": {
+        "mean": 54.0,
+        "sd": 0.0
+      },
+      "negatives_22": {
+        "mean": 68.0,
+        "sd": 0.0
+      },
+      "deferred_22": {
+        "mean": 13.8,
+        "sd": 1.3266
+      },
+      "unsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_24": {
+        "mean": 15.4,
+        "sd": 1.7436
+      },
+      "positives_24": {
+        "mean": 40.0,
+        "sd": 0.0
+      },
+      "negatives_24": {
+        "mean": 82.0,
+        "sd": 0.0
+      },
+      "deferred_24": {
+        "mean": 16.8,
+        "sd": 1.3266
+      },
+      "unsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "abort_26": {
+        "mean": 17.2,
+        "sd": 0.4
+      },
+      "positives_26": {
+        "mean": 24.0,
+        "sd": 0.0
+      },
+      "negatives_26": {
+        "mean": 98.0,
+        "sd": 0.0
+      },
+      "deferred_26": {
+        "mean": 17.8,
+        "sd": 1.6
+      },
+      "autounsafe_16": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "autoabort_16": {
+        "mean": 11.0,
+        "sd": 0.6325
+      },
+      "autounsafe_18": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_18": {
+        "mean": 6.0,
+        "sd": 1.0954
+      },
+      "autounsafe_20": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_20": {
+        "mean": 14.8,
+        "sd": 1.7205
+      },
+      "autounsafe_22": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_22": {
+        "mean": 14.0,
+        "sd": 2.0976
+      },
+      "autounsafe_24": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_24": {
+        "mean": 15.4,
+        "sd": 1.7436
+      },
+      "autounsafe_26": {
+        "mean": 0.0,
+        "sd": 0.0
+      },
+      "autoabort_26": {
+        "mean": 17.2,
+        "sd": 0.4
+      },
+      "mae_wh": {
+        "mean": 0.4133,
+        "sd": 0.0033
+      },
+      "bias_wh": {
+        "mean": 0.0049,
+        "sd": 0.0108
+      },
+      "p90_coverage": {
+        "mean": 0.9283,
+        "sd": 0.0118
+      },
+      "low_quality_share": {
+        "mean": 0.5068,
+        "sd": 0.0252
+      },
+      "unsafe_all": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "abort_all": {
+        "mean": 78.4,
+        "sd": 5.8515
+      },
+      "deferred_all": {
+        "mean": 84.0,
+        "sd": 4.98
+      },
+      "positives_all": {
+        "mean": 386.0,
+        "sd": 0.0
+      },
+      "negatives_all": {
+        "mean": 346.0,
+        "sd": 0.0
+      },
+      "auto_unsafe_all": {
+        "mean": 0.2,
+        "sd": 0.4
+      },
+      "auto_abort_all": {
+        "mean": 78.4,
+        "sd": 5.8515
+      }
+    }
+  },
+  "by_window_seed_mean": {
+    "combined/no_fix/1": {
+      "mae_wh": 0.608,
+      "bias_wh": -0.2306,
+      "p90_coverage": 0.9114
+    },
+    "combined/no_fix/2": {
+      "mae_wh": 0.4233,
+      "bias_wh": -0.1316,
+      "p90_coverage": 0.8513
+    },
+    "combined/no_fix/3": {
+      "mae_wh": 0.4826,
+      "bias_wh": -0.0375,
+      "p90_coverage": 0.7609
+    },
+    "combined/no_fix/4": {
+      "mae_wh": 0.5873,
+      "bias_wh": -0.3222,
+      "p90_coverage": 0.4199
+    },
+    "combined/no_fix/5": {
+      "mae_wh": 0.8919,
+      "bias_wh": -0.7457,
+      "p90_coverage": 0.4327
+    },
+    "combined/no_fix/6": {
+      "mae_wh": 1.0178,
+      "bias_wh": -0.9629,
+      "p90_coverage": 0.6126
+    },
+    "combined/no_fix/7": {
+      "mae_wh": 1.2312,
+      "bias_wh": -1.1968,
+      "p90_coverage": 0.3364
+    },
+    "combined/fix/1": {
+      "mae_wh": 0.6102,
+      "bias_wh": -0.2334,
+      "p90_coverage": 0.9712
+    },
+    "combined/fix/2": {
+      "mae_wh": 0.3818,
+      "bias_wh": -0.0948,
+      "p90_coverage": 0.8802
+    },
+    "combined/fix/3": {
+      "mae_wh": 0.5584,
+      "bias_wh": 0.1924,
+      "p90_coverage": 0.9302
+    },
+    "combined/fix/4": {
+      "mae_wh": 0.4338,
+      "bias_wh": 0.0254,
+      "p90_coverage": 0.9486
+    },
+    "combined/fix/5": {
+      "mae_wh": 0.4338,
+      "bias_wh": -0.1868,
+      "p90_coverage": 0.8834
+    },
+    "combined/fix/6": {
+      "mae_wh": 0.3231,
+      "bias_wh": -0.0004,
+      "p90_coverage": 0.9109
+    },
+    "combined/fix/7": {
+      "mae_wh": 0.3134,
+      "bias_wh": -0.0039,
+      "p90_coverage": 0.9405
+    },
+    "low_quality/no_fix/1": {
+      "mae_wh": 0.608,
+      "bias_wh": -0.2306,
+      "p90_coverage": 0.9114
+    },
+    "low_quality/no_fix/2": {
+      "mae_wh": 0.4233,
+      "bias_wh": -0.1316,
+      "p90_coverage": 0.8513
+    },
+    "low_quality/no_fix/3": {
+      "mae_wh": 0.4589,
+      "bias_wh": -0.0026,
+      "p90_coverage": 0.8734
+    },
+    "low_quality/no_fix/4": {
+      "mae_wh": 0.4528,
+      "bias_wh": -0.1575,
+      "p90_coverage": 0.6979
+    },
+    "low_quality/no_fix/5": {
+      "mae_wh": 0.6787,
+      "bias_wh": -0.5104,
+      "p90_coverage": 0.5803
+    },
+    "low_quality/no_fix/6": {
+      "mae_wh": 0.5274,
+      "bias_wh": -0.4312,
+      "p90_coverage": 0.784
+    },
+    "low_quality/no_fix/7": {
+      "mae_wh": 0.6771,
+      "bias_wh": -0.5823,
+      "p90_coverage": 0.6851
+    },
+    "low_quality/fix/1": {
+      "mae_wh": 0.6102,
+      "bias_wh": -0.2334,
+      "p90_coverage": 0.9712
+    },
+    "low_quality/fix/2": {
+      "mae_wh": 0.3818,
+      "bias_wh": -0.0948,
+      "p90_coverage": 0.8802
+    },
+    "low_quality/fix/3": {
+      "mae_wh": 0.5413,
+      "bias_wh": 0.2404,
+      "p90_coverage": 0.945
+    },
+    "low_quality/fix/4": {
+      "mae_wh": 0.4013,
+      "bias_wh": 0.0606,
+      "p90_coverage": 0.9299
+    },
+    "low_quality/fix/5": {
+      "mae_wh": 0.4239,
+      "bias_wh": -0.1911,
+      "p90_coverage": 0.8575
+    },
+    "low_quality/fix/6": {
+      "mae_wh": 0.3052,
+      "bias_wh": 0.0271,
+      "p90_coverage": 0.8937
+    },
+    "low_quality/fix/7": {
+      "mae_wh": 0.3063,
+      "bias_wh": 0.0083,
+      "p90_coverage": 0.919
+    },
+    "reference/no_fix/1": {
+      "mae_wh": 0.608,
+      "bias_wh": -0.2306,
+      "p90_coverage": 0.9114
+    },
+    "reference/no_fix/2": {
+      "mae_wh": 0.3711,
+      "bias_wh": -0.0848,
+      "p90_coverage": 0.8838
+    },
+    "reference/no_fix/3": {
+      "mae_wh": 0.5412,
+      "bias_wh": 0.2413,
+      "p90_coverage": 0.8994
+    },
+    "reference/no_fix/4": {
+      "mae_wh": 0.3831,
+      "bias_wh": 0.0562,
+      "p90_coverage": 0.8894
+    },
+    "reference/no_fix/5": {
+      "mae_wh": 0.406,
+      "bias_wh": -0.1664,
+      "p90_coverage": 0.7977
+    },
+    "reference/no_fix/6": {
+      "mae_wh": 0.2933,
+      "bias_wh": 0.0242,
+      "p90_coverage": 0.9646
+    },
+    "reference/no_fix/7": {
+      "mae_wh": 0.3194,
+      "bias_wh": 0.0075,
+      "p90_coverage": 0.9259
+    },
+    "reference/fix/1": {
+      "mae_wh": 0.6102,
+      "bias_wh": -0.2334,
+      "p90_coverage": 0.9712
+    },
+    "reference/fix/2": {
+      "mae_wh": 0.3716,
+      "bias_wh": -0.088,
+      "p90_coverage": 0.8602
+    },
+    "reference/fix/3": {
+      "mae_wh": 0.5371,
+      "bias_wh": 0.2354,
+      "p90_coverage": 0.9408
+    },
+    "reference/fix/4": {
+      "mae_wh": 0.3813,
+      "bias_wh": 0.0471,
+      "p90_coverage": 0.9136
+    },
+    "reference/fix/5": {
+      "mae_wh": 0.4093,
+      "bias_wh": -0.1757,
+      "p90_coverage": 0.7504
+    },
+    "reference/fix/6": {
+      "mae_wh": 0.2904,
+      "bias_wh": 0.0198,
+      "p90_coverage": 0.9051
+    },
+    "reference/fix/7": {
+      "mae_wh": 0.3188,
+      "bias_wh": 0.0066,
+      "p90_coverage": 0.9347
+    },
+    "stale/no_fix/1": {
+      "mae_wh": 0.608,
+      "bias_wh": -0.2306,
+      "p90_coverage": 0.9114
+    },
+    "stale/no_fix/2": {
+      "mae_wh": 0.3711,
+      "bias_wh": -0.0848,
+      "p90_coverage": 0.8838
+    },
+    "stale/no_fix/3": {
+      "mae_wh": 0.5778,
+      "bias_wh": 0.1951,
+      "p90_coverage": 0.9219
+    },
+    "stale/no_fix/4": {
+      "mae_wh": 0.4453,
+      "bias_wh": 0.0384,
+      "p90_coverage": 0.9378
+    },
+    "stale/no_fix/5": {
+      "mae_wh": 0.4718,
+      "bias_wh": 0.0168,
+      "p90_coverage": 0.9437
+    },
+    "stale/no_fix/6": {
+      "mae_wh": 0.4027,
+      "bias_wh": 0.01,
+      "p90_coverage": 0.9634
+    },
+    "stale/no_fix/7": {
+      "mae_wh": 0.4469,
+      "bias_wh": 0.1093,
+      "p90_coverage": 0.9953
+    },
+    "stale/fix/1": {
+      "mae_wh": 0.6102,
+      "bias_wh": -0.2334,
+      "p90_coverage": 0.9712
+    },
+    "stale/fix/2": {
+      "mae_wh": 0.3716,
+      "bias_wh": -0.088,
+      "p90_coverage": 0.8602
+    },
+    "stale/fix/3": {
+      "mae_wh": 0.5694,
+      "bias_wh": 0.1883,
+      "p90_coverage": 0.9284
+    },
+    "stale/fix/4": {
+      "mae_wh": 0.432,
+      "bias_wh": 0.0422,
+      "p90_coverage": 0.9353
+    },
+    "stale/fix/5": {
+      "mae_wh": 0.4699,
+      "bias_wh": -0.0778,
+      "p90_coverage": 0.8992
+    },
+    "stale/fix/6": {
+      "mae_wh": 0.4055,
+      "bias_wh": -0.0257,
+      "p90_coverage": 0.8891
+    },
+    "stale/fix/7": {
+      "mae_wh": 0.4039,
+      "bias_wh": -0.0642,
+      "p90_coverage": 0.9434
+    }
+  },
+  "rare_events": {
+    "combined/no_fix/750 g flight": {
+      "mae_wh": 1.4748,
+      "bias_wh": -1.439,
+      "p90_coverage": 0.325,
+      "n_checkpoints": 80
+    },
+    "combined/no_fix/R6 long route": {
+      "mae_wh": 0.9123,
+      "bias_wh": -0.8043,
+      "p90_coverage": 0.3714,
+      "n_checkpoints": 245
+    },
+    "combined/fix/750 g flight": {
+      "mae_wh": 0.4598,
+      "bias_wh": -0.4252,
+      "p90_coverage": 0.7125,
+      "n_checkpoints": 80
+    },
+    "combined/fix/R6 long route": {
+      "mae_wh": 0.4291,
+      "bias_wh": 0.0623,
+      "p90_coverage": 0.9143,
+      "n_checkpoints": 245
+    },
+    "failure_no_reference_flights/no_fix/750 g flight": {
+      "mae_wh": 1.4748,
+      "bias_wh": -1.439,
+      "p90_coverage": 0.325,
+      "n_checkpoints": 80
+    },
+    "failure_no_reference_flights/no_fix/R6 long route": {
+      "mae_wh": 0.9123,
+      "bias_wh": -0.8043,
+      "p90_coverage": 0.3714,
+      "n_checkpoints": 245
+    },
+    "failure_no_reference_flights/fix/750 g flight": {
+      "mae_wh": 1.2052,
+      "bias_wh": -1.1592,
+      "p90_coverage": 0.3125,
+      "n_checkpoints": 80
+    },
+    "failure_no_reference_flights/fix/R6 long route": {
+      "mae_wh": 0.7506,
+      "bias_wh": -0.5965,
+      "p90_coverage": 0.5633,
+      "n_checkpoints": 245
+    },
+    "low_quality/no_fix/750 g flight": {
+      "mae_wh": 0.7832,
+      "bias_wh": -0.7344,
+      "p90_coverage": 0.625,
+      "n_checkpoints": 80
+    },
+    "low_quality/no_fix/R6 long route": {
+      "mae_wh": 0.7342,
+      "bias_wh": -0.5321,
+      "p90_coverage": 0.6163,
+      "n_checkpoints": 245
+    },
+    "low_quality/fix/750 g flight": {
+      "mae_wh": 0.4128,
+      "bias_wh": -0.3969,
+      "p90_coverage": 0.6625,
+      "n_checkpoints": 80
+    },
+    "low_quality/fix/R6 long route": {
+      "mae_wh": 0.4312,
+      "bias_wh": 0.0607,
+      "p90_coverage": 0.8653,
+      "n_checkpoints": 245
+    },
+    "reference/no_fix/750 g flight": {
+      "mae_wh": 0.4185,
+      "bias_wh": -0.3993,
+      "p90_coverage": 0.9,
+      "n_checkpoints": 80
+    },
+    "reference/no_fix/R6 long route": {
+      "mae_wh": 0.4397,
+      "bias_wh": 0.0522,
+      "p90_coverage": 0.8041,
+      "n_checkpoints": 245
+    },
+    "reference/fix/750 g flight": {
+      "mae_wh": 0.426,
+      "bias_wh": -0.4081,
+      "p90_coverage": 0.6125,
+      "n_checkpoints": 80
+    },
+    "reference/fix/R6 long route": {
+      "mae_wh": 0.4478,
+      "bias_wh": 0.0102,
+      "p90_coverage": 0.8245,
+      "n_checkpoints": 245
+    },
+    "stale/no_fix/750 g flight": {
+      "mae_wh": 0.283,
+      "bias_wh": -0.1001,
+      "p90_coverage": 0.9875,
+      "n_checkpoints": 80
+    },
+    "stale/no_fix/R6 long route": {
+      "mae_wh": 0.427,
+      "bias_wh": 0.1478,
+      "p90_coverage": 1.0,
+      "n_checkpoints": 245
+    },
+    "stale/fix/750 g flight": {
+      "mae_wh": 0.3985,
+      "bias_wh": -0.2861,
+      "p90_coverage": 0.8,
+      "n_checkpoints": 80
+    },
+    "stale/fix/R6 long route": {
+      "mae_wh": 0.4778,
+      "bias_wh": 0.1257,
+      "p90_coverage": 0.9673,
+      "n_checkpoints": 245
+    },
+    "unseen_bias_20pct/no_fix/750 g flight": {
+      "mae_wh": 1.2504,
+      "bias_wh": -1.1309,
+      "p90_coverage": 0.65,
+      "n_checkpoints": 80
+    },
+    "unseen_bias_20pct/no_fix/R6 long route": {
+      "mae_wh": 1.0555,
+      "bias_wh": -0.931,
+      "p90_coverage": 0.449,
+      "n_checkpoints": 245
+    },
+    "unseen_bias_20pct/fix/750 g flight": {
+      "mae_wh": 0.4223,
+      "bias_wh": -0.3923,
+      "p90_coverage": 0.7,
+      "n_checkpoints": 80
+    },
+    "unseen_bias_20pct/fix/R6 long route": {
+      "mae_wh": 0.4299,
+      "bias_wh": 0.0641,
+      "p90_coverage": 0.9061,
+      "n_checkpoints": 245
+    },
+    "unseen_drifting_bias/no_fix/750 g flight": {
+      "mae_wh": 1.392,
+      "bias_wh": -1.3596,
+      "p90_coverage": 0.1625,
+      "n_checkpoints": 80
+    },
+    "unseen_drifting_bias/no_fix/R6 long route": {
+      "mae_wh": 0.9171,
+      "bias_wh": -0.8068,
+      "p90_coverage": 0.3551,
+      "n_checkpoints": 245
+    },
+    "unseen_drifting_bias/fix/750 g flight": {
+      "mae_wh": 0.4542,
+      "bias_wh": -0.421,
+      "p90_coverage": 0.7875,
+      "n_checkpoints": 80
+    },
+    "unseen_drifting_bias/fix/R6 long route": {
+      "mae_wh": 0.4352,
+      "bias_wh": 0.0462,
+      "p90_coverage": 0.898,
+      "n_checkpoints": 245
+    },
+    "unseen_offset/no_fix/750 g flight": {
+      "mae_wh": 1.4691,
+      "bias_wh": -1.4487,
+      "p90_coverage": 0.175,
+      "n_checkpoints": 80
+    },
+    "unseen_offset/no_fix/R6 long route": {
+      "mae_wh": 0.8628,
+      "bias_wh": -0.7634,
+      "p90_coverage": 0.3347,
+      "n_checkpoints": 245
+    },
+    "unseen_offset/fix/750 g flight": {
+      "mae_wh": 0.4498,
+      "bias_wh": -0.4081,
+      "p90_coverage": 0.7375,
+      "n_checkpoints": 80
+    },
+    "unseen_offset/fix/R6 long route": {
+      "mae_wh": 0.4147,
+      "bias_wh": 0.0849,
+      "p90_coverage": 0.9184,
+      "n_checkpoints": 245
+    },
+    "unseen_overreading/no_fix/750 g flight": {
+      "mae_wh": 0.8836,
+      "bias_wh": 0.8461,
+      "p90_coverage": 1.0,
+      "n_checkpoints": 80
+    },
+    "unseen_overreading/no_fix/R6 long route": {
+      "mae_wh": 0.6822,
+      "bias_wh": 0.638,
+      "p90_coverage": 1.0,
+      "n_checkpoints": 245
+    },
+    "unseen_overreading/fix/750 g flight": {
+      "mae_wh": 0.4507,
+      "bias_wh": -0.4291,
+      "p90_coverage": 0.7375,
+      "n_checkpoints": 80
+    },
+    "unseen_overreading/fix/R6 long route": {
+      "mae_wh": 0.4506,
+      "bias_wh": 0.043,
+      "p90_coverage": 0.9184,
+      "n_checkpoints": 245
+    }
+  },
+  "health_status_counts_with_fix": {
+    "combined": {
+      "amber": 30,
+      "green": 5
+    },
+    "failure_no_reference_flights": {
+      "red": 21,
+      "amber": 4
+    },
+    "low_quality": {
+      "amber": 30,
+      "green": 5
+    },
+    "reference": {
+      "green": 35
+    },
+    "stale": {
+      "amber": 20,
+      "green": 15
+    },
+    "unseen_bias_20pct": {
+      "amber": 25
+    },
+    "unseen_drifting_bias": {
+      "amber": 25
+    },
+    "unseen_offset": {
+      "amber": 25
+    },
+    "unseen_overreading": {
+      "amber": 25
+    }
+  },
+  "audits": {
+    "combined": {
+      "actions": {
+        "recalibrate": 105
+      },
+      "mean_estimated_ratio_recalibrated": 0.8798
+    },
+    "failure_no_reference_flights": {
+      "actions": {
+        "unverified": 100
+      },
+      "mean_estimated_ratio_recalibrated": null
+    },
+    "low_quality": {
+      "actions": {
+        "recalibrate": 105
+      },
+      "mean_estimated_ratio_recalibrated": 0.8798
+    },
+    "unseen_bias_20pct": {
+      "actions": {
+        "recalibrate": 100
+      },
+      "mean_estimated_ratio_recalibrated": 0.7998
+    },
+    "unseen_drifting_bias": {
+      "actions": {
+        "recalibrate": 100
+      },
+      "mean_estimated_ratio_recalibrated": 0.9173
+    },
+    "unseen_offset": {
+      "actions": {
+        "recalibrate": 100
+      },
+      "mean_estimated_ratio_recalibrated": 0.8913
+    },
+    "unseen_overreading": {
+      "actions": {
+        "recalibrate": 100
+      },
+      "mean_estimated_ratio_recalibrated": 1.0998
+    }
+  },
+  "settings": {
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "timeline_seed": 0,
+    "usable_wh": [
+      16,
+      18,
+      20,
+      22,
+      24,
+      26
+    ],
+    "conditions": {
+      "reference": {
+        "b_defect": {
+          "factor": 0.88
+        },
+        "low_quality_feed": false,
+        "a_stops_after": null,
+        "reference_flights_per_window": 3,
+        "windows": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "stale": {
+        "b_defect": {
+          "factor": 0.88
+        },
+        "low_quality_feed": false,
+        "a_stops_after": 1,
+        "reference_flights_per_window": 3,
+        "windows": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "low_quality": {
+        "b_defect": {
+          "factor": 0.88
+        },
+        "low_quality_feed": true,
+        "a_stops_after": null,
+        "reference_flights_per_window": 3,
+        "windows": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "combined": {
+        "b_defect": {
+          "factor": 0.88
+        },
+        "low_quality_feed": true,
+        "a_stops_after": 1,
+        "reference_flights_per_window": 3,
+        "windows": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "unseen_bias_20pct": {
+        "b_defect": {
+          "factor": 0.8
+        },
+        "low_quality_feed": true,
+        "a_stops_after": 1,
+        "reference_flights_per_window": 3,
+        "windows": [
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "unseen_drifting_bias": {
+        "b_defect": {
+          "factor": "drift"
+        },
+        "low_quality_feed": true,
+        "a_stops_after": 1,
+        "reference_flights_per_window": 3,
+        "windows": [
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "unseen_offset": {
+        "b_defect": {
+          "factor": 1.0,
+          "offset_a": -2.5
+        },
+        "low_quality_feed": true,
+        "a_stops_after": 1,
+        "reference_flights_per_window": 3,
+        "windows": [
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "unseen_overreading": {
+        "b_defect": {
+          "factor": 1.1
+        },
+        "low_quality_feed": true,
+        "a_stops_after": 1,
+        "reference_flights_per_window": 3,
+        "windows": [
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "failure_no_reference_flights": {
+        "b_defect": {
+          "factor": 0.88
+        },
+        "low_quality_feed": true,
+        "a_stops_after": 1,
+        "reference_flights_per_window": 0,
+        "windows": [
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    },
+    "python": "3.14.6",
+    "numpy": "2.4.6",
+    "pandas": "3.0.5",
+    "scikit_learn": "1.9.0"
+  }
+}

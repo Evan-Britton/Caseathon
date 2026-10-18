@@ -1,0 +1,74 @@
+[
+  {
+    "id": "timeline",
+    "type": "simulated progression",
+    "fields": [
+      "flight order"
+    ],
+    "timing": "all windows",
+    "severity": "payload-driven ordering, noise sd 0.8",
+    "represents": "a delivery operation whose package mix gets heavier over time"
+  },
+  {
+    "id": "stale_ingestion",
+    "type": "stale",
+    "fields": [
+      "all fields of A-logged flights"
+    ],
+    "timing": "A flights from window 2 on never reach training",
+    "severity": "training data age grows by one window per retrain",
+    "represents": "a log-upload job that silently stops, so retraining keeps reusing old records"
+  },
+  {
+    "id": "feed_b_bias",
+    "type": "low quality",
+    "fields": [
+      "battery_current"
+    ],
+    "timing": "whole flight, for B-logged flights",
+    "severity": "x0.88 (reads 12% low) + N(0, 1.0 A) per sample",
+    "source_mix": "B share of flights 0.15 x window, max 0.9; 2 records per A record",
+    "represents": "a cheap, fast telemetry feed with an uncalibrated current sensor"
+  },
+  {
+    "id": "placebo_noise",
+    "type": "control",
+    "fields": [
+      "battery_current"
+    ],
+    "timing": "whole flight",
+    "severity": "N(0, 3.0 A), no bias",
+    "represents": "same volume of extra records, noisy but unbiased"
+  },
+  {
+    "id": "frozen_telemetry",
+    "type": "stale (input stage)",
+    "fields": [
+      "battery_voltage",
+      "battery_current"
+    ],
+    "timing": "held at last value from 30% of the route",
+    "severity": "full hold",
+    "represents": "a telemetry link that drops and keeps showing the last packet"
+  },
+  {
+    "id": "biased_live_sensor",
+    "type": "low quality (input stage)",
+    "fields": [
+      "battery_current"
+    ],
+    "timing": "whole flight",
+    "severity": "x0.88 + N(0, 1.0 A)",
+    "represents": "the drone flying with the cheap sensor itself"
+  },
+  {
+    "id": "observed_source_defects",
+    "type": "already in source, not injected",
+    "fields": [
+      "battery_current"
+    ],
+    "timing": "on the ground before take-off and after landing",
+    "severity": "small negative readings near 0 A in 185 flights; 3 flights with a gap over 2 s",
+    "represents": "left unchanged in every condition"
+  }
+]
