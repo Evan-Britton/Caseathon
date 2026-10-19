@@ -4,16 +4,19 @@ import { GridHelper, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { clock, useStore } from "../store";
 import type { CameraMode, FlightMeta, FlightSeries } from "../types";
-import { GOOGLE_MAPS_KEY, PhotoTiles, StreetMap } from "./Basemap";
+import { GOOGLE_MAPS_KEY, PhotoTiles } from "./Basemap";
 import { Drone, dronePose } from "./Drone";
 import { FlightPath } from "./FlightPath";
 import { SCENE } from "./palette";
+import { Stars } from "./Stars";
+import { Terrain } from "./Terrain";
 
 export function Scene() {
   const series = useStore((s) => s.series);
   const meta = useStore((s) => s.meta);
   const camera = useStore((s) => s.camera);
   const basemap = useStore((s) => s.basemap);
+  const ground = useStore((s) => s.ground);
   const onMap = basemap !== "grid";
 
   return (
@@ -31,11 +34,12 @@ export function Scene() {
       <Ticker />
       {basemap === "grid" && <Ground />}
       <LaunchPad />
-      {meta && basemap === "street" && <StreetMap meta={meta} />}
+      {basemap !== "photo" && <Stars />}
+      {meta && basemap === "terrain" && <Terrain meta={meta} />}
       {meta && basemap === "photo" && GOOGLE_MAPS_KEY && <PhotoTiles meta={meta} apiKey={GOOGLE_MAPS_KEY} />}
       {series && meta && (
         <>
-          <FlightPath series={series} glow={!onMap} />
+          <FlightPath series={series} glow={basemap !== "photo"} ground={ground} />
           <Drone series={series} meta={meta} />
           <CameraRig series={series} meta={meta} mode={camera} />
         </>
@@ -146,6 +150,8 @@ function CameraRig({ series, meta, mode }: { series: FlightSeries; meta: FlightM
   }, [controls, mode]);
 
   useFrame((_, delta) => {
+    // Looking straight down, "up" is ambiguous; pin north to the top of the screen in top view.
+    camera.up.set(0, mode === "top" ? 0 : 1, mode === "top" ? -1 : 0);
     if (mode === "orbit") {
       controls.update();
       return;

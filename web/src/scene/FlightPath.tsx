@@ -6,16 +6,16 @@ import { LineGeometry } from "three/examples/jsm/lines/LineGeometry.js";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 import { sampleAt } from "../data";
 import { clock } from "../store";
-import type { FlightSeries } from "../types";
+import type { FlightSeries, GroundSampler } from "../types";
 import { powerColor, powerRange, toWorld } from "./palette";
 
 /**
  * The flown path as a glowing ribbon coloured by power draw, with a
- * translucent "curtain" dropped to the ground beneath it. Both grow with
+ * translucent "curtain" dropped to the ground (or terrain) beneath it. Both grow with
  * playback; the remaining route shows as a faint dashed guide.
  */
-export function FlightPath({ series, glow }: { series: FlightSeries; glow: boolean }) {
-  const { flown, guide, curtain } = useMemo(() => build(series), [series]);
+export function FlightPath({ series, glow, ground }: { series: FlightSeries; glow: boolean; ground: GroundSampler | null }) {
+  const { flown, guide, curtain } = useMemo(() => build(series, ground), [series, ground]);
 
   useEffect(
     () => () => {
@@ -53,7 +53,7 @@ export function FlightPath({ series, glow }: { series: FlightSeries; glow: boole
   );
 }
 
-function build(series: FlightSeries) {
+function build(series: FlightSeries, ground: GroundSampler | null) {
   const n = series.t.length;
   const [lo, hi] = powerRange(series.power, series.up);
   const linePos = new Float32Array(n * 3);
@@ -67,7 +67,9 @@ function build(series: FlightSeries) {
     powerColor(series.power[i], lo, hi, c);
     linePos.set([x, y, z], i * 3);
     lineCol.set([c.r, c.g, c.b], i * 3);
-    pos.set([x, y, z, x, 0, z], i * 6);
+    // Curtain reaches down to the terrain (or y = 0 on the flat grid), never above the path itself.
+    const floor = ground ? Math.min(ground(x, z), y) : 0;
+    pos.set([x, y, z, x, floor, z], i * 6);
     col.set([c.r, c.g, c.b, 0.42, c.r, c.g, c.b, 0], i * 8);
   }
 

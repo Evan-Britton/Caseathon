@@ -1,8 +1,9 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
-import { CanvasTexture, Group, Mesh, Vector3 } from "three";
+import { CanvasTexture, Color, Group, Mesh, MeshBasicMaterial, Vector3 } from "three";
 import { lerpAt, sampleAt } from "../data";
-import { clock } from "../store";
+import { missionState } from "../mission";
+import { budgetFor, clock, useStore } from "../store";
 import type { FlightMeta, FlightSeries } from "../types";
 import { SCENE, toWorld } from "./palette";
 
@@ -18,6 +19,7 @@ export const dronePose = { x: 0, y: 0, z: 0, headingRad: 0 };
 /** DOM targeting reticle drawn over the canvas; positioned each frame from the drone's screen position. */
 export const reticle: { el: HTMLDivElement | null; label: HTMLSpanElement | null } = { el: null, label: null };
 const projected = new Vector3();
+const RING = { go: new Color(SCENE.teal), review: new Color(SCENE.amber), stop: new Color(SCENE.ember) };
 
 export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta }) {
   const group = useRef<Group>(null);
@@ -25,6 +27,7 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
   const rotors = useRef<(Mesh | null)[]>([]);
   const marker = useRef<Group>(null);
   const drop = useRef<Mesh>(null);
+  const ring = useRef<MeshBasicMaterial>(null);
   const { camera, size } = useThree();
   const shadowTex = useMemo(radialGlow, []);
 
@@ -49,19 +52,30 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
     if (!reducedMotion && !powerLost) {
       for (const [k, r] of rotors.current.entries()) if (r) r.rotation.y += (k % 2 ? 1 : -1) * delta * (airborne ? 60 : 8);
     }
-    marker.current?.position.set(x, 0.05, z);
+    const ground = useStore.getState().ground;
+    const g = ground ? ground(x, z) : 0;
+    marker.current?.position.set(x, g + 0.3, z);
     if (drop.current) {
-      drop.current.scale.y = Math.max(y, 0.01);
-      drop.current.position.y = -y / 2;
-      drop.current.visible = airborne;
+      const h = Math.max(y - g, 0.01);
+      drop.current.scale.y = h;
+      drop.current.position.y = -h / 2;
+      drop.current.visible = airborne && h > 0.5;
     }
+    // Mission check at this instant: tint the ground ring and the reticle once a call is made.
+    const st = useStore.getState();
+    const mission = missionState(st.forecast, meta, budgetFor(st.model, meta, st.budgetWh), st.model?.deadlineFrac ?? 0.5, clock.time);
+    const callType = mission.call?.type;
+    ring.current?.color.copy(callType === "return" ? RING.stop : callType === "review" ? RING.review : RING.go);
     if (reticle.el) {
       projected.set(x, y, z).project(camera);
       const visible = projected.z < 1;
       reticle.el.style.opacity = visible ? "1" : "0";
       reticle.el.style.transform = `translate(${((projected.x + 1) / 2) * size.width}px, ${((1 - projected.y) / 2) * size.height}px)`;
       reticle.el.classList.toggle("reticle-fail", powerLost);
-      if (reticle.label) reticle.label.textContent = powerLost ? `Power lost, ${y.toFixed(0)} m` : `${y.toFixed(0)} m above launch`;
+      reticle.el.classList.toggle("reticle-return", !powerLost && callType === "return");
+      reticle.el.classList.toggle("reticle-review", !powerLost && callType === "review");
+      const tag = callType === "return" ? " · turn back" : callType === "review" ? " · operator review" : "";
+      if (reticle.label) reticle.label.textContent = powerLost ? `Power lost, ${y.toFixed(0)} m` : `${y.toFixed(0)} m above launch${tag}`;
     }
   });
 
@@ -143,7 +157,7 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
         </mesh>
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
           <ringGeometry args={[4.2, 4.5, 48]} />
-          <meshBasicMaterial color={SCENE.teal} transparent opacity={0.6} />
+          <meshBasicMaterial ref={ring} color={SCENE.teal} transparent opacity={0.6} />
         </mesh>
       </group>
     </>

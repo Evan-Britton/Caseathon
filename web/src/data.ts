@@ -1,11 +1,11 @@
-import type { DataIndex, FlightSeries } from "./types";
+import type { DataIndex, FlightForecast, FlightSeries, ModelIndex } from "./types";
 
 const base = import.meta.env.BASE_URL;
 const flightCache = new Map<number, Promise<FlightSeries>>();
 
-async function getJson<T>(path: string): Promise<T> {
+async function getJson<T>(path: string, script = "npm run data"): Promise<T> {
   const res = await fetch(`${base}${path}`);
-  if (!res.ok) throw new Error(`Couldn't load ${path} (HTTP ${res.status}). Run "npm run data" to generate it.`);
+  if (!res.ok) throw new Error(`Couldn't load ${path} (HTTP ${res.status}). Run "${script}" to generate it.`);
   return res.json() as Promise<T>;
 }
 
@@ -19,6 +19,22 @@ export function loadFlight(id: number): Promise<FlightSeries> {
     p = getJson<FlightSeries>(`data/flights/${id}.json`);
     p.catch(() => flightCache.delete(id));
     flightCache.set(id, p);
+  }
+  return p;
+}
+
+export function loadModelIndex(): Promise<ModelIndex> {
+  return getJson<ModelIndex>("data/model/index.json", "npm run model");
+}
+
+const forecastCache = new Map<number, Promise<FlightForecast>>();
+
+export function loadForecast(id: number): Promise<FlightForecast> {
+  let p = forecastCache.get(id);
+  if (!p) {
+    p = getJson<FlightForecast>(`data/model/flights/${id}.json`, "npm run model");
+    p.catch(() => forecastCache.delete(id));
+    forecastCache.set(id, p);
   }
   return p;
 }

@@ -144,8 +144,8 @@ data age/quality ──▶ model learns wrong power ──▶ overconfident P90 
 
 ## Next step: wire it into the app
 
-1. **`scripts/export_web_model.py`**: per flight, per condition, with and without the fix: the checkpoint list `{t, e_used, e50, e90, decision, health}`, plus `timeline.json` for the window chart (section 5, data contract).
-2. **AI decision panel, scenario switcher and fix toggle in the app** (section 5, items 1–3).
+1. ✅ **Live mission check in the app** for the clean model (`scripts/export_web_model.py`, `web/src/ui/Mission.tsx`).
+2. **Scenario switcher and fix toggle**: extend the export with each flight's forecast per condition, with and without the fix (simulated timeline windows), plus `timeline.json` for the window chart. Then add the switcher and health badges to the panel (section 5, items 2–4).
 3. **Operator walkthrough with a timer** (section 5, item 5). That gives our human-effort number.
 4. **Requirement 7 text**: pilot criteria and the bounded next action (section 9).
 
@@ -157,11 +157,48 @@ data age/quality ──▶ model learns wrong power ──▶ overconfident P90 
 
 ### What exists now
 
-A 3D replay of each CMU flight in `web/`: React 19, three.js via React Three Fiber, Zustand and Vite, deployed to Cloudflare Workers. It has a flight picker, a 3D path coloured by power, terrain and photo map layers, telemetry, a playback scrubber, and simulated failure flight 900. **It has no model output yet.**
+A 3D replay of each CMU flight in `web/`: React 19, three.js via React Three Fiber, Zustand and Vite, deployed to Cloudflare Workers. It has a flight picker, a 3D path coloured by power, terrain and photo map layers, telemetry, a playback scrubber, and simulated failure flight 900.
+
+### Live mission check (built ✅)
+
+As any flight plays, the app decides in real time whether the drone will make it or should turn back. It covers all 196 real route flights plus simulated flight 900. It was tested in the browser at desktop (1440×900), laptop (1280×800, 1000×820) and phone (375 wide) sizes, and the production build passes.
+
+**What you see.** A **Mission check** panel sits top-left, above the telemetry:
+- **The call, live:**
+  - **On track** (green): even the cautious P90 forecast fits the battery.
+  - **Turn back** (red): even the median forecast doesn't fit.
+  - **Too close to call** (amber): the P50–P90 band straddles the battery, so it goes to the operator and is scored as a return.
+
+  The call only counts before halfway round the route. After that it switches to **Committed**, because finishing the loop is the quickest way home.
+- **Energy gauge:** used, forecast, and the P90 margin (red when it's over the battery line).
+- **Forecast chart:** the total-mission forecast over the flight against the battery line, zoomed to the band around the battery. Click to scrub.
+- **Battery slider:** the usable energy for this mission (12–36 Wh, default 20). The call updates instantly, and the value is remembered between visits.
+- **Hindsight line:** compares the call with what the flight really used ("Right call", "Missed" or "Cautious"). It appears automatically after landing.
+
+**Everywhere else:**
+- The timeline shades the decision window and flags the call.
+- The route map marks halfway (½) and where the call was made.
+- The drone's reticle and ground ring turn amber or red.
+- Hover tests show "Not rated", since they have no route.
+
+**Demo moments:**
+- **Flight 142 at 20 Wh:** "Turn back" at 0:19. Drag the battery to 24 Wh and it flips to "On track". The hindsight confirms both calls were right (21.2 Wh really used).
+- **Flight 900 (simulated battery failure):** the check calls for a return at 0:19, **72 s before the simulated pack cuts out**. Its battery is fixed at 11.8 Wh (the slider is locked), and the hindsight says the full mission takes 21.2 Wh, 9.4 Wh more than the pack had.
+
+**How it works:**
+- `scripts/export_web_model.py` (`npm run model`, about 10 s) uses the same hybrid model as `results/`.
+- It writes `web/public/data/model/index.json` plus one file per flight: energy used, and the P50/P90 still needed, once per second.
+- **Every flight is scored by a model that never saw it.** Flights are split into 5 groups by flight day, and each group is forecast by a model trained on the other four. Out of sample, forecasts are off by 0.38 Wh on average, and the P90 holds 95% of the time.
+- Flight 900 reuses flight 142's forecast, since the path and sensors are the same, up to the moment its pack cuts out.
+- The browser makes the call from those numbers and the slider, in `web/src/mission.ts`. The panel is `web/src/ui/Mission.tsx`.
+
+**Not done yet:**
+- Switching between the poisoned and fixed scenarios in the app (items 2–4 below).
+- At about 1000 px wide, the playback timeline gets very narrow. This predates the mission check.
 
 ### What to add (priority order)
 
-1. **AI decision panel**, on the flight being replayed:
+1. ✅ **AI decision panel**, on the flight being replayed:
    - a gauge of energy needed (P50 with a P90 band) against energy left, with the budget line;
    - a big status: **CONTINUE**, **RETURN** or **DEFER TO OPERATOR**;
    - when the call was made, and how much margin was left.
@@ -211,8 +248,8 @@ flowchart LR
 | Defects and simulated timeline | `scripts/degrade.py` | ✅ |
 | Degradation grid and mechanism checks | `scripts/run_degradation.py` → `results/degradation/` (~9 min) | ✅ |
 | Countermeasure | `scripts/countermeasure.py`, `scripts/run_countermeasure.py` → `results/countermeasure/` (~4 min) | ✅ |
-| Export for the app | `scripts/export_web_model.py` | ⬜ |
-| Web replay | `web/` (see `web/README.md`) | 🟡 replay done, AI panel not started |
+| Export for the app | `scripts/export_web_model.py` (`npm run model`, ~10 s) | 🟡 clean model done; degradation and fix scenarios not exported yet |
+| Web replay | `web/` (see `web/README.md`) | 🟡 replay and live mission check done; scenario switcher, badges and timeline chart not started |
 | Manifest and AI disclosure | `MANIFEST.md` | ⬜ |
 
 **Key design decisions** (and why, for judge questions):
@@ -229,7 +266,7 @@ flowchart LR
 
 | Time | Beat | On screen |
 |---|---|---|
-| 0:00–1:00 | **The decision.** A drone, a package, a battery. "Continue or come home?" Who uses it, and what an error costs | 3D replay of a heavy flight, AI panel showing CONTINUE |
+| 0:00–1:00 | **The decision.** A drone, a package, a battery. "Continue or come home?" Who uses it, and what an error costs | Flight 142 playing; drag the battery from 24 Wh (On track) to 20 Wh (Turn back). Then flight 900: turn back called 72 s before the pack dies |
 | 1:00–2:00 | **How the AI works.** Physics + ML, P90 safety margin, why 0.36 Wh is good enough | Architecture diagram, baseline numbers |
 | 2:00–4:00 | **Poison it.** Flip to *Combined* on the same flight. The answer still looks confident, and aborts even drop, but the margin is gone. Timeline chart: coverage falls from 90% to 34% | Scenario switcher, timeline view |
 | 4:00–5:30 | **Why: the mechanism.** Dose-response vs placebo. "It's the bias, not the volume." The ML half broke, not physics. Heavy flights hit hardest | Mechanism chart |
@@ -300,6 +337,9 @@ python3 scripts/run_degradation.py
 ```
 ```bash
 python3 scripts/run_countermeasure.py
+```
+```bash
+cd web && npm run model
 ```
 ```bash
 cd web && npm install && npm run dev

@@ -53,5 +53,32 @@ export interface DataIndex {
 
 export type CameraMode = "orbit" | "chase" | "top";
 
-/** Ground layer: dark grid, OpenStreetMap street tiles, or Google photorealistic 3D tiles. */
-export type Basemap = "grid" | "street" | "photo";
+/** Ground layer: dark grid, 3D terrain from elevation tiles, or Google photorealistic 3D tiles. */
+export type Basemap = "grid" | "terrain" | "photo";
+
+/** Ground height (m, relative to the launch point) at a world position (x east, z south, in m). */
+export type GroundSampler = (x: number, z: number) => number;
+
+/** The energy model's out-of-sample forecast for one flight, once per second of flight. */
+export interface FlightForecast {
+  group: number; // cross-validation group: this flight was not in the model's training data
+  tOn: number; // s, rotors start
+  tOff: number; // s, rotors stop (or power is lost on a simulated failure)
+  totalWh: number; // energy the mission actually used (hindsight only, never shown as a forecast)
+  t: number[]; // s since first sample, same clock as FlightSeries.t
+  used: number[]; // Wh used so far (Coulomb counting)
+  e50: number[]; // Wh still needed before landing, median forecast
+  e90: number[]; // Wh still needed before landing, P90 (the safety margin)
+  frac: number[]; // share of the planned route flown
+}
+
+export interface ModelIndex {
+  model: string;
+  validation: string;
+  metrics: { maeWh: number; biasWh: number; p90Coverage: number; checkpoints: number };
+  deadlineFrac: number; // a turn-back call only helps before this share of the route
+  packWh: number;
+  budget: { default: number; min: number; max: number; step: number };
+  flights: number[]; // flights with a forecast
+  simulated: Record<string, { basedOn: number; budgetWh: number; note: string }>;
+}
