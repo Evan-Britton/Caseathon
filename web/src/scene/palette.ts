@@ -1,22 +1,25 @@
 import { Color } from "three";
 
-// Night-ops palette shared by the 3D scene and the CSS tokens in styles.css.
+// Graphite + Ultraviolet palette shared by the 3D scene and the CSS tokens in styles.css.
 export const SCENE = {
-  horizon: "#111c25",
-  ground: "#0c1319",
-  gridCell: "#1a2731",
-  gridSection: "#2b3e4b",
-  text: "#e8edf2",
-  teal: "#3fb6c9",
-  amber: "#f2a33a",
-  ember: "#ff5a2c",
+  horizon: "#14131b",
+  ground: "#0e0d13",
+  gridCell: "#1f1d29",
+  gridSection: "#332f45",
+  text: "#eeedf4",
+  accent: "#9a8cff",
+  warn: "#ffb84d",
+  stop: "#ff4f5e",
+  rampLow: "#5b6cff",
+  rampMid: "#b45cff",
+  rampHigh: "#ff5c8a",
 };
 
-const low = new Color(SCENE.teal);
-const mid = new Color(SCENE.amber);
-const high = new Color(SCENE.ember);
+const low = new Color(SCENE.rampLow);
+const mid = new Color(SCENE.rampMid);
+const high = new Color(SCENE.rampHigh);
 
-/** Heat ramp for power draw: teal (low) through amber to ember (high). */
+/** Heat ramp for power draw: indigo (low) through violet to rose (high). */
 export function powerColor(p: number, lo: number, hi: number, out = new Color()): Color {
   const x = Math.min(Math.max((p - lo) / Math.max(hi - lo, 1), 0), 1);
   return x < 0.5 ? out.lerpColors(low, mid, x * 2) : out.lerpColors(mid, high, (x - 0.5) * 2);

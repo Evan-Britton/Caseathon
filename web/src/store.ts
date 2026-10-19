@@ -20,7 +20,6 @@ interface State {
   camera: CameraMode;
   basemap: Basemap;
   mapCredits: string;
-  mapError: string | null;
   /** Terrain height lookup while the terrain layer is loaded, else null (flat ground at y = 0). */
   ground: GroundSampler | null;
   /** Energy model: index, the current flight's forecast (null if the flight isn't rated), load error. */
@@ -41,8 +40,6 @@ interface State {
   setMapCredits: (credits: string) => void;
   setGround: (ground: GroundSampler | null) => void;
   setBudget: (wh: number) => void;
-  /** The Google 3D map failed to load: explain why and fall back to the terrain map. */
-  failPhotoMap: (message: string) => void;
 }
 
 
@@ -81,7 +78,6 @@ export const useStore = create<State>((set, get) => ({
   camera: "orbit",
   basemap: "terrain",
   mapCredits: "",
-  mapError: null,
   ground: null,
   model: null,
   forecast: null,
@@ -148,7 +144,7 @@ export const useStore = create<State>((set, get) => ({
   },
   setRate: (rate) => set({ rate }),
   setCamera: (camera) => set({ camera }),
-  setBasemap: (basemap) => set({ basemap, mapCredits: "", mapError: null }),
+  setBasemap: (basemap) => set({ basemap, mapCredits: "" }),
   setMapCredits: (mapCredits) => set({ mapCredits }),
   setGround: (ground) => set({ ground }),
   setBudget: (budgetWh) => {
@@ -159,5 +155,4 @@ export const useStore = create<State>((set, get) => ({
     }
     set({ budgetWh });
   },
-  failPhotoMap: (message) => set({ basemap: "terrain", mapCredits: "", mapError: message }),
 }));

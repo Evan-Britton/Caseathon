@@ -247,7 +247,7 @@ function ForecastChart({ forecast, budget, call, deadlineT }: { forecast: Flight
   };
   const playX = geo.x(Math.min(uiTime, end));
   const by = geo.y(budget);
-  const callColor = call?.type === "return" ? "var(--ember)" : call?.type === "review" ? "var(--amber)" : "var(--go)";
+  const callColor = call?.type === "return" ? "var(--stop)" : call?.type === "review" ? "var(--warn)" : "var(--go)";
   const callWh = call ? forecast.used[call.idx] + forecast.e50[call.idx] : 0;
 
   return (

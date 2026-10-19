@@ -29,7 +29,7 @@ export function Telemetry() {
         <DroneGlyph spinning={airborne && !powerLost} />
         <dl className="readouts">
           <Readout label="Altitude" value={fmtNum(up)} unit="m" />
-          <Readout label="Ground speed" value={fmtNum(at(series.groundSpeed))} unit="m/s" />
+          <Readout label="Speed" value={fmtNum(at(series.groundSpeed))} unit="m/s" />
           <Readout label="Airflow" value={fmtNum(series.windSpeed[i])} unit="m/s" />
           <Readout label="Voltage" value={fmtNum(at(series.voltage), 2)} unit="V" />
           <Readout label="Current" value={fmtNum(at(series.current))} unit="A" />
@@ -84,7 +84,7 @@ function DroneGlyph({ spinning }: { spinning: boolean }) {
         </g>
       ))}
       <rect x={38} y={36} width={24} height={28} rx={6} fill="#2a333d" stroke="#8a95a3" strokeWidth={1.5} />
-      <path d="M50 30l5 6h-10z" fill="#f2a33a" />
+      <path d="M50 30l5 6h-10z" fill="#9a8cff" />
     </svg>
   );
 }

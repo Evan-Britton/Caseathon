@@ -19,7 +19,7 @@ export const dronePose = { x: 0, y: 0, z: 0, headingRad: 0 };
 /** DOM targeting reticle drawn over the canvas; positioned each frame from the drone's screen position. */
 export const reticle: { el: HTMLDivElement | null; label: HTMLSpanElement | null } = { el: null, label: null };
 const projected = new Vector3();
-const RING = { go: new Color(SCENE.teal), review: new Color(SCENE.amber), stop: new Color(SCENE.ember) };
+const RING = { go: new Color(SCENE.accent), review: new Color(SCENE.warn), stop: new Color(SCENE.stop) };
 
 export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta }) {
   const group = useRef<Group>(null);
@@ -147,7 +147,7 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
         </group>
         <mesh ref={drop}>
           <cylinderGeometry args={[0.06, 0.06, 1, 6]} />
-          <meshBasicMaterial color={SCENE.teal} transparent opacity={0.35} />
+          <meshBasicMaterial color={SCENE.accent} transparent opacity={0.35} />
         </mesh>
       </group>
       <group ref={marker}>
@@ -157,7 +157,7 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
         </mesh>
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
           <ringGeometry args={[4.2, 4.5, 48]} />
-          <meshBasicMaterial ref={ring} color={SCENE.teal} transparent opacity={0.6} />
+          <meshBasicMaterial ref={ring} color={SCENE.accent} transparent opacity={0.6} />
         </mesh>
       </group>
     </>
@@ -169,8 +169,8 @@ function radialGlow() {
   c.width = c.height = 64;
   const g = c.getContext("2d")!;
   const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-  grad.addColorStop(0, "rgba(63,182,201,0.45)");
-  grad.addColorStop(1, "rgba(63,182,201,0)");
+  grad.addColorStop(0, "rgba(154,140,255,0.45)");
+  grad.addColorStop(1, "rgba(154,140,255,0)");
   g.fillStyle = grad;
   g.fillRect(0, 0, 64, 64);
   return new CanvasTexture(c);

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { powerRange } from "../scene/palette";
 import { useStore } from "../store";
-import { GOOGLE_MAPS_KEY } from "../scene/Basemap";
 import type { Basemap, CameraMode } from "../types";
 import { fmtClock } from "./format";
 import { Icons } from "./icons";
@@ -15,15 +14,9 @@ const CAMERAS: { id: CameraMode; label: string; icon: React.ReactNode }[] = [
   { id: "top", label: "Top", icon: Icons.top },
 ];
 
-const BASEMAPS: { id: Basemap; label: string; icon: React.ReactNode; disabledHint?: string }[] = [
+const BASEMAPS: { id: Basemap; label: string; icon: React.ReactNode }[] = [
   { id: "grid", label: "Grid", icon: Icons.grid },
   { id: "terrain", label: "Terrain", icon: Icons.terrain },
-  {
-    id: "photo",
-    label: "Photo",
-    icon: Icons.map,
-    disabledHint: GOOGLE_MAPS_KEY ? undefined : "Add VITE_GOOGLE_MAPS_API_KEY to web/.env.local to turn on Google's photorealistic map",
-  },
 ];
 
 /** Playback controls with a power-draw scrubber and camera modes. */
@@ -74,7 +67,7 @@ export function Dock() {
   };
   const playX = (uiTime / end) * width;
   const tx = (s: number) => (s / end) * width;
-  const callColor = call?.type === "return" ? "var(--ember)" : "var(--amber)";
+  const callColor = call?.type === "return" ? "var(--stop)" : "var(--warn)";
 
   return (
     <section className="dock glass" aria-label="Playback">
@@ -116,9 +109,9 @@ export function Dock() {
         >
           <defs>
             <linearGradient id="powerfill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#ff5a2c" stopOpacity="0.85" />
-              <stop offset="0.5" stopColor="#f2a33a" stopOpacity="0.45" />
-              <stop offset="1" stopColor="#3fb6c9" stopOpacity="0.1" />
+              <stop offset="0" stopColor="#ff5c8a" stopOpacity="0.85" />
+              <stop offset="0.5" stopColor="#b45cff" stopOpacity="0.45" />
+              <stop offset="1" stopColor="#5b6cff" stopOpacity="0.1" />
             </linearGradient>
             <clipPath id="flown">
               <rect width={playX} height={H} />
@@ -158,9 +151,8 @@ export function Dock() {
           <button
             key={b.id}
             aria-pressed={basemap === b.id}
-            disabled={!!b.disabledHint}
             onClick={() => setBasemap(b.id)}
-            title={b.disabledHint ?? `${b.label} map`}
+            title={`${b.label} map`}
           >
             {b.icon}
             <span>{b.label}</span>

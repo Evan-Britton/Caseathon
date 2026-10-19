@@ -19,6 +19,10 @@ import { SCENE } from "./palette";
 const ZOOM = 15; // Terrarium's max zoom: ~3.6 m per pixel at this latitude
 const TILE_RADIUS = 1; // 3 x 3 tiles, ~2.8 km square
 const STEP = 2; // sample every 2nd pixel: ~385 x 385 vertices
+// Narrow pits in the lidar model (stormwater basins, road cuts, culverts) render as deep,
+// faceted holes at this mesh resolution. A grayscale closing fills any dip narrower than
+// about (2 * PIT_RADIUS + 1) px (~33 m); hills, ridges and wide valleys are unchanged.
+const PIT_RADIUS = 4;
 const TILE_PX = 256;
 const M_PER_DEG_LAT = 110_540; // same conversion as scripts/build_web_data.py
 const M_PER_DEG_LON_EQ = 111_320;
@@ -40,6 +44,54 @@ function loadImage(url: string): Promise<HTMLImageElement> {
     img.onerror = () => reject(new Error(`Couldn't load elevation tile ${url}`));
     img.src = url;
   });
+}
+
+/** Running max (dilate) or min (erode) over a (2r+1) square window, done as two 1-D passes. */
+function windowFilter(src: Float32Array, size: number, r: number, max: boolean): Float32Array {
+  const pick = max ? Math.max : Math.min;
+  const tmp = new Float32Array(src.length);
+  const out = new Float32Array(src.length);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      let v = src[y * size + x];
+      for (let k = Math.max(0, x - r); k <= Math.min(size - 1, x + r); k++) v = pick(v, src[y * size + k]);
+      tmp[y * size + x] = v;
+    }
+  }
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      let v = tmp[y * size + x];
+      for (let k = Math.max(0, y - r); k <= Math.min(size - 1, y + r); k++) v = pick(v, tmp[k * size + x]);
+      out[y * size + x] = v;
+    }
+  }
+  return out;
+}
+
+/** Grayscale closing: dilate then erode. Fills depressions narrower than the window, never lowers ground. */
+function fillPits(elev: Float32Array, size: number, r: number): Float32Array {
+  return windowFilter(windowFilter(elev, size, r, true), size, r, false);
+}
+
+/** 3 x 3 box blur from src into dst, to soften the facets the closing leaves behind. */
+function smoothInPlace(src: Float32Array, size: number, dst: Float32Array) {
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      let sum = 0;
+      let n = 0;
+      for (let dy = -1; dy <= 1; dy++) {
+        const yy = y + dy;
+        if (yy < 0 || yy >= size) continue;
+        for (let dx = -1; dx <= 1; dx++) {
+          const xx = x + dx;
+          if (xx < 0 || xx >= size) continue;
+          sum += src[yy * size + xx];
+          n++;
+        }
+      }
+      dst[y * size + x] = sum / n;
+    }
+  }
 }
 
 interface TerrainData {
@@ -74,6 +126,7 @@ async function buildTerrain(lat: number, lon: number): Promise<TerrainData> {
   // Terrarium encoding: metres = R * 256 + G + B / 256 - 32768
   const elev = new Float32Array(size * size);
   for (let i = 0; i < size * size; i++) elev[i] = rgba[i * 4] * 256 + rgba[i * 4 + 1] + rgba[i * 4 + 2] / 256 - 32768;
+  smoothInPlace(fillPits(elev, size, PIT_RADIUS), size, elev);
 
   const elevAtPx = (px: number, py: number) => {
     const x = Math.min(Math.max(px, 0), size - 1.001);
@@ -237,10 +290,10 @@ export function Terrain({ meta }: { meta: FlightMeta }) {
         fragmentShader,
         transparent: true,
         uniforms: {
-          uLow: { value: new Color("#06121a") },
-          uHigh: { value: new Color("#1b4a5a") },
-          uLine: { value: new Color(SCENE.teal) },
-          uAccent: { value: new Color("#9fe8f5") }, // cool pulse, distinct from the power ramp
+          uLow: { value: new Color("#0b0a12") },
+          uHigh: { value: new Color("#2c2844") },
+          uLine: { value: new Color(SCENE.accent) },
+          uAccent: { value: new Color("#dcd6ff") }, // pale pulse, distinct from the power ramp
           uMinH: { value: 0 },
           uMaxH: { value: 1 },
           uOffset: { value: 0 },

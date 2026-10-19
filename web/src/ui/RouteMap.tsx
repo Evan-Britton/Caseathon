@@ -2,6 +2,9 @@ import { useMemo } from "react";
 import { lerpAt, sampleAt } from "../data";
 import { powerCss, powerRange } from "../scene/palette";
 import { useStore } from "../store";
+import type { FlightMeta } from "../types";
+import { fmtAltitude, fmtClock, fmtDate, fmtNum } from "./format";
+import { Icons } from "./icons";
 import { useMission } from "./useMission";
 
 const W = 268;
@@ -12,6 +15,7 @@ const PROFILE_H = 54;
 /** Top-down route (north up) plus an altitude profile over time. */
 export function RouteMap() {
   const series = useStore((s) => s.series);
+  const meta = useStore((s) => s.meta);
   const uiTime = useStore((s) => s.uiTime);
   const { call, deadlineT } = useMission();
 
@@ -64,6 +68,7 @@ export function RouteMap() {
         <h2>Route</h2>
         <span className="muted">Top view, north up</span>
       </div>
+      {meta && <FlightSpecs meta={meta} />}
       <svg viewBox={`0 0 ${W} ${H}`} className="map">
         <defs>
           <pattern id="mapgrid" width="16" height="16" patternUnits="userSpaceOnUse">
@@ -83,7 +88,7 @@ export function RouteMap() {
           </g>
         )}
         {callPt && (
-          <circle cx={callPt[0]} cy={callPt[1]} r={5} fill={call?.type === "return" ? "var(--ember)" : "var(--amber)"} className="map-call">
+          <circle cx={callPt[0]} cy={callPt[1]} r={5} fill={call?.type === "return" ? "var(--stop)" : "var(--warn)"} className="map-call">
             <title>{call?.type === "return" ? "Turn-back" : "Operator review"} called here</title>
           </circle>
         )}
@@ -108,13 +113,37 @@ export function RouteMap() {
       <svg viewBox={`0 0 ${W} ${PROFILE_H}`} className="profile" preserveAspectRatio="none">
         <defs>
           <linearGradient id="altfill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#3fb6c9" stopOpacity="0.45" />
-            <stop offset="1" stopColor="#3fb6c9" stopOpacity="0" />
+            <stop offset="0" stopColor="#9a8cff" stopOpacity="0.45" />
+            <stop offset="1" stopColor="#9a8cff" stopOpacity="0" />
           </linearGradient>
         </defs>
-        <path d={geo.profile} fill="url(#altfill)" stroke="#3fb6c9" strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
+        <path d={geo.profile} fill="url(#altfill)" stroke="#9a8cff" strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
         <line x1={playX} x2={playX} y1={0} y2={PROFILE_H} className="playhead" vectorEffect="non-scaling-stroke" />
       </svg>
     </section>
+  );
+}
+
+/** The flight's plan and totals as a compact 3 x 2 grid. */
+function FlightSpecs({ meta }: { meta: FlightMeta }) {
+  const specs: [React.ReactNode, string, string, string?][] = [
+    [Icons.speed, "Cruise", meta.route === "H" ? "Hover" : `${meta.speed} m/s`],
+    [Icons.box, "Payload", `${meta.payload} g`],
+    [Icons.altitude, "Altitude", fmtAltitude(meta.altitude)],
+    [Icons.clock, "Duration", fmtClock(meta.durationS)],
+    [Icons.bolt, "Energy", `${fmtNum(meta.energyWh)} Wh`],
+    meta.simulated
+      ? [Icons.calendar, "Source", "Simulated"]
+      : [Icons.calendar, "Flown", fmtDate(meta.date), `${fmtDate(meta.date)}, ${meta.time}`],
+  ];
+  return (
+    <dl className="specs">
+      {specs.map(([icon, label, value, title]) => (
+        <div key={label} title={title}>
+          <dt>{icon}{label}</dt>
+          <dd className="num">{value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }

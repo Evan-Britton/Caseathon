@@ -53,8 +53,8 @@ export interface DataIndex {
 
 export type CameraMode = "orbit" | "chase" | "top";
 
-/** Ground layer: dark grid, 3D terrain from elevation tiles, or Google photorealistic 3D tiles. */
-export type Basemap = "grid" | "terrain" | "photo";
+/** Ground layer: dark grid, or 3D terrain from elevation tiles. */
+export type Basemap = "grid" | "terrain";
 
 /** Ground height (m, relative to the launch point) at a world position (x east, z south, in m). */
 export type GroundSampler = (x: number, z: number) => number;

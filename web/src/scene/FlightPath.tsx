@@ -1,6 +1,6 @@
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo } from "react";
-import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, DoubleSide, NormalBlending } from "three";
+import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, DoubleSide } from "three";
 import { Line2 } from "three/examples/jsm/lines/Line2.js";
 import { LineGeometry } from "three/examples/jsm/lines/LineGeometry.js";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
@@ -14,7 +14,7 @@ import { powerColor, powerRange, toWorld } from "./palette";
  * translucent "curtain" dropped to the ground (or terrain) beneath it. Both grow with
  * playback; the remaining route shows as a faint dashed guide.
  */
-export function FlightPath({ series, glow, ground }: { series: FlightSeries; glow: boolean; ground: GroundSampler | null }) {
+export function FlightPath({ series, ground }: { series: FlightSeries; ground: GroundSampler | null }) {
   const { flown, guide, curtain } = useMemo(() => build(series, ground), [series, ground]);
 
   useEffect(
@@ -39,15 +39,8 @@ export function FlightPath({ series, glow, ground }: { series: FlightSeries; glo
       <primitive object={guide} />
       <primitive object={flown} />
       <mesh geometry={curtain} renderOrder={-1}>
-        {/* Additive glow reads well on the dark grid but washes out over map imagery */}
-        <meshBasicMaterial
-          key={glow ? "glow" : "plain"}
-          vertexColors
-          transparent
-          side={DoubleSide}
-          depthWrite={false}
-          blending={glow ? AdditiveBlending : NormalBlending}
-        />
+        {/* Additive glow reads well over the dark grid and the topo map */}
+        <meshBasicMaterial vertexColors transparent side={DoubleSide} depthWrite={false} blending={AdditiveBlending} />
       </mesh>
     </group>
   );

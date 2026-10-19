@@ -6,8 +6,8 @@ Built with React 19, three.js (via React Three Fiber) and Vite. It deploys to Cl
 
 ## What's on screen
 
-- **3D scene.** The recorded path, coloured by power draw (teal is low, ember is high). A translucent curtain drops from the path to the ground. The drone model is drawn 6× real size so it stays visible.
-- **Top bar.** Flight picker (grouped by flight day, with previous and next buttons) and the planned cruise speed, payload, altitude, duration, total energy and date.
+- **3D scene.** The recorded path, coloured by power draw (indigo is low, violet in between, rose is high). A translucent curtain drops from the path to the ground. The drone model is drawn 6× real size so it stays visible.
+- **Top bar.** Flight picker, grouped by flight day, with previous and next buttons.
 - **Mission check.** The model's live call for this flight:
   - **On track**: even the cautious forecast (P90) fits the battery.
   - **Turn back**: even the median forecast doesn't fit.
@@ -20,9 +20,9 @@ Built with React 19, three.js (via React Three Fiber) and Vite. It deploys to Cl
   - a hindsight line comparing the call with what the flight really used.
 
   The timeline shades the decision window and flags the call, the route map marks halfway and where the call was made, and the drone's reticle and ground ring turn amber or red. Hover tests have no route, so they show "Not rated". Simulated flight 900 uses its own depleted pack (11.8 Wh) instead of the slider.
-- **Route.** Top-down map (north up) with a scale bar, plus an altitude profile.
+- **Route.** The flight's plan in a compact grid (cruise speed, payload, altitude, duration, total energy, date flown), a top-down map (north up) with a scale bar, and an altitude profile.
 - **Telemetry.** Altitude above launch, ground speed, airflow from the onboard anemometer, battery voltage, current, power, and energy used so far.
-- **Playback.** Play/pause, a power-draw scrubber, speed (1–16×), a map layer (Grid, Terrain, Photo) and three camera modes: Orbit, Chase and Top.
+- **Playback.** Play/pause, a power-draw scrubber, speed (1–16×), a map layer (Grid or Terrain) and three camera modes: Orbit, Chase and Top.
 - **Simulated flight 900.** A labelled battery-failure scenario, built by `scripts/make_sim_failure.py` from flight 142's real path. It is not CMU data: the picker, a banner, the telemetry chip and the 3D reticle all mark it, and the rotors stop when power is lost.
 
 Keyboard: Space plays or pauses. With the scrubber focused, the arrow keys step 1 s (10 s with Shift), and Home/End jump to the start or end. The URL hash (`#flight=142`) links to a specific flight.
@@ -34,24 +34,7 @@ Each flight's launch latitude and longitude (`origin` in `index.json`) places it
 | Layer | What it is | Needs |
 |---|---|---|
 | Grid | The dark grid, no map | Nothing |
-| Terrain (default) | Real 3D relief from [Terrain Tiles on AWS](https://registry.opendata.aws/terrain-tiles/), about 2.8 km square around the launch point. Here that's USGS 3DEP elevation at about 3 m resolution. It's drawn as a holographic topo map: hill shading, glowing contour lines (5 m minor, 25 m major, on true elevation), a faint 100 m grid, a scan pulse from the drone, and an edge that fades out. The path curtain and the drone's shadow sit on the terrain surface. | Nothing |
-| Photo | Google Photorealistic 3D Tiles: terrain, trees and buildings. The tileset is re-centred on the launch point and dropped so the ground under it sits at the launch height. | A Google Maps Platform key (below). |
-
-### Turning on the Photo map
-
-1. In [Google Cloud Console](https://console.cloud.google.com/), create a project, enable billing and enable the **Map Tiles API**. There's a monthly free allowance.
-2. Create an API key. Restrict it to the Map Tiles API and to your site's addresses, for example `http://localhost:5173/*` and `https://<your-worker>.workers.dev/*`.
-3. Put it in `web/.env.local`. This file is gitignored.
-
-```
-VITE_GOOGLE_MAPS_API_KEY=your-key-here
-```
-
-4. Restart `npm run dev`. The Photo button turns on.
-
-The key is built into the client JavaScript, so the address restriction is what protects it.
-
-For a deployed build, set the variable when running `npm run deploy`. If the key is wrong or blocked, the app says so and falls back to the terrain map. Google's attribution shows bottom right while the Photo layer is on.
+| Terrain (default) | Real 3D relief from [Terrain Tiles on AWS](https://registry.opendata.aws/terrain-tiles/), about 2.8 km square around the launch point. Here that's USGS 3DEP elevation at about 3 m resolution. Dips narrower than about 33 m (stormwater basins, road cuts, culverts in the lidar) are filled and the surface lightly smoothed, because at this mesh resolution they rendered as deep, faceted holes. It's drawn as a holographic topo map: hill shading, glowing contour lines (5 m minor, 25 m major, on true elevation), a faint 100 m grid, a scan pulse from the drone, and an edge that fades out. The path curtain and the drone's shadow sit on the terrain surface. | Nothing |
 
 ## Setup
 
@@ -130,7 +113,6 @@ Before the first deploy, change `name` in `wrangler.jsonc` if you want a differe
 |---|---|
 | react, react-dom | 19.3.1 |
 | three | 0.186.1 |
-| 3d-tiles-renderer | 0.5.3 |
 | @react-three/fiber | 9.8.2 |
 | zustand | 5.0.15 |
 | vite | 8.3.4 |
@@ -139,6 +121,10 @@ Before the first deploy, change `name` in `wrangler.jsonc` if you want a differe
 
 The production build is about 350 KB of gzipped JS. three.js is split into its own long-cached chunk. Each flight file is about 85 KB, or about 27 KB compressed, and loads on demand.
 
+## Look
+
+Graphite panels with an ultraviolet accent, after a tactical drone-ops dashboard. Colours are CSS tokens at the top of `src/styles.css` (`--accent`, `--go`, `--warn`, `--stop`, `--ramp`), mirrored for the 3D scene in `src/scene/palette.ts`. Headings use Orbitron (uppercase, wide tracking); numbers and body text use Geist.
+
 ## Code map
 
 | Path | What it does |
@@ -146,6 +132,5 @@ The production build is about 350 KB of gzipped JS. three.js is split into its o
 | `src/store.ts` | App state (Zustand) and the playback clock. Time lives outside React so the 3D scene can advance every frame without re-rendering. |
 | `src/data.ts` | Fetching, caching and time interpolation helpers. |
 | `src/mission.ts` | The mission check: on track / turn back / too close, the halfway deadline, and the hindsight outcome. Pure functions shared by the panel, the timeline, the route map and the 3D reticle. |
-| `src/scene/` | `Scene` (lights, ground, camera modes), `Terrain` (elevation tiles to topo mesh and shader), `Basemap` (Google photorealistic tiles), `Stars`, `FlightPath` (ribbon and curtain), `Drone` (model and reticle), `palette` (colours shared with CSS). |
-| `public/draco/` | Draco mesh decoder for Google's compressed 3D tiles. It only loads when the Photo layer is on. |
+| `src/scene/` | `Scene` (lights, ground, camera modes), `Terrain` (elevation tiles to topo mesh and shader, with narrow pits filled), `Stars`, `FlightPath` (ribbon and curtain), `Drone` (model and reticle), `palette` (colours shared with CSS). |
 | `src/ui/` | `TopBar`, `Mission` (mission check panel), `useMission` (shared hook), `RouteMap`, `Telemetry`, `Dock` (playback). |

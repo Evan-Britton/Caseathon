@@ -157,7 +157,7 @@ data age/quality ──▶ model learns wrong power ──▶ overconfident P90 
 
 ### What exists now
 
-A 3D replay of each CMU flight in `web/`: React 19, three.js via React Three Fiber, Zustand and Vite, deployed to Cloudflare Workers. It has a flight picker, a 3D path coloured by power, terrain and photo map layers, telemetry, a playback scrubber, and simulated failure flight 900.
+A 3D replay of each CMU flight in `web/`: React 19, three.js via React Three Fiber, Zustand and Vite, deployed to Cloudflare Workers. It has a flight picker, a 3D path coloured by power, grid and terrain map layers (the Google photo layer was removed), telemetry, a playback scrubber, and simulated failure flight 900. It uses a graphite-and-ultraviolet dashboard theme with Orbitron headings (see `web/README.md`, "Look").
 
 ### Live mission check (built ✅)
 

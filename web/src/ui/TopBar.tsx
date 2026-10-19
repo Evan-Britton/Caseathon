@@ -20,11 +20,6 @@ export function TopBar() {
 
   return (
     <header className="topbar">
-      <div className="brand glass">
-        <span className="brand-mark">{Icons.drone}</span>
-        <span className="brand-name">Flight replay</span>
-      </div>
-
       <div className="picker glass">
         <button onClick={() => stepFlight(-1)} aria-label="Previous flight">{Icons.prev}</button>
         <label>
@@ -51,30 +46,6 @@ export function TopBar() {
         </div>
       )}
 
-      {meta && (
-        <dl className="chips">
-          {meta.route !== "H" && <Chip icon={Icons.speed} label="Cruise" value={`${meta.speed} m/s`} />}
-          <Chip icon={Icons.box} label="Payload" value={`${meta.payload} g`} />
-          <Chip icon={Icons.altitude} label="Altitude" value={fmtAltitude(meta.altitude)} />
-          <Chip icon={Icons.clock} label="Duration" value={fmtClock(meta.durationS)} />
-          <Chip icon={Icons.bolt} label="Energy" value={`${fmtNum(meta.energyWh)} Wh`} />
-          {meta.simulated ? (
-            <Chip icon={Icons.calendar} label="Source" value="Simulated" />
-          ) : (
-            <Chip icon={Icons.calendar} label="Flown" value={`${fmtDate(meta.date)}, ${meta.time}`} />
-          )}
-        </dl>
-      )}
     </header>
-  );
-}
-
-function Chip({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="chip glass">
-      {icon}
-      <dt className="visually-hidden">{label}</dt>
-      <dd title={label}>{value}</dd>
-    </div>
   );
 }
