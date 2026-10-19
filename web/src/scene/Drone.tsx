@@ -3,7 +3,7 @@ import { useMemo, useRef } from "react";
 import { CanvasTexture, Color, Group, Mesh, MeshBasicMaterial, Vector3 } from "three";
 import { lerpAt, sampleAt } from "../data";
 import { missionState } from "../mission";
-import { budgetFor, clock, useStore } from "../store";
+import { activeForecast, budgetFor, clock, useStore } from "../store";
 import type { FlightMeta, FlightSeries } from "../types";
 import { SCENE, toWorld } from "./palette";
 
@@ -63,7 +63,7 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
     }
     // Mission check at this instant: tint the ground ring and the reticle once a call is made.
     const st = useStore.getState();
-    const mission = missionState(st.forecast, meta, budgetFor(st.model, meta, st.budgetWh), st.model?.deadlineFrac ?? 0.5, clock.time);
+    const mission = missionState(activeForecast(st), meta, budgetFor(st.model, meta, st.budgetWh), st.model?.deadlineFrac ?? 0.5, clock.time);
     const callType = mission.call?.type;
     ring.current?.color.copy(callType === "return" ? RING.stop : callType === "review" ? RING.review : RING.go);
     if (reticle.el) {

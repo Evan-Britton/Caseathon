@@ -82,3 +82,63 @@ export interface ModelIndex {
   flights: number[]; // flights with a forecast
   simulated: Record<string, { basedOn: number; budgetWh: number; note: string }>;
 }
+
+/** SIMULATED data-poisoning scenarios (scripts/export_web_scenarios.py). */
+export type ScenarioCondition = "reference" | "stale" | "low_quality" | "combined";
+
+export interface ScenarioHealth {
+  trainFlights: number;
+  trainRecords: number;
+  cheapFeedShare: number; // share of training records from the biased cheap feed
+  newestAccurateWindow: number | null;
+  newestAutoUploadWindow: number | null;
+  uploadAgeWindows: number; // windows since the accurate logger's automatic upload last arrived
+  status: "unmonitored" | "green" | "amber" | "red"; // "unmonitored" = no fix, nothing checks the data
+  referenceFlights?: number;
+  recalibratedRecords?: number;
+  unverifiedRecords?: number;
+  auditedWindows?: number;
+  estimatedFeedRatio?: number | null;
+}
+
+export interface ScenarioDemo {
+  flight: number;
+  condition: ScenarioCondition;
+  budgetWh: number;
+  window: number;
+  totalWh: number;
+  shortWh: number;
+  claimedSpareWh: number;
+  cleanCall: string;
+  fixedCall: string;
+  payload: number;
+  speed: number;
+}
+
+export interface ScenarioIndex {
+  simulated: boolean;
+  note: string;
+  conditions: Record<ScenarioCondition, { label: string; desc: string }>;
+  windows: number;
+  staleAfter: number;
+  feed: { currentFactor: number; recordsPerAccurate: number };
+  flightWindow: Record<string, number>;
+  windowMix: Record<string, Record<string, number>>;
+  health: Record<string, ScenarioHealth>; // key: "<condition>/<on|off>/<window>"
+  chart: Record<string, { maeWh: number[]; p90Coverage: number[] }>; // key: "<condition>/<on|off>", windows 1..N-1
+  demos: ScenarioDemo[];
+  flights: number[];
+}
+
+/** One flight's forecasts under every condition, aligned point for point with its FlightForecast. */
+export interface FlightScenarios {
+  window: number;
+  n: number;
+  runs: Record<string, { e50: number[]; e90: number[] }>; // key: "<condition>/<on|off>"
+}
+
+export interface LabState {
+  on: boolean;
+  condition: ScenarioCondition;
+  fix: boolean;
+}

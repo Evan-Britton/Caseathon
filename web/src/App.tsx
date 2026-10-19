@@ -4,6 +4,7 @@ import { reticle } from "./scene/Drone";
 import { Scene } from "./scene/Scene";
 import { useStore } from "./store";
 import { Dock } from "./ui/Dock";
+import { Lab } from "./ui/Lab";
 import { Mission } from "./ui/Mission";
 import { RouteMap } from "./ui/RouteMap";
 import { Telemetry } from "./ui/Telemetry";
@@ -42,6 +43,7 @@ export default function App() {
         <Mission />
         <Telemetry />
       </div>
+      <Lab />
       <RouteMap />
       <Dock />
       <Attribution />

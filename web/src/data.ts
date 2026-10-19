@@ -1,4 +1,4 @@
-import type { DataIndex, FlightForecast, FlightSeries, ModelIndex } from "./types";
+import type { DataIndex, FlightForecast, FlightScenarios, FlightSeries, ModelIndex, ScenarioIndex } from "./types";
 
 const base = import.meta.env.BASE_URL;
 const flightCache = new Map<number, Promise<FlightSeries>>();
@@ -35,6 +35,22 @@ export function loadForecast(id: number): Promise<FlightForecast> {
     p = getJson<FlightForecast>(`data/model/flights/${id}.json`, "npm run model");
     p.catch(() => forecastCache.delete(id));
     forecastCache.set(id, p);
+  }
+  return p;
+}
+
+export function loadScenarioIndex(): Promise<ScenarioIndex> {
+  return getJson<ScenarioIndex>("data/scenarios/index.json", "npm run scenarios");
+}
+
+const scenarioCache = new Map<number, Promise<FlightScenarios>>();
+
+export function loadScenarios(id: number): Promise<FlightScenarios> {
+  let p = scenarioCache.get(id);
+  if (!p) {
+    p = getJson<FlightScenarios>(`data/scenarios/flights/${id}.json`, "npm run scenarios");
+    p.catch(() => scenarioCache.delete(id));
+    scenarioCache.set(id, p);
   }
   return p;
 }
