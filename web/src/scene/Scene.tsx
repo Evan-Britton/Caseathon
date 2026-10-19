@@ -4,7 +4,6 @@ import { GridHelper, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { clock, useStore } from "../store";
 import type { CameraMode, FlightMeta, FlightSeries } from "../types";
-import { GOOGLE_MAPS_KEY, PhotoTiles } from "./Basemap";
 import { Drone, dronePose } from "./Drone";
 import { FlightPath } from "./FlightPath";
 import { SCENE } from "./palette";
@@ -28,18 +27,17 @@ export function Scene() {
     >
       {/* Push the fog back over real maps so distant terrain stays readable */}
       <fog attach="fog" args={onMap ? [SCENE.horizon, 900, 3200] : [SCENE.horizon, 380, 1400]} />
-      <hemisphereLight args={["#9fb4c4", "#0d141a", 1.1]} />
+      <hemisphereLight args={["#b8b3d9", "#0e0d14", 1.1]} />
       <directionalLight position={[120, 300, 80]} intensity={1.6} />
-      <directionalLight position={[-200, 80, -120]} intensity={0.5} color={SCENE.teal} />
+      <directionalLight position={[-200, 80, -120]} intensity={0.5} color={SCENE.accent} />
       <Ticker />
       {basemap === "grid" && <Ground />}
       <LaunchPad />
-      {basemap !== "photo" && <Stars />}
+      <Stars />
       {meta && basemap === "terrain" && <Terrain meta={meta} />}
-      {meta && basemap === "photo" && GOOGLE_MAPS_KEY && <PhotoTiles meta={meta} apiKey={GOOGLE_MAPS_KEY} />}
       {series && meta && (
         <>
-          <FlightPath series={series} glow={basemap !== "photo"} ground={ground} />
+          <FlightPath series={series} ground={ground} />
           <Drone series={series} meta={meta} />
           <CameraRig series={series} meta={meta} mode={camera} />
         </>
@@ -92,11 +90,11 @@ function LaunchPad() {
     <group position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <mesh>
         <ringGeometry args={[5, 5.6, 64]} />
-        <meshBasicMaterial color={SCENE.amber} />
+        <meshBasicMaterial color={SCENE.warn} />
       </mesh>
       <mesh>
         <circleGeometry args={[1.2, 32]} />
-        <meshBasicMaterial color={SCENE.amber} />
+        <meshBasicMaterial color={SCENE.warn} />
       </mesh>
     </group>
   );

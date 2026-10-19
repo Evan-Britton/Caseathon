@@ -15,7 +15,7 @@ export function Stars({ count = 1400, radius = 4200 }: { count?: number; radius?
     }
     const g = new BufferGeometry();
     g.setAttribute("position", new BufferAttribute(pos, 3));
-    const m = new PointsMaterial({ color: 0xbfe6ee, size: 1.6, sizeAttenuation: false, transparent: true, opacity: 0.7, fog: false, depthWrite: false });
+    const m = new PointsMaterial({ color: 0xd8d4ff, size: 1.6, sizeAttenuation: false, transparent: true, opacity: 0.7, fog: false, depthWrite: false });
     return { geometry: g, material: m };
   }, [count, radius]);
   useEffect(

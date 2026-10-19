@@ -1,19 +1,24 @@
 :root {
-  /* Night-ops palette, mirrored in src/scene/palette.ts */
-  --bg: #0a1016;
-  --glass: rgba(14, 22, 30, 0.62);
-  --glass-hi: rgba(255, 255, 255, 0.06);
-  --edge: rgba(255, 255, 255, 0.09);
-  --text: #e8edf2;
-  --muted: #8b97a5;
-  --teal: #3fb6c9;
-  --amber: #f2a33a;
-  --ember: #ff5a2c;
-  --go: #5cff9a;
+  /* Graphite + Ultraviolet palette, mirrored in src/scene/palette.ts */
+  --bg: #0a0a0e;
+  --glass: rgba(24, 24, 31, 0.8);
+  --glass-top: rgba(44, 43, 56, 0.82);
+  --glass-hi: rgba(255, 255, 255, 0.07);
+  --edge: rgba(255, 255, 255, 0.075);
+  --inset: rgba(255, 255, 255, 0.035);
+  --inset-edge: rgba(255, 255, 255, 0.055);
+  --text: #eeedf4;
+  --muted: #8f8ea3;
+  --accent: #9a8cff; /* ultraviolet: selection, highlights, data */
+  --warn: #ffb84d;
+  --stop: #ff4f5e;
+  --go: #3ee8a8;
+  --ramp: linear-gradient(90deg, #5b6cff, #b45cff, #ff5c8a); /* power draw, low to high */
 
-  --display: "Chakra Petch", system-ui, sans-serif;
+  --display: "Orbitron", system-ui, sans-serif;
+  --num: "Geist", system-ui, sans-serif;
   --body: "Geist", system-ui, sans-serif;
-  --r: 16px;
+  --r: 18px;
   --gap: 16px;
 
   color-scheme: dark;
@@ -52,7 +57,7 @@ select {
 }
 
 :focus-visible {
-  outline: 2px solid var(--teal);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -80,7 +85,7 @@ select {
 }
 
 .glass {
-  background: var(--glass);
+  background: linear-gradient(180deg, var(--glass-top), var(--glass) 120px);
   border: 1px solid var(--edge);
   border-radius: var(--r);
   backdrop-filter: blur(16px) saturate(140%);
@@ -99,7 +104,7 @@ select {
 .scene {
   position: absolute;
   inset: 0;
-  background: radial-gradient(120% 80% at 50% 38%, #142430 0%, #0d1820 45%, var(--bg) 100%);
+  background: radial-gradient(120% 80% at 50% 38%, #1b1926 0%, #111017 45%, var(--bg) 100%);
 }
 
 .scene canvas {
@@ -111,7 +116,7 @@ select {
   position: absolute;
   top: var(--gap);
   left: var(--gap);
-  right: var(--gap);
+  right: calc(300px + var(--gap) * 2); /* stops short of the route panel */
   display: flex;
   align-items: center;
   gap: 10px;
@@ -125,7 +130,7 @@ select {
 
 .route-map {
   position: absolute;
-  top: 80px;
+  top: var(--gap);
   right: var(--gap);
   width: 300px;
   z-index: 20;
@@ -170,32 +175,6 @@ select {
 
 /* ---------- top bar ---------- */
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 46px;
-  padding: 0 16px 0 12px;
-}
-
-.brand-mark {
-  display: grid;
-  place-items: center;
-  color: var(--amber);
-}
-
-.brand-mark .icon {
-  width: 22px;
-  height: 22px;
-}
-
-.brand-name {
-  font-family: var(--display);
-  font-weight: 600;
-  font-size: 16px;
-  letter-spacing: 0.02em;
-}
-
 .picker {
   display: flex;
   align-items: center;
@@ -224,7 +203,7 @@ select {
   appearance: none;
   border: 0;
   background: transparent;
-  font-family: var(--display);
+  font-family: var(--num);
   font-weight: 600;
   font-size: 15px;
   padding: 6px 8px;
@@ -236,35 +215,8 @@ select {
 .picker select option,
 .picker select optgroup,
 .rate select option {
-  background: #121b23;
+  background: #18171f;
   color: var(--text);
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-left: auto;
-}
-
-.chip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 46px;
-  padding: 0 14px;
-  border-radius: 14px;
-}
-
-.chip .icon {
-  color: var(--muted);
-}
-
-.chip dd {
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
 }
 
 /* ---------- panels ---------- */
@@ -278,7 +230,7 @@ select {
 }
 
 .panel-head h2 {
-  font-family: var(--display);
+  font-family: var(--num);
   font-weight: 600;
   font-size: 17px;
   letter-spacing: 0.02em;
@@ -300,7 +252,7 @@ select {
 }
 
 .panel-head.sub .num {
-  font-family: var(--display);
+  font-family: var(--num);
   font-weight: 600;
 }
 
@@ -316,7 +268,7 @@ select {
 
 .map-launch {
   fill: none;
-  stroke: var(--amber);
+  stroke: var(--warn);
   stroke-width: 2;
 }
 
@@ -325,8 +277,8 @@ select {
 }
 
 .map-drone-halo {
-  fill: rgba(63, 182, 201, 0.22);
-  stroke: var(--teal);
+  fill: rgba(154, 140, 255, 0.22);
+  stroke: var(--accent);
   stroke-width: 1;
 }
 
@@ -374,20 +326,21 @@ select {
 
 .state-air {
   color: var(--go);
-  background: rgba(92, 255, 154, 0.12);
+  background: rgba(62, 232, 168, 0.12);
 }
 
 .state-fail {
-  color: var(--ember);
-  background: rgba(255, 90, 44, 0.16);
+  color: var(--stop);
+  background: rgba(255, 79, 94, 0.16);
 }
 
 .sim-banner {
+  min-width: 0;
   padding: 8px 14px;
   border-radius: 12px;
   font-size: 12px;
-  color: var(--ember);
-  border: 1px solid rgba(255, 90, 44, 0.45);
+  color: var(--stop);
+  border: 1px solid rgba(255, 79, 94, 0.45);
 }
 
 .state-ground {
@@ -430,7 +383,7 @@ select {
 }
 
 .readouts dd {
-  font-family: var(--display);
+  font-family: var(--num);
   font-size: 19px;
   font-weight: 600;
   line-height: 1.15;
@@ -455,7 +408,7 @@ select {
 }
 
 .energy-label .num {
-  font-family: var(--display);
+  font-family: var(--num);
   font-weight: 600;
   font-size: 14px;
 }
@@ -470,7 +423,7 @@ select {
 .energy-fill {
   height: 100%;
   border-radius: 3px;
-  background: linear-gradient(90deg, var(--teal), var(--amber), var(--ember));
+  background: var(--ramp);
   background-size: 330px 100%;
 }
 
@@ -491,14 +444,14 @@ select {
   flex: none;
   border: 0;
   border-radius: 50%;
-  background: var(--amber);
+  background: var(--warn);
   cursor: pointer;
 }
 
 .play svg {
   width: 16px;
   height: 16px;
-  fill: #1a1206;
+  fill: #120f24;
 }
 
 .play:disabled {
@@ -506,7 +459,7 @@ select {
 }
 
 .clock {
-  font-family: var(--display);
+  font-family: var(--num);
   font-weight: 600;
   font-size: 18px;
   min-width: 108px;
@@ -548,7 +501,7 @@ select {
   border: 1px solid var(--edge);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.04);
-  font-family: var(--display);
+  font-family: var(--num);
   font-weight: 600;
   cursor: pointer;
 }
@@ -644,11 +597,11 @@ select {
 }
 
 .reticle-fail .reticle i {
-  border-color: var(--ember);
+  border-color: var(--stop);
 }
 
 .reticle-fail .reticle-label {
-  color: var(--ember);
+  color: var(--stop);
 }
 
 .reticle-label {
@@ -658,8 +611,8 @@ select {
   transform: translateX(-50%);
   padding: 2px 8px;
   border-radius: 6px;
-  background: rgba(10, 16, 22, 0.7);
-  font-family: var(--display);
+  background: rgba(14, 13, 19, 0.7);
+  font-family: var(--num);
   font-weight: 600;
   font-size: 12px;
   white-space: nowrap;
@@ -680,7 +633,7 @@ select {
   height: 6px;
   margin: 6px 0 3px;
   border-radius: 3px;
-  background: linear-gradient(90deg, var(--teal), var(--amber), var(--ember));
+  background: var(--ramp);
 }
 
 .ramp-ends {
@@ -693,41 +646,16 @@ select {
   inset: 0;
   display: grid;
   place-items: center;
-  font-family: var(--display);
+  font-family: var(--num);
   font-size: 16px;
   color: var(--muted);
   pointer-events: none;
 }
 
 .stage-msg.error {
-  color: var(--ember);
+  color: var(--stop);
   padding: 24px;
   text-align: center;
-}
-
-.map-error {
-  position: absolute;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 25;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  width: min(520px, calc(100% - 32px));
-  padding: 12px 14px;
-  font-size: 13px;
-  border-color: rgba(255, 90, 44, 0.45);
-}
-
-.map-error button {
-  flex: none;
-  border: 1px solid var(--edge);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  padding: 4px 10px;
-  font-size: 12px;
-  cursor: pointer;
 }
 
 .attribution {
@@ -746,51 +674,51 @@ select {
 /* mission markers on the scrubber and route map */
 
 .scrub-window {
-  fill: rgba(63, 182, 201, 0.1);
+  fill: rgba(154, 140, 255, 0.1);
 }
 
 .scrub-deadline {
-  stroke: rgba(63, 182, 201, 0.75);
+  stroke: rgba(154, 140, 255, 0.75);
   stroke-dasharray: 3 3;
 }
 
 .scrub-call {
-  stroke: rgba(10, 16, 22, 0.9);
+  stroke: rgba(14, 13, 19, 0.9);
   stroke-width: 1.5;
 }
 
 .map-half {
-  fill: rgba(10, 16, 22, 0.85);
-  stroke: var(--teal);
+  fill: rgba(14, 13, 19, 0.85);
+  stroke: var(--accent);
   stroke-width: 1.5;
 }
 
 .map-half-text {
-  fill: var(--teal);
+  fill: var(--accent);
   font-size: 8px;
   font-weight: 700;
   font-family: var(--body);
 }
 
 .map-call {
-  stroke: rgba(10, 16, 22, 0.9);
+  stroke: rgba(14, 13, 19, 0.9);
   stroke-width: 1.5;
 }
 
 .reticle-return .reticle i {
-  border-color: var(--ember);
+  border-color: var(--stop);
 }
 
 .reticle-return .reticle-label {
-  color: var(--ember);
+  color: var(--stop);
 }
 
 .reticle-review .reticle i {
-  border-color: var(--amber);
+  border-color: var(--warn);
 }
 
 .reticle-review .reticle-label {
-  color: var(--amber);
+  color: var(--warn);
 }
 
 /* mission check */
@@ -800,9 +728,9 @@ select {
   font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--teal);
+  color: var(--accent);
   padding: 2px 8px;
-  border: 1px solid rgba(63, 182, 201, 0.35);
+  border: 1px solid rgba(154, 140, 255, 0.35);
   border-radius: 999px;
 }
 
@@ -823,18 +751,18 @@ select {
 
 .verdict.tone-go {
   --tone: var(--go);
-  --tone-bg: rgba(92, 255, 154, 0.08);
+  --tone-bg: rgba(62, 232, 168, 0.08);
 }
 
 .verdict.tone-warn {
-  --tone: var(--amber);
-  --tone-bg: rgba(242, 163, 58, 0.12);
+  --tone: var(--warn);
+  --tone-bg: rgba(255, 184, 77, 0.12);
 }
 
 .verdict.tone-stop,
 .verdict.tone-fail {
-  --tone: var(--ember);
-  --tone-bg: rgba(255, 90, 44, 0.13);
+  --tone: var(--stop);
+  --tone-bg: rgba(255, 79, 94, 0.13);
 }
 
 .verdict-icon {
@@ -848,7 +776,7 @@ select {
 }
 
 .verdict-title {
-  font-family: var(--display);
+  font-family: var(--num);
   font-size: 20px;
   font-weight: 700;
   line-height: 1.1;
@@ -896,7 +824,7 @@ select {
 .ebar-used {
   left: 0;
   border-radius: 6px 0 0 6px;
-  background: linear-gradient(90deg, var(--teal), #6fd3e0);
+  background: linear-gradient(90deg, var(--accent), #c9c1ff);
 }
 
 .ebar-p50 {
@@ -909,7 +837,7 @@ select {
 }
 
 .ebar-p90.over {
-  background: repeating-linear-gradient(-45deg, rgba(255, 90, 44, 0.55) 0 3px, rgba(255, 90, 44, 0.2) 3px 6px);
+  background: repeating-linear-gradient(-45deg, rgba(255, 79, 94, 0.55) 0 3px, rgba(255, 79, 94, 0.2) 3px 6px);
 }
 
 .ebar-budget {
@@ -919,7 +847,7 @@ select {
   margin-left: -1px;
   border-radius: 1px;
   background: var(--text);
-  box-shadow: 0 0 0 2px rgba(10, 16, 22, 0.8);
+  box-shadow: 0 0 0 2px rgba(14, 13, 19, 0.8);
 }
 
 .ebar-legend {
@@ -943,7 +871,7 @@ select {
 }
 
 .ebar-legend dd {
-  font-family: var(--display);
+  font-family: var(--num);
   font-size: 13px;
   font-weight: 600;
 }
@@ -958,7 +886,7 @@ select {
 }
 
 .sw-used {
-  background: var(--teal);
+  background: var(--accent);
 }
 
 .sw-need {
@@ -982,8 +910,8 @@ select {
 }
 
 .sw-window {
-  background: rgba(63, 182, 201, 0.16);
-  border: 1px solid rgba(63, 182, 201, 0.4);
+  background: rgba(154, 140, 255, 0.16);
+  border: 1px solid rgba(154, 140, 255, 0.4);
 }
 
 .fchart {
@@ -1022,11 +950,11 @@ select {
 }
 
 .fc-window {
-  fill: rgba(63, 182, 201, 0.08);
+  fill: rgba(154, 140, 255, 0.08);
 }
 
 .fc-deadline {
-  stroke: rgba(63, 182, 201, 0.6);
+  stroke: rgba(154, 140, 255, 0.6);
   stroke-dasharray: 3 3;
 }
 
@@ -1067,7 +995,7 @@ select {
 }
 
 .fc-call {
-  stroke: rgba(10, 16, 22, 0.9);
+  stroke: rgba(14, 13, 19, 0.9);
   stroke-width: 1.5;
 }
 
@@ -1088,7 +1016,7 @@ select {
 }
 
 .budget-val {
-  font-family: var(--display);
+  font-family: var(--num);
   font-size: 16px;
   font-weight: 700;
 }
@@ -1100,7 +1028,7 @@ select {
 }
 
 .budget.locked .budget-note {
-  color: var(--ember);
+  color: var(--stop);
 }
 
 .budget input[type="range"] {
@@ -1117,13 +1045,13 @@ select {
 .budget input[type="range"]::-webkit-slider-runnable-track {
   height: 6px;
   border-radius: 3px;
-  background: linear-gradient(90deg, var(--teal) var(--fill), rgba(255, 255, 255, 0.12) var(--fill));
+  background: linear-gradient(90deg, var(--accent) var(--fill), rgba(255, 255, 255, 0.12) var(--fill));
 }
 
 .budget input[type="range"]::-moz-range-track {
   height: 6px;
   border-radius: 3px;
-  background: linear-gradient(90deg, var(--teal) var(--fill), rgba(255, 255, 255, 0.12) var(--fill));
+  background: linear-gradient(90deg, var(--accent) var(--fill), rgba(255, 255, 255, 0.12) var(--fill));
 }
 
 .budget input[type="range"]::-webkit-slider-thumb {
@@ -1133,7 +1061,7 @@ select {
   margin-top: -6px;
   border-radius: 50%;
   background: var(--text);
-  border: 3px solid var(--teal);
+  border: 3px solid var(--accent);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
@@ -1142,7 +1070,7 @@ select {
   height: 12px;
   border-radius: 50%;
   background: var(--text);
-  border: 3px solid var(--teal);
+  border: 3px solid var(--accent);
 }
 
 .hindsight {
@@ -1168,35 +1096,35 @@ select {
 }
 
 .hindsight-text.out-unsafe-continue {
-  border-left-color: var(--ember);
+  border-left-color: var(--stop);
 }
 
 .hindsight-text.out-unsafe-continue strong {
-  color: var(--ember);
+  color: var(--stop);
 }
 
 .hindsight-text.out-needless-return {
-  border-left-color: var(--amber);
+  border-left-color: var(--warn);
 }
 
 .hindsight-text.out-needless-return strong {
-  color: var(--amber);
+  color: var(--warn);
 }
 
 .link-btn {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--teal);
+  color: var(--accent);
   font-size: 12px;
   cursor: pointer;
   text-decoration: underline;
-  text-decoration-color: rgba(63, 182, 201, 0.4);
+  text-decoration-color: rgba(154, 140, 255, 0.4);
   text-underline-offset: 3px;
 }
 
 .link-btn:hover {
-  text-decoration-color: var(--teal);
+  text-decoration-color: var(--accent);
 }
 
 .mission-foot {
@@ -1205,25 +1133,206 @@ select {
   color: var(--muted);
 }
 
+/* ---------- theme: graphite + ultraviolet ---------- */
+
+.panel-head h2,
+.verdict-title,
+.stage-msg {
+  font-family: var(--display);
+  text-transform: uppercase;
+}
+
+.panel-head h2 {
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+}
+
+.panel-head h3 {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.verdict-title {
+  font-size: 16px;
+  letter-spacing: 0.05em;
+}
+
+.stage-msg {
+  font-size: 13px;
+  letter-spacing: 0.12em;
+}
+
+.picker {
+  flex: none;
+  width: 330px; /* lines up with the left column */
+  height: 52px;
+}
+
+.picker label {
+  flex: 1;
+  min-width: 0;
+}
+
+.picker select {
+  width: 100%;
+  max-width: none;
+}
+
+.picker select {
+  font-weight: 600;
+}
+
+/* status pills get a live dot */
+.state,
+.ai-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.state::before,
+.ai-tag::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+
+/* telemetry readouts as inset tiles */
+.tele-body {
+  grid-template-columns: 1fr;
+  padding: 2px 12px 0;
+}
+
+.glyph {
+  display: none;
+}
+
+.readouts {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.readouts > div {
+  padding: 7px 10px 6px;
+  border-radius: 10px;
+  background: var(--inset);
+  border: 1px solid var(--inset-edge);
+}
+
+.readouts dt {
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.readouts dd {
+  font-size: 17px;
+}
+
+/* inset surfaces inside panels */
+.map,
+.profile,
+.fchart svg {
+  border: 1px solid var(--inset-edge);
+}
+
+.budget,
+.verdict {
+  border-radius: 12px;
+}
+
+/* dock */
+.play {
+  background: var(--accent);
+  box-shadow: 0 0 0 5px rgba(154, 140, 255, 0.14), 0 8px 24px rgba(154, 140, 255, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.play:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.cams {
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--inset);
+  border: 1px solid var(--inset-edge);
+}
+
+.cams button[aria-pressed="true"] {
+  background: rgba(154, 140, 255, 0.18);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px rgba(154, 140, 255, 0.35);
+}
+
+.rate select {
+  background: var(--inset);
+}
+
+/* flight specs at the top of the route panel */
+.specs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 0 12px 10px;
+}
+
+.specs > div {
+  min-width: 0;
+  padding: 6px 8px 5px;
+  border-radius: 10px;
+  background: var(--inset);
+  border: 1px solid var(--inset-edge);
+}
+
+.specs dt {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--display);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.specs dt .icon {
+  width: 11px;
+  height: 11px;
+  color: var(--accent);
+}
+
+.specs dd {
+  margin-top: 1px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ---------- responsive ---------- */
 
+/* Laptop widths: icon-only dock buttons, so the scrubber keeps its room. */
 @media (max-width: 1280px) {
-  .chip:nth-of-type(n + 5) {
+  .cams span {
     display: none;
   }
 }
 
 @media (max-width: 1060px) {
-  .chips {
-    display: none;
-  }
-
   .route-map {
     width: 250px;
   }
 
-  .cams span {
-    display: none;
+  .topbar {
+    right: calc(250px + var(--gap) * 2);
   }
 }
 
@@ -1256,12 +1365,9 @@ select {
     flex-wrap: wrap;
   }
 
-  .brand {
-    display: none;
-  }
-
   .picker {
     flex: 1;
+    width: auto;
   }
 
   .picker label {
@@ -1312,32 +1418,12 @@ select {
 
   .power-legend {
     top: 12px;
+    left: 12px;
   }
 }
 
 /* Short desktop windows: slimmer telemetry so the left column fits without scrolling. */
 @media (max-height: 880px) and (min-width: 821px) {
-  .tele-body {
-    grid-template-columns: 1fr;
-    padding-top: 0;
-  }
-
-  .glyph {
-    display: none;
-  }
-
-  .readouts {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .readouts dd {
-    font-size: 17px;
-  }
-
-  .energy {
-    padding-top: 10px;
-  }
-
   .budget:not(.locked) .budget-note,
   .fchart-key {
     display: none;

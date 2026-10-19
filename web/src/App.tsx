@@ -44,7 +44,6 @@ export default function App() {
       </div>
       <RouteMap />
       <Dock />
-      <MapError />
       <Attribution />
     </div>
   );
@@ -74,18 +73,6 @@ function StageMessage() {
   return null;
 }
 
-function MapError() {
-  const mapError = useStore((s) => s.mapError);
-  const setBasemap = useStore((s) => s.setBasemap);
-  if (!mapError) return null;
-  return (
-    <div className="map-error glass" role="alert">
-      <p>{mapError}</p>
-      <button onClick={() => setBasemap("terrain")}>Dismiss</button>
-    </div>
-  );
-}
-
 function Attribution() {
   const source = useStore((s) => s.index?.source);
   const basemap = useStore((s) => s.basemap);
@@ -99,7 +86,6 @@ function Attribution() {
           {" "}<a href="https://registry.opendata.aws/terrain-tiles/" target="_blank" rel="noreferrer">{mapCredits}</a>
         </>
       )}
-      {basemap === "photo" && <> Map: Google{mapCredits && `, ${mapCredits}`}</>}
     </p>
   );
 }

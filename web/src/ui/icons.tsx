@@ -9,12 +9,6 @@ function Icon({ children }: { children: ReactNode }) {
 }
 
 export const Icons = {
-  drone: (
-    <Icon>
-      <circle cx="5.5" cy="5.5" r="3" /><circle cx="18.5" cy="5.5" r="3" /><circle cx="5.5" cy="18.5" r="3" /><circle cx="18.5" cy="18.5" r="3" />
-      <path d="M8 8l8 8M16 8l-8 8" /><rect x="9.5" y="9.5" width="5" height="5" rx="1" />
-    </Icon>
-  ),
   speed: (
     <Icon>
       <path d="M4 15a8 8 0 0 1 16 0" /><path d="M12 15l4-5" /><path d="M3 19h18" />
@@ -63,11 +57,6 @@ export const Icons = {
   grid: (
     <Icon>
       <path d="M4 9h16M4 15h16M9 4v16M15 4v16" /><rect x="4" y="4" width="16" height="16" rx="2" />
-    </Icon>
-  ),
-  map: (
-    <Icon>
-      <path d="M9 4L3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5L9 4z" /><path d="M9 4v13.5M15 6.5V20" />
     </Icon>
   ),
   terrain: (
