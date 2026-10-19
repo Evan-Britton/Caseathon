@@ -5,6 +5,7 @@ import { GOOGLE_MAPS_KEY } from "../scene/Basemap";
 import type { Basemap, CameraMode } from "../types";
 import { fmtClock } from "./format";
 import { Icons } from "./icons";
+import { useMission } from "./useMission";
 
 const RATES = [1, 2, 4, 8, 16];
 const H = 56;
@@ -16,12 +17,12 @@ const CAMERAS: { id: CameraMode; label: string; icon: React.ReactNode }[] = [
 
 const BASEMAPS: { id: Basemap; label: string; icon: React.ReactNode; disabledHint?: string }[] = [
   { id: "grid", label: "Grid", icon: Icons.grid },
-  { id: "street", label: "Street", icon: Icons.map },
+  { id: "terrain", label: "Terrain", icon: Icons.terrain },
   {
     id: "photo",
-    label: "3D",
-    icon: Icons.terrain,
-    disabledHint: GOOGLE_MAPS_KEY ? undefined : "Add VITE_GOOGLE_MAPS_API_KEY to web/.env.local to turn on the 3D map",
+    label: "Photo",
+    icon: Icons.map,
+    disabledHint: GOOGLE_MAPS_KEY ? undefined : "Add VITE_GOOGLE_MAPS_API_KEY to web/.env.local to turn on Google's photorealistic map",
   },
 ];
 
@@ -34,6 +35,7 @@ export function Dock() {
   const camera = useStore((s) => s.camera);
   const basemap = useStore((s) => s.basemap);
   const { seek, setPlaying, setRate, setCamera, setBasemap } = useStore.getState();
+  const { forecast, call, deadlineT } = useMission();
 
   const wrap = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(600);
@@ -71,6 +73,8 @@ export function Dock() {
     e.preventDefault();
   };
   const playX = (uiTime / end) * width;
+  const tx = (s: number) => (s / end) * width;
+  const callColor = call?.type === "return" ? "var(--ember)" : "var(--amber)";
 
   return (
     <section className="dock glass" aria-label="Playback">
@@ -120,8 +124,21 @@ export function Dock() {
               <rect width={playX} height={H} />
             </clipPath>
           </defs>
+          {forecast && deadlineT !== null && (
+            <g aria-hidden>
+              <rect x={tx(forecast.tOn)} width={Math.max(tx(deadlineT) - tx(forecast.tOn), 0)} y={0} height={H} className="scrub-window" />
+              <line x1={tx(deadlineT)} x2={tx(deadlineT)} y1={0} y2={H} className="scrub-deadline">
+                <title>Halfway: the last moment a turn-back call helps</title>
+              </line>
+            </g>
+          )}
           {chart && <path d={chart} fill="rgba(255,255,255,0.07)" />}
           {chart && <path d={chart} fill="url(#powerfill)" clipPath="url(#flown)" />}
+          {call && call.type !== "continue" && uiTime >= call.t && (
+            <circle cx={tx(call.t)} cy={H - 7} r={4.5} fill={callColor} className="scrub-call">
+              <title>{call.type === "return" ? "Turn back" : "Operator review"} called at {fmtClock(call.t)}</title>
+            </circle>
+          )}
           <line x1={playX} x2={playX} y1={0} y2={H} className="playhead" />
           <circle cx={playX} cy={4} r={4} className="playhead-knob" />
         </svg>

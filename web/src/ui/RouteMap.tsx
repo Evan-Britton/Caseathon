@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { lerpAt, sampleAt } from "../data";
 import { powerCss, powerRange } from "../scene/palette";
 import { useStore } from "../store";
+import { useMission } from "./useMission";
 
 const W = 268;
 const H = 190;
@@ -12,6 +13,7 @@ const PROFILE_H = 54;
 export function RouteMap() {
   const series = useStore((s) => s.series);
   const uiTime = useStore((s) => s.uiTime);
+  const { call, deadlineT } = useMission();
 
   const geo = useMemo(() => {
     if (!series) return null;
@@ -44,6 +46,12 @@ export function RouteMap() {
   }, [series]);
 
   if (!series || !geo) return null;
+  const at = (time: number): [number, number] => {
+    const s = sampleAt(series.t, time);
+    return [geo.px(lerpAt(series.east, s.i, s.f)), geo.py(lerpAt(series.north, s.i, s.f))];
+  };
+  const half = deadlineT !== null ? at(deadlineT) : null;
+  const callPt = call && call.type !== "continue" && uiTime >= call.t ? at(call.t) : null;
   const { i, f } = sampleAt(series.t, uiTime);
   const dx = geo.px(lerpAt(series.east, i, f));
   const dy = geo.py(lerpAt(series.north, i, f));
@@ -67,6 +75,18 @@ export function RouteMap() {
           <path key={k} d={s.d} stroke={s.c} strokeWidth={2.4} strokeLinecap="round" opacity={s.t <= uiTime ? 1 : 0.22} />
         ))}
         <circle cx={geo.launch[0]} cy={geo.launch[1]} r={5} className="map-launch" />
+        {half && (
+          <g transform={`translate(${half[0]},${half[1]})`}>
+            <title>Halfway: after this, finishing the loop is the quickest way home</title>
+            <rect x={-7} y={-7} width={14} height={14} rx={3} transform="rotate(45)" className="map-half" />
+            <text y={3} textAnchor="middle" className="map-half-text">½</text>
+          </g>
+        )}
+        {callPt && (
+          <circle cx={callPt[0]} cy={callPt[1]} r={5} fill={call?.type === "return" ? "var(--ember)" : "var(--amber)"} className="map-call">
+            <title>{call?.type === "return" ? "Turn-back" : "Operator review"} called here</title>
+          </circle>
+        )}
         <g transform={`translate(${dx},${dy}) rotate(${heading})`}>
           <circle r={9} className="map-drone-halo" />
           <path d="M0,-7 L5,5 L0,2.5 L-5,5 Z" className="map-drone" />

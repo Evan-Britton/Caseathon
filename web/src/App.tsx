@@ -4,6 +4,7 @@ import { reticle } from "./scene/Drone";
 import { Scene } from "./scene/Scene";
 import { useStore } from "./store";
 import { Dock } from "./ui/Dock";
+import { Mission } from "./ui/Mission";
 import { RouteMap } from "./ui/RouteMap";
 import { Telemetry } from "./ui/Telemetry";
 import { TopBar } from "./ui/TopBar";
@@ -37,8 +38,11 @@ export default function App() {
         <StageMessage />
       </main>
       <TopBar />
+      <div className="left-stack">
+        <Mission />
+        <Telemetry />
+      </div>
       <RouteMap />
-      <Telemetry />
       <Dock />
       <MapError />
       <Attribution />
@@ -77,7 +81,7 @@ function MapError() {
   return (
     <div className="map-error glass" role="alert">
       <p>{mapError}</p>
-      <button onClick={() => setBasemap("street")}>Dismiss</button>
+      <button onClick={() => setBasemap("terrain")}>Dismiss</button>
     </div>
   );
 }
@@ -90,9 +94,9 @@ function Attribution() {
   return (
     <p className="attribution">
       Data: <a href={source.url} target="_blank" rel="noreferrer">{source.authors}</a>, {source.license}
-      {basemap === "street" && (
+      {basemap === "terrain" && mapCredits && (
         <>
-          {" "}Map: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a>
+          {" "}<a href="https://registry.opendata.aws/terrain-tiles/" target="_blank" rel="noreferrer">{mapCredits}</a>
         </>
       )}
       {basemap === "photo" && <> Map: Google{mapCredits && `, ${mapCredits}`}</>}
