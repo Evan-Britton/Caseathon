@@ -30,7 +30,14 @@ export function Mission() {
     <section className="mission glass" aria-label="Mission energy check">
       <div className="panel-head">
         <h2>Mission check</h2>
-        <span className="ai-tag" title={m.model?.model}>AI forecast</span>
+        {m.labActive && m.scenarioIndex ? (
+          <span className={`ai-tag lab-tag ${m.lab.condition !== "reference" && !m.lab.fix ? "bad" : ""}`} title={m.scenarioIndex.note}>
+            Lab · {m.scenarioIndex.conditions[m.lab.condition].label}
+            {m.lab.fix ? " + fix" : ""}
+          </span>
+        ) : (
+          <span className="ai-tag" title={m.model?.model}>AI forecast</span>
+        )}
       </div>
 
       <div className={`verdict tone-${head.tone}`} role="status" aria-live="polite">
@@ -44,7 +51,13 @@ export function Mission() {
       {m.forecast && (
         <>
           <EnergyBar state={m.state} budget={m.budget} forecast={m.forecast} done={done} />
-          <ForecastChart forecast={m.forecast} budget={m.budget} call={m.call} deadlineT={m.deadlineT} />
+          <ForecastChart
+            forecast={m.forecast}
+            budget={m.budget}
+            call={m.call}
+            deadlineT={m.deadlineT}
+            actualWh={m.labActive ? m.forecast.totalWh : null}
+          />
         </>
       )}
 
@@ -69,7 +82,7 @@ export function Mission() {
 
       {m.model && m.forecast && (
         <p className="mission-foot" title={m.model.validation}>
-          Out-of-sample · typical error {fmtNum(m.model.metrics.maeWh, 2)} Wh · P90 held {Math.round(m.model.metrics.p90Coverage * 100)}%
+          Tested on flights it never saw · off by about {fmtNum(m.model.metrics.maeWh, 2)} Wh on average · safety margin held {Math.round(m.model.metrics.p90Coverage * 100)}% of the time
         </p>
       )}
     </section>
@@ -158,7 +171,7 @@ function headline(
   // Past halfway with no return call: committed to finishing the loop.
   const margin = est!.margin;
   if (st.phase === "landed")
-    return { tone: "go", icon: "check", title: "Continued and landed", detail: `The check cleared this mission at halfway (${fmtClock(call!.t)}).` };
+    return { tone: "go", icon: "check", title: "Cleared to continue", detail: `The check let this mission continue at halfway (${fmtClock(call!.t)}). The hindsight below says whether that was right.` };
   return margin >= 0
     ? { tone: "go", icon: "lock", title: "Committed: will make it", detail: `Past halfway, finishing is the quickest way home. Forecast to land with ${fmtNum(margin)} Wh to spare.` }
     : { tone: "warn", icon: "lock", title: "Committed: tight", detail: `Past halfway, finishing is the quickest way home, but the forecast is now ${range} against ${fmtNum(budget)} Wh.` };
@@ -208,7 +221,20 @@ const PAD_T = 12;
  * Total-mission forecast (energy used + still needed) over the flight, against the battery line.
  * The y-axis is zoomed to the band around the battery, where the decision is made. Click or drag to scrub.
  */
-function ForecastChart({ forecast, budget, call, deadlineT }: { forecast: FlightForecast; budget: number; call: MissionCall | null; deadlineT: number | null }) {
+function ForecastChart({
+  forecast,
+  budget,
+  call,
+  deadlineT,
+  actualWh,
+}: {
+  forecast: FlightForecast;
+  budget: number;
+  call: MissionCall | null;
+  deadlineT: number | null;
+  /** In the poisoning lab, what the mission really used, so the band can be judged against it. */
+  actualWh: number | null;
+}) {
   const series = useStore((s) => s.series);
   const uiTime = useStore((s) => s.uiTime);
   const seek = useStore((s) => s.seek);
@@ -226,8 +252,8 @@ function ForecastChart({ forecast, budget, call, deadlineT }: { forecast: Flight
     const { t, used, e50, e90 } = forecast;
     const totals90 = e90.map((e, i) => used[i] + e);
     const totals50 = e50.map((e, i) => used[i] + e);
-    const top = Math.max(budget, ...totals90) + 1;
-    const bottom = Math.max(Math.min(budget, ...totals50) - 1.5, 0);
+    const top = Math.max(budget, ...totals90, actualWh ?? 0) + 1;
+    const bottom = Math.max(Math.min(budget, ...totals50, actualWh ?? Infinity) - 1.5, 0);
     const x = (s: number) => (s / end) * width;
     const y = (wh: number) => CH - ((wh - bottom) / Math.max(top - bottom, 1)) * (CH - PAD_T);
     const step = Math.max(1, Math.floor(t.length / 160));
@@ -238,7 +264,7 @@ function ForecastChart({ forecast, budget, call, deadlineT }: { forecast: Flight
     const band = `M${idx.map((i) => p(i, used[i] + e90[i])).join("L")}L${[...idx].reverse().map((i) => p(i, used[i] + e50[i])).join("L")}Z`;
     const mid = `M${idx.map((i) => p(i, used[i] + e50[i])).join("L")}`;
     return { x, y, band, mid, top, bottom };
-  }, [forecast, budget, end, width]);
+  }, [forecast, budget, end, width, actualWh]);
 
   const scrubbing = useRef(false);
   const seekFrom = (e: PointerEvent<SVGSVGElement>) => {
@@ -286,6 +312,12 @@ function ForecastChart({ forecast, budget, call, deadlineT }: { forecast: Flight
         <path d={geo.band} className="fc-band past" clipPath="url(#fc-past)" />
         <path d={geo.mid} className="fc-mid future" />
         <path d={geo.mid} className="fc-mid" clipPath="url(#fc-past)" />
+        {actualWh !== null && (
+          <>
+            <line x1={0} x2={width} y1={geo.y(actualWh)} y2={geo.y(actualWh)} className="fc-actual" />
+            <text x={4} y={geo.y(actualWh) - 4} className="fc-label actual">actual {fmtNum(actualWh)} Wh</text>
+          </>
+        )}
         <line x1={0} x2={width} y1={by} y2={by} className="fc-budget" />
         <text x={width - 4} y={by < 18 ? by + 11 : by - 4} textAnchor="end" className="fc-label budget">battery {fmtNum(budget)} Wh</text>
         {Math.abs(by - CH) > 16 && <text x={4} y={CH - 4} className="fc-label">{fmtNum(geo.bottom, 0)} Wh</text>}
@@ -300,7 +332,11 @@ function ForecastChart({ forecast, budget, call, deadlineT }: { forecast: Flight
       <div className="fchart-key">
         <span><i className="sw sw-band" />Forecast, P50–P90</span>
         <span><i className="sw sw-budgetline" />Battery</span>
-        <span><i className="sw sw-window" />Before halfway</span>
+        {actualWh !== null ? (
+          <span><i className="sw sw-actual" />Actual (hindsight)</span>
+        ) : (
+          <span><i className="sw sw-window" />Before halfway</span>
+        )}
       </div>
     </div>
   );

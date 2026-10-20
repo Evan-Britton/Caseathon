@@ -9,8 +9,8 @@ import { SCENE } from "./palette";
 /**
  * Real terrain around the launch point, from Mapzen/Tilezen Terrain Tiles on AWS
  * (USGS 3DEP elevation here, ~3 m resolution). Drawn as a holographic topo map:
- * hill-shaded relief, glowing contour lines, a faint 100 m grid, a scan pulse
- * that ripples out from the drone, and an edge that fades into the dark.
+ * dim hill-shaded relief under bright contour lines, a faint 100 m grid, a soft
+ * halo beneath the drone, and an edge that fades into the dark.
  *
  * Heights are shifted so the ground at the launch point is y = 0, matching the
  * recorded "metres above launch" altitudes.
@@ -211,7 +211,6 @@ const fragmentShader = /* glsl */ `
   uniform float uMaxH;
   uniform float uOffset;
   uniform float uRadius;
-  uniform float uTime;
   uniform vec3 uDrone;
   varying vec3 vPos;
   varying vec3 vNormal;
@@ -219,7 +218,11 @@ const fragmentShader = /* glsl */ `
   // Anti-aliased iso-line: 1 on the line, 0 away from it.
   float isoLine(float v, float interval, float width) {
     float f = v / interval;
-    float d = abs(fract(f - 0.5) - 0.5) / max(fwidth(f), 1e-4);
+    float fw = fwidth(f);
+    // A perfectly flat patch (a roof, or a pond levelled by the pit filling) that sits exactly on a
+    // contour height has zero slope, which would flood the whole patch with line colour. No slope, no line.
+    if (fw < 1e-6) return 0.0;
+    float d = abs(fract(f - 0.5) - 0.5) / fw;
     return 1.0 - clamp(d / width, 0.0, 1.0);
   }
 
@@ -229,27 +232,25 @@ const fragmentShader = /* glsl */ `
 
     // Hill shading from a low north-west sun
     float shade = clamp(dot(normalize(vNormal), normalize(vec3(-0.5, 0.75, -0.45))), 0.0, 1.0);
-    col *= 0.35 + 0.9 * shade;
+    col *= 0.28 + 0.7 * shade;
 
     // Contours on true elevation: minor every 5 m, major every 25 m
     float elev = vPos.y + uOffset;
-    col += uLine * isoLine(elev, 5.0, 0.9) * 0.22;
-    col += uLine * isoLine(elev, 25.0, 1.3) * 0.75;
+    vec3 line = uLine;
+    col += line * isoLine(elev, 5.0, 0.9) * 0.3;
+    col += line * isoLine(elev, 25.0, 1.5) * 1.15;
 
     // Faint 100 m grid
     float grid = max(isoLine(vPos.x, 100.0, 0.8), isoLine(vPos.z, 100.0, 0.8));
-    col += uLine * grid * 0.07;
+    col += line * grid * 0.07;
 
-    // Scan pulse rippling out from the drone every few seconds, plus a halo beneath it
+    // Soft halo beneath the drone
     float d = distance(vPos.xz, uDrone.xz);
-    float r = mod(uTime * 120.0, uRadius * 1.1);
-    float ring = smoothstep(6.0, 0.0, abs(d - r)) * (1.0 - r / (uRadius * 1.1));
-    col += uAccent * ring * 0.4;
     col += uAccent * smoothstep(24.0, 0.0, d) * 0.12;
 
     // Glowing boundary ring, then fade to transparent at the edge
     float e = length(vPos.xz) / uRadius;
-    col += uLine * (1.0 - smoothstep(0.0, 0.006, abs(e - 0.86))) * 0.9;
+    col += line * (1.0 - smoothstep(0.0, 0.006, abs(e - 0.86))) * 0.9;
     float alpha = 1.0 - smoothstep(0.86, 1.0, e);
 
     gl_FragColor = vec4(col, alpha);
@@ -290,15 +291,14 @@ export function Terrain({ meta }: { meta: FlightMeta }) {
         fragmentShader,
         transparent: true,
         uniforms: {
-          uLow: { value: new Color("#0b0a12") },
-          uHigh: { value: new Color("#2c2844") },
+          uLow: { value: new Color(SCENE.terrainLow) },
+          uHigh: { value: new Color(SCENE.terrainHigh) },
           uLine: { value: new Color(SCENE.accent) },
-          uAccent: { value: new Color("#dcd6ff") }, // pale pulse, distinct from the power ramp
+          uAccent: { value: new Color(SCENE.halo) },
           uMinH: { value: 0 },
           uMaxH: { value: 1 },
           uOffset: { value: 0 },
           uRadius: { value: 1000 },
-          uTime: { value: 0 },
           uDrone: { value: new Vector3() },
         },
       }),
@@ -314,8 +314,7 @@ export function Terrain({ meta }: { meta: FlightMeta }) {
     material.uniforms.uRadius.value = data.radius;
   }, [data, material]);
 
-  useFrame(({ clock }) => {
-    material.uniforms.uTime.value = clock.elapsedTime;
+  useFrame(() => {
     (material.uniforms.uDrone.value as Vector3).set(dronePose.x, dronePose.y, dronePose.z);
   });
 

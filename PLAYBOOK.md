@@ -145,7 +145,7 @@ data age/quality ──▶ model learns wrong power ──▶ overconfident P90 
 ## Next step: wire it into the app
 
 1. ✅ **Live mission check in the app** for the clean model (`scripts/export_web_model.py`, `web/src/ui/Mission.tsx`).
-2. **Scenario switcher and fix toggle**: extend the export with each flight's forecast per condition, with and without the fix (simulated timeline windows), plus `timeline.json` for the window chart. Then add the switcher and health badges to the panel (section 5, items 2–4).
+2. ✅ **Poisoning lab** (scenario switcher, fix toggle, health rows, window charts, demo buttons): `scripts/export_web_scenarios.py` (`npm run scenarios`) and `web/src/ui/Lab.tsx`. The best demo is flight 268 at 28.5 Wh. Under "Both" with the fix off, it says continue, then "Committed: tight", and the hindsight says "Missed" (0.15 Wh short). With the fix on, it says "Too close to call" at 0:20 and sends it to the operator, the badge turns amber, and the panel reads "cheap feed reads ×0.88: 1022 records recalibrated". Honest caveat: decision flips are rare and small (the poisoning mostly removes the margin), so lean on the charts (P90 holds 43% vs 88% with the fix in window 5) and the "actual" line.
 3. **Operator walkthrough with a timer** (section 5, item 5). That gives our human-effort number.
 4. **Requirement 7 text**: pilot criteria and the bounded next action (section 9).
 
@@ -248,8 +248,8 @@ flowchart LR
 | Defects and simulated timeline | `scripts/degrade.py` | ✅ |
 | Degradation grid and mechanism checks | `scripts/run_degradation.py` → `results/degradation/` (~9 min) | ✅ |
 | Countermeasure | `scripts/countermeasure.py`, `scripts/run_countermeasure.py` → `results/countermeasure/` (~4 min) | ✅ |
-| Export for the app | `scripts/export_web_model.py` (`npm run model`, ~10 s) | 🟡 clean model done; degradation and fix scenarios not exported yet |
-| Web replay | `web/` (see `web/README.md`) | 🟡 replay and live mission check done; scenario switcher, badges and timeline chart not started |
+| Export for the app | `scripts/export_web_model.py` (`npm run model`, ~10 s), `scripts/export_web_scenarios.py` (`npm run scenarios`, ~2 min) | ✅ |
+| Web replay | `web/` (see `web/README.md`) | ✅ replay, live mission check and poisoning lab; 🟡 operator walkthrough not started |
 | Manifest and AI disclosure | `MANIFEST.md` | ⬜ |
 
 **Key design decisions** (and why, for judge questions):
@@ -268,9 +268,9 @@ flowchart LR
 |---|---|---|
 | 0:00–1:00 | **The decision.** A drone, a package, a battery. "Continue or come home?" Who uses it, and what an error costs | Flight 142 playing; drag the battery from 24 Wh (On track) to 20 Wh (Turn back). Then flight 900: turn back called 72 s before the pack dies |
 | 1:00–2:00 | **How the AI works.** Physics + ML, P90 safety margin, why 0.36 Wh is good enough | Architecture diagram, baseline numbers |
-| 2:00–4:00 | **Poison it.** Flip to *Combined* on the same flight. The answer still looks confident, and aborts even drop, but the margin is gone. Timeline chart: coverage falls from 90% to 34% | Scenario switcher, timeline view |
+| 2:00–4:00 | **Poison it.** Open the lab and press Demo (flight 268, 28.5 Wh, "Both"). The answer still looks confident ("On track", then "Committed: tight"), the health check says "Not monitored", and the hindsight says "Missed". The window charts show the P90 holding only 34–43% of the time | Poisoning lab, mission check |
 | 4:00–5:30 | **Why: the mechanism.** Dose-response vs placebo. "It's the bias, not the volume." The ML half broke, not physics. Heavy flights hit hardest | Mechanism chart |
-| 5:30–7:30 | **The fix.** Toggle the countermeasure. Coverage restored, unsafe continues back to 0, aborts within budget. Then the unseen condition | Same flight, fix on; timeline with/without |
+| 5:30–7:30 | **The fix.** Flip the countermeasure switch on the same flight: "Too close to call" at 0:20, sent to the operator, health amber, "cheap feed reads ×0.88: 1022 records recalibrated". The charts switch to the green line (about 90% coverage). Then show the unseen-defect results | Poisoning lab, fix on |
 | 7:30–8:45 | **Human in the loop.** A DEFER case: the operator sees the evidence, the badges and the explanation, takes an action, and it's logged. Review time: N seconds | Operator walkthrough |
 | 8:45–10:00 | **Limits and next step.** Where the fix fails, what we'd pilot, who owns what, when not to use it | Limits slide |
 

@@ -1,6 +1,21 @@
 import { create } from "zustand";
-import { loadFlight, loadForecast, loadIndex, loadModelIndex } from "./data";
-import type { Basemap, CameraMode, DataIndex, FlightForecast, FlightMeta, FlightSeries, GroundSampler, ModelIndex } from "./types";
+import { loadFlight, loadForecast, loadIndex, loadModelIndex, loadResults, loadScenarioIndex, loadScenarios } from "./data";
+import type {
+  Basemap,
+  CameraMode,
+  DataIndex,
+  FlightForecast,
+  FlightMeta,
+  FlightScenarios,
+  FlightSeries,
+  GroundSampler,
+  LabState,
+  LeftTab,
+  ModelIndex,
+  ResultsSummary,
+  ScenarioDemo,
+  ScenarioIndex,
+} from "./types";
 
 /**
  * Playback time lives outside React so the 3D scene can advance it every frame
@@ -28,6 +43,13 @@ interface State {
   modelError: string | null;
   /** Battery energy available for the mission (Wh), set by the viewer. Simulated flights fix their own. */
   budgetWh: number;
+  /** SIMULATED poisoning lab: scenario index, this flight's scenario forecasts, and the viewer's choice. */
+  scenarioIndex: ScenarioIndex | null;
+  scenarios: FlightScenarios | null;
+  lab: LabState;
+  /** Headline experiment results for the scorecard, or null if not exported. */
+  results: ResultsSummary | null;
+  leftTab: LeftTab;
   init: () => Promise<void>;
   selectFlight: (id: number) => Promise<void>;
   stepFlight: (dir: 1 | -1) => void;
@@ -40,6 +62,10 @@ interface State {
   setMapCredits: (credits: string) => void;
   setGround: (ground: GroundSampler | null) => void;
   setBudget: (wh: number) => void;
+  setLab: (lab: Partial<LabState>) => void;
+  setLeftTab: (tab: LeftTab) => void;
+  /** Jump to a demo case: its flight, battery and poisoned condition, with the fix off. */
+  runDemo: (demo: ScenarioDemo) => Promise<void>;
 }
 
 
@@ -61,6 +87,23 @@ export function budgetFor(model: ModelIndex | null, meta: FlightMeta | null, bud
   return sim ? sim.budgetWh : budgetWh;
 }
 
+let lastActive: { fc: FlightForecast | null; sc: FlightScenarios | null; key: string; out: FlightForecast | null } | null = null;
+
+/**
+ * The forecast the mission check should use: the standard model, or in the poisoning lab the
+ * forecast from the chosen condition's model. Cached so callers get a stable object.
+ */
+export function activeForecast(st: Pick<State, "forecast" | "scenarios" | "lab">): FlightForecast | null {
+  const { forecast: fc, scenarios: sc, lab } = st;
+  const key = `${lab.on}/${lab.condition}/${lab.fix}`;
+  if (lastActive && lastActive.fc === fc && lastActive.sc === sc && lastActive.key === key) return lastActive.out;
+  let out = fc;
+  const run = sc?.runs[`${lab.condition}/${lab.fix ? "on" : "off"}`];
+  if (lab.on && fc && sc && run && sc.n === fc.t.length) out = { ...fc, e50: run.e50, e90: run.e90 };
+  lastActive = { fc, sc, key, out };
+  return out;
+}
+
 function flightFromHash(): number | null {
   const m = /flight=(\d+)/.exec(window.location.hash);
   return m ? Number(m[1]) : null;
@@ -74,8 +117,8 @@ export const useStore = create<State>((set, get) => ({
   loading: true,
   uiTime: 0,
   playing: false,
-  rate: 4,
-  camera: "orbit",
+  rate: 8,
+  camera: "chase",
   basemap: "terrain",
   mapCredits: "",
   ground: null,
@@ -83,18 +126,25 @@ export const useStore = create<State>((set, get) => ({
   forecast: null,
   modelError: null,
   budgetWh: savedBudget() ?? 20,
+  scenarioIndex: null,
+  scenarios: null,
+  lab: { on: false, condition: "combined", fix: false },
+  results: null,
+  leftTab: "mission",
 
   init: async () => {
     try {
-      const [index, model] = await Promise.all([
+      const [index, model, scenarioIndex, results] = await Promise.all([
         loadIndex(),
         loadModelIndex().catch((e: Error) => {
           set({ modelError: e.message });
           return null;
         }),
+        loadScenarioIndex().catch(() => null),
+        loadResults().catch(() => null),
       ]);
       const budgetWh = savedBudget() ?? model?.budget.default ?? 20;
-      set({ index, model, budgetWh });
+      set({ index, model, budgetWh, scenarioIndex, results });
       const wanted = flightFromHash() ?? DEFAULT_FLIGHT;
       const id = index.flights.some((f) => f.id === wanted) ? wanted : index.flights[0].id;
       await get().selectFlight(id);
@@ -108,15 +158,17 @@ export const useStore = create<State>((set, get) => ({
     if (!meta) return;
     set({ loading: true, playing: false, error: null });
     try {
-      const model = get().model;
+      const { model, scenarioIndex } = get();
       const rated = !!model?.flights.includes(id);
-      const [series, forecast] = await Promise.all([
+      const hasScenarios = rated && !!scenarioIndex?.flights.includes(id);
+      const [series, forecast, scenarios] = await Promise.all([
         loadFlight(id),
         rated ? loadForecast(id).catch(() => null) : Promise.resolve(null),
+        hasScenarios ? loadScenarios(id).catch(() => null) : Promise.resolve(null),
       ]);
       clock.time = 0;
       window.history.replaceState(null, "", `#flight=${id}`);
-      set({ meta, series, forecast, uiTime: 0, loading: false });
+      set({ meta, series, forecast, scenarios, uiTime: 0, loading: false });
     } catch (e) {
       set({ error: (e as Error).message, loading: false });
     }
@@ -154,5 +206,14 @@ export const useStore = create<State>((set, get) => ({
       // storage unavailable (private window): the budget just won't be remembered
     }
     set({ budgetWh });
+  },
+  // Opening the lab shows its effect in the mission check, so bring that tab forward.
+  setLab: (lab) => set({ lab: { ...get().lab, ...lab }, ...(lab.on ? { leftTab: "mission" as const } : {}) }),
+  setLeftTab: (leftTab) => set({ leftTab }),
+  runDemo: async (demo) => {
+    set({ lab: { on: true, condition: demo.condition, fix: false }, leftTab: "mission" });
+    get().setBudget(demo.budgetWh);
+    if (get().meta?.id !== demo.flight) await get().selectFlight(demo.flight);
+    else get().seek(0);
   },
 }));
