@@ -2708,7 +2708,7 @@ select {
   color: var(--muted);
 }
 
-.fc-gauge {
+.dp-gauge {
   position: relative;
   height: 8px;
   border-radius: 4px;
@@ -2716,25 +2716,25 @@ select {
   overflow: visible;
 }
 
-.fc-used,
-.fc-need {
+.dp-used,
+.dp-need {
   position: absolute;
   top: 0;
   bottom: 0;
 }
 
-.fc-used {
+.dp-used {
   left: 0;
   background: var(--accent);
   border-radius: 4px 0 0 4px;
 }
 
-.fc-need {
+.dp-need {
   background: repeating-linear-gradient(135deg, rgba(154, 140, 255, 0.5) 0 3px, rgba(154, 140, 255, 0.15) 3px 6px);
   border-radius: 0 4px 4px 0;
 }
 
-.fc-budget {
+.dp-budget {
   position: absolute;
   top: -3px;
   bottom: -3px;
@@ -2886,15 +2886,8 @@ select {
   background: #ff7480;
 }
 
-.link-btn {
+.ops .link-btn {
   align-self: flex-start;
-  border: 0;
-  background: none;
-  padding: 0;
-  color: var(--accent);
-  font-size: 12px;
-  text-decoration: underline;
-  cursor: pointer;
 }
 
 .link-btn:disabled {
@@ -2961,7 +2954,9 @@ select {
 .fleet-on .topbar,
 .fleet-on .left-stack,
 .fleet-on .lab,
-.fleet-on .route-map,
+.fleet-on .flight-panel,
+.fleet-on .caution,
+.fleet-on .caution-edge,
 .fleet-on .dock,
 .fleet-on .power-legend,
 .fleet-on .reticle-anchor,

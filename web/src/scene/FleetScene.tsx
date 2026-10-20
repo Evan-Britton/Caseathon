@@ -1,6 +1,6 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { Color, Group, Mesh, MeshBasicMaterial, PerspectiveCamera, Vector3 } from "three";
+import { Color, Group, Mesh, MeshBasicMaterial, PerspectiveCamera, RingGeometry, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { lerpAt, sampleAt } from "../data";
 import { pathTime } from "../fleet";
@@ -9,7 +9,10 @@ import { fleetStatus, fleetTime, useFleet } from "../fleetStore";
 import { useStore } from "../store";
 import { DRONE_SCALE, dronePose } from "./Drone";
 import { FlightPath } from "./FlightPath";
+import { drape } from "./drape";
+import { LaunchPad } from "./LaunchPad";
 import { SCENE, toWorld } from "./palette";
+import { M_PER_DEG_LAT, M_PER_DEG_LON_EQ } from "./Terrain";
 
 const ARM_ANGLES = [45, 135, 225, 315].map((d) => (d * Math.PI) / 180);
 const ARM_REACH = 0.33;
@@ -27,9 +30,6 @@ const TONE = {
 
 /** DOM name tags over the canvas, one per drone, moved each frame by FleetDrone. */
 export const fleetTags: (HTMLDivElement | null)[] = [];
-
-const M_PER_DEG_LAT = 110_540; // same conversion as the terrain layer and scripts/build_web_data.py
-const M_PER_DEG_LON_EQ = 111_320;
 
 /** Each drone's real launch point, in metres east and south of the first drone's (three.js x and z). */
 export function realOffsets(loaded: LoadedDrone[]): { x: number; z: number }[] {
@@ -54,25 +54,16 @@ export function FleetScene({ loaded }: { loaded: LoadedDrone[] }) {
   return (
     <>
       {loaded.map((d, i) => (
+        <LaunchPad key={d.slot.flight} x={offsets[i].x} z={offsets[i].z} disc={false} />
+      ))}
+      {loaded.map((d, i) => (
         <group key={d.slot.flight} position={[offsets[i].x, 0, offsets[i].z]}>
-          <Pad />
           <FlightPath series={d.series} ground={ground} getTime={() => droneTime(d)} fade={follow && selected !== d.slot.flight} />
           <FleetDrone d={d} index={i} offset={offsets[i]} />
         </group>
       ))}
       <FleetCamera loaded={loaded} offsets={offsets} />
     </>
-  );
-}
-
-function Pad() {
-  return (
-    <group position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <mesh>
-        <ringGeometry args={[5, 5.6, 48]} />
-        <meshBasicMaterial color={SCENE.warn} />
-      </mesh>
-    </group>
   );
 }
 
@@ -88,6 +79,8 @@ function FleetDrone({ d, index, offset }: { d: LoadedDrone; index: number; offse
   const ring = useRef<MeshBasicMaterial>(null);
   const lastTag = useRef("");
   const { camera, size } = useThree();
+  const ringGeo = useMemo(() => new RingGeometry(5, 5.8, 40, 2).rotateX(-Math.PI / 2), []);
+  useEffect(() => () => ringGeo.dispose(), [ringGeo]);
 
   useFrame((_, delta) => {
     const te = Math.min(droneTime(d), series.t[series.t.length - 1]);
@@ -111,7 +104,8 @@ function FleetDrone({ d, index, offset }: { d: LoadedDrone; index: number; offse
     // Terrain under the drone, in the same launch-relative coordinates as the map.
     const gnd = useStore.getState().ground;
     const g = gnd ? gnd(x + offset.x, z + offset.z) : 0;
-    marker.current?.position.set(x, g + 0.3, z);
+    marker.current?.position.set(x, 0, z);
+    drape(ringGeo, gnd, x + offset.x, z + offset.z, 0.3);
     if (drop.current) {
       const h = Math.max(y - g, 0.01);
       drop.current.scale.y = h;
@@ -204,9 +198,8 @@ function FleetDrone({ d, index, offset }: { d: LoadedDrone; index: number; offse
         </mesh>
       </group>
       <group ref={marker}>
-        <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[5, 5.8, 40]} />
-          <meshBasicMaterial ref={ring} color={SCENE.accent} transparent opacity={0.75} />
+        <mesh geometry={ringGeo}>
+          <meshBasicMaterial ref={ring} color={SCENE.accent} transparent opacity={0.75} polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-2} />
         </mesh>
       </group>
     </>

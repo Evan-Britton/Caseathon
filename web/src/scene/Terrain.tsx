@@ -24,8 +24,8 @@ const STEP = 2; // sample every 2nd pixel: ~385 x 385 vertices
 // about (2 * PIT_RADIUS + 1) px (~33 m); hills, ridges and wide valleys are unchanged.
 const PIT_RADIUS = 4;
 const TILE_PX = 256;
-const M_PER_DEG_LAT = 110_540; // same conversion as scripts/build_web_data.py
-const M_PER_DEG_LON_EQ = 111_320;
+export const M_PER_DEG_LAT = 110_540; // same conversion as scripts/build_web_data.py
+export const M_PER_DEG_LON_EQ = 111_320;
 const tileUrl = (x: number, y: number) => `https://elevation-tiles-prod.s3.amazonaws.com/terrarium/${ZOOM}/${x}/${y}.png`;
 
 const worldX = (lon: number) => ((lon + 180) / 360) * 2 ** ZOOM * TILE_PX;

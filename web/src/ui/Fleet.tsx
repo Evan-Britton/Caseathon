@@ -4,10 +4,9 @@ import { FLEET, VERDICT_TEXT, callLabel, droneView, pathTime } from "../fleet";
 import type { DroneView, LoadedDrone } from "../fleet";
 import { fleetEnd, fleetStatus, useFleet } from "../fleetStore";
 import { useStore } from "../store";
-import type { ScenarioCondition, ScenarioHealth } from "../types";
 import { fmtClock, fmtNum } from "./format";
+import { Health, ScenarioControls } from "./Lab";
 
-const ORDER: ScenarioCondition[] = ["reference", "stale", "low_quality", "combined"];
 const RATES = [2, 4, 8];
 
 export function FleetButton() {
@@ -176,30 +175,7 @@ function Scenario() {
   if (!idx) return null;
   return (
     <Panel title="Scenario" tag="simulated">
-      <div className="ops-row">
-        <span className="lab-label">Training data</span>
-        <div className="seg" role="radiogroup" aria-label="Training data condition">
-          {ORDER.map((c) => (
-            <button
-              key={c}
-              role="radio"
-              aria-checked={s.condition === c}
-              className={c === "reference" ? "seg-clean" : "seg-bad"}
-              onClick={() => s.setCondition(c)}
-              title={idx.conditions[c].desc}
-            >
-              {idx.conditions[c].label}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="ops-row">
-        <span className="lab-label">Countermeasure</span>
-        <button className={`switch ${s.fix ? "on" : ""}`} role="switch" aria-checked={s.fix} onClick={() => s.setFix(!s.fix)}>
-          <i aria-hidden />
-          {s.fix ? "On: audit + trusted calibration" : "Off"}
-        </button>
-      </div>
+      <ScenarioControls idx={idx} condition={s.condition} fix={s.fix} onCondition={s.setCondition} onFix={s.setFix} rowClass="ops-row" />
       <details className="ops-more">
         <summary>Presenter controls</summary>
         <div className="ops-row">
@@ -280,7 +256,11 @@ function Detail({ d, v }: { d: LoadedDrone; v: DroneView }) {
         <summary>Forecast chart</summary>
         <Evidence d={d} v={v} t={s.t} />
       </details>
-      {health && <Health health={health} fix={s.fix} feedLow={idx ? Math.round((1 - idx.feed.currentFactor) * 100) : 12} />}
+      {idx && health && (
+        <Health idx={idx} health={health} window={d.window} fix={s.fix}>
+          <FlagLink />
+        </Health>
+      )}
 
       {decision ? (
         <p className="fd-chose">
@@ -358,10 +338,10 @@ function DronePanel({ d, v, index, selected, onSelect }: { d: LoadedDrone; v: Dr
           ? `${fmtNum(Math.max(at(series.up), 0), 0)} m · ${fmtNum(at(series.groundSpeed), 1)} m/s · ${fmtNum(at(series.voltage), 1)} V · ${fmtNum(Math.max(at(series.power), 0), 0)} W`
           : "Preparing for launch"}
       </p>
-      <div className="fc-gauge" aria-hidden>
-        <div className="fc-used" style={{ width: pct(e?.used ?? 0) }} />
-        {e && <div className="fc-need" style={{ left: pct(e.used), width: `calc(${pct(e.need90)} - ${pct(e.used)})` }} />}
-        <div className="fc-budget" style={{ left: pct(v.budget) }} />
+      <div className="dp-gauge" aria-hidden>
+        <div className="dp-used" style={{ width: pct(e?.used ?? 0) }} />
+        {e && <div className="dp-need" style={{ left: pct(e.used), width: `calc(${pct(e.need90)} - ${pct(e.used)})` }} />}
+        <div className="dp-budget" style={{ left: pct(v.budget) }} />
       </div>
       <span className="dp-foot num">{e ? `${fmtNum(e.used, 1)} of ${fmtNum(v.budget)} Wh used` : `${fmtNum(v.budget)} Wh pack`}</span>
       {v.verdict && <p className={`fc-verdict ${VERDICT_TEXT[v.verdict].good ? "good" : "bad"}`}>{VERDICT_TEXT[v.verdict].label}</p>}
@@ -405,40 +385,6 @@ function Evidence({ d, v, t }: { d: LoadedDrone; v: DroneView; t: number }) {
         {v.settled && <line x1={6} x2={CW - 6} y1={y(fc.totalWh)} y2={y(fc.totalWh)} className="ev-actual" />}
       </svg>
     </figure>
-  );
-}
-
-function Health({ health, fix, feedLow }: { health: ScenarioHealth; fix: boolean; feedLow: number }) {
-  const stale = health.uploadAgeWindows > 1;
-  const cheap = health.cheapFeedShare > 0;
-  const status: Record<ScenarioHealth["status"], string> = { unmonitored: "Not monitored", green: "Green", amber: "Amber", red: "Red" };
-  const found: string[] = [];
-  if (fix) {
-    if (health.recalibratedRecords && health.estimatedFeedRatio)
-      found.push(`cheap feed reads ×${fmtNum(health.estimatedFeedRatio, 2)}: ${health.recalibratedRecords} records recalibrated`);
-    if (health.unverifiedRecords) found.push(`${health.unverifiedRecords} records unverified, down-weighted`);
-    if (stale) found.push("upload outage flagged");
-    if (health.referenceFlights) found.push(`margin checked on ${health.referenceFlights} reference flights`);
-  }
-  return (
-    <div className="lab-health">
-      <dl>
-        <div className={stale ? "bad" : "ok"}>
-          <dt>Newest accurate upload</dt>
-          <dd>{health.newestAutoUploadWindow === null ? "none" : `window ${health.newestAutoUploadWindow}`}{stale && <span> · {health.uploadAgeWindows} windows old</span>}</dd>
-        </div>
-        <div className={cheap ? "bad" : "ok"}>
-          <dt>Cheap-feed records</dt>
-          <dd>{Math.round(health.cheapFeedShare * 100)}%{cheap && <span> · reads {feedLow}% low</span>}</dd>
-        </div>
-        <div className={`status-${health.status}`}>
-          <dt>Data health check</dt>
-          <dd>{status[health.status]}{!fix && (stale || cheap) && <span> · nothing flags it</span>}</dd>
-        </div>
-      </dl>
-      {found.length > 0 && <p className="lab-findings">Fix: {found.join(" · ")}.</p>}
-      <FlagLink />
-    </div>
   );
 }
 
