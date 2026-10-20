@@ -1,10 +1,15 @@
 import { useMemo } from "react";
 import { deadlineTime, missionCall, missionState } from "../mission";
-import { budgetFor, useStore } from "../store";
+import { activeForecast, budgetFor, useStore } from "../store";
 
 /** Everything the mission-check UI needs, at the current playback time. */
 export function useMission() {
-  const forecast = useStore((s) => s.forecast);
+  // The standard model's forecast, or the chosen condition's in the poisoning lab.
+  const forecast = useStore(activeForecast);
+  const lab = useStore((s) => s.lab);
+  const scenarios = useStore((s) => s.scenarios);
+  const scenarioIndex = useStore((s) => s.scenarioIndex);
+  const labActive = lab.on && forecast !== null && scenarios !== null;
   const meta = useStore((s) => s.meta);
   const model = useStore((s) => s.model);
   const budgetWh = useStore((s) => s.budgetWh);
@@ -17,5 +22,5 @@ export function useMission() {
   const state = missionState(forecast, meta, budget, deadline, uiTime);
   const sim = meta ? model?.simulated[String(meta.id)] ?? null : null;
 
-  return { forecast, meta, model, budget, deadline, call, deadlineT, state, sim, uiTime };
+  return { forecast, meta, model, budget, deadline, call, deadlineT, state, sim, uiTime, lab, labActive, scenarios, scenarioIndex };
 }

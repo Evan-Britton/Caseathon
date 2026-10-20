@@ -1,10 +1,12 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import { GridHelper, Vector3 } from "three";
+import { CanvasTexture, GridHelper, PMREMGenerator, SRGBColorSpace, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { clock, useStore } from "../store";
 import type { CameraMode, FlightMeta, FlightSeries } from "../types";
-import { Drone, dronePose } from "./Drone";
+import { BODY_LIFT, Drone, dronePose } from "./Drone";
+import { Effects } from "./Effects";
 import { FlightPath } from "./FlightPath";
 import { SCENE } from "./palette";
 import { Stars } from "./Stars";
@@ -30,6 +32,9 @@ export function Scene() {
       <hemisphereLight args={["#b8b3d9", "#0e0d14", 1.1]} />
       <directionalLight position={[120, 300, 80]} intensity={1.6} />
       <directionalLight position={[-200, 80, -120]} intensity={0.5} color={SCENE.accent} />
+      <Backdrop />
+      <Reflections />
+      <Effects />
       <Ticker />
       {basemap === "grid" && <Ground />}
       <LaunchPad />
@@ -37,7 +42,7 @@ export function Scene() {
       {meta && basemap === "terrain" && <Terrain meta={meta} />}
       {series && meta && (
         <>
-          <FlightPath series={series} ground={ground} />
+          <FlightPath series={series} ground={ground} failureS={meta.simulated ? meta.failureS : undefined} />
           <Drone series={series} meta={meta} />
           <CameraRig series={series} meta={meta} mode={camera} />
         </>
@@ -64,6 +69,51 @@ function Ticker() {
   return null;
 }
 
+/** Opaque sky gradient drawn by three (the bloom pass needs an opaque frame to composite onto). */
+function Backdrop() {
+  const scene = useThree((s) => s.scene);
+  useEffect(() => {
+    const [inner, mid, outer] = SCENE.bg;
+    const c = document.createElement("canvas");
+    c.width = c.height = 512;
+    const g = c.getContext("2d")!;
+    // Same shape as the old CSS backdrop: an ellipse centred a little above the middle.
+    const grad = g.createRadialGradient(256, 194, 0, 256, 194, 400);
+    grad.addColorStop(0, inner);
+    grad.addColorStop(0.45, mid);
+    grad.addColorStop(1, outer);
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 512, 512);
+    const tex = new CanvasTexture(c);
+    tex.colorSpace = SRGBColorSpace;
+    scene.background = tex;
+    return () => {
+      scene.background = null;
+      tex.dispose();
+    };
+  }, [scene]);
+  return null;
+}
+
+/** Soft studio reflections so the drone's metal parts read as metal. Only PBR materials (the drone) use it. */
+function Reflections() {
+  const { gl, scene } = useThree();
+  useEffect(() => {
+    const pmrem = new PMREMGenerator(gl);
+    const room = new RoomEnvironment();
+    const env = pmrem.fromScene(room, 0.04).texture;
+    room.dispose();
+    pmrem.dispose();
+    scene.environment = env;
+    scene.environmentIntensity = 0.45;
+    return () => {
+      scene.environment = null;
+      env.dispose();
+    };
+  }, [gl, scene]);
+  return null;
+}
+
 function Ground() {
   const grids = useMemo(
     () => ({
@@ -71,6 +121,12 @@ function Ground() {
       sections: new GridHelper(2000, 40, SCENE.gridSection, SCENE.gridSection),
     }),
     [],
+  );
+  useEffect(
+    () => () => {
+      for (const g of Object.values(grids)) g.dispose();
+    },
+    [grids],
   );
   return (
     <>
@@ -115,6 +171,12 @@ function useBounds(series: FlightSeries) {
 const tmpPos = new Vector3();
 const tmpLook = new Vector3();
 
+// Chase view: default ~26 m behind and ~9 m above the drone. Dragging orbits around it, scrolling zooms.
+const CHASE_DIST = 27.5;
+const CHASE_PITCH = 0.33; // rad above the horizon
+const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi);
+const wrapAngle = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
+
 function CameraRig({ series, meta, mode }: { series: FlightSeries; meta: FlightMeta; mode: CameraMode }) {
   const { camera, size, gl } = useThree();
   const controls = useMemo(() => {
@@ -131,6 +193,59 @@ function CameraRig({ series, meta, mode }: { series: FlightSeries; meta: FlightM
   aspect.current = size.width / size.height;
   const bounds = useBounds(series);
   const look = useRef(new Vector3());
+  // Viewer's chase offsets (yaw relative to the drone's heading), their smoothed values, and the eased heading.
+  const chase = useRef({ yaw: 0, pitch: CHASE_PITCH, dist: CHASE_DIST, sYaw: 0, sPitch: CHASE_PITCH, sDist: CHASE_DIST, heading: 0, settle: 0 });
+
+  // Chase mode: drag to orbit the drone, scroll to zoom, double-click to go back behind it.
+  useEffect(() => {
+    if (mode !== "chase") return;
+    const el = gl.domElement;
+    const c = chase.current;
+    c.heading = dronePose.headingRad;
+    c.settle = 0;
+    let drag: { id: number; x: number; y: number } | null = null;
+    const down = (e: PointerEvent) => {
+      if (e.button !== 0) return;
+      drag = { id: e.pointerId, x: e.clientX, y: e.clientY };
+      el.setPointerCapture(e.pointerId);
+      el.style.cursor = "grabbing";
+    };
+    const move = (e: PointerEvent) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      // Same feel as the orbit camera: a full screen-height drag turns the view a full circle.
+      const k = (2 * Math.PI) / el.clientHeight;
+      c.yaw += (e.clientX - drag.x) * k;
+      c.pitch = clamp(c.pitch + (e.clientY - drag.y) * k, 0.05, 1.45);
+      drag.x = e.clientX;
+      drag.y = e.clientY;
+    };
+    const up = (e: PointerEvent) => {
+      if (drag?.id !== e.pointerId) return;
+      drag = null;
+      el.style.cursor = "grab";
+    };
+    const wheel = (e: WheelEvent) => {
+      e.preventDefault();
+      c.dist = clamp(c.dist * Math.exp(e.deltaY * 0.001), 10, 150);
+    };
+    const reset = () => Object.assign(c, { yaw: 0, pitch: CHASE_PITCH, dist: CHASE_DIST });
+    el.style.cursor = "grab";
+    el.addEventListener("pointerdown", down);
+    el.addEventListener("pointermove", move);
+    el.addEventListener("pointerup", up);
+    el.addEventListener("pointercancel", up);
+    el.addEventListener("wheel", wheel, { passive: false });
+    el.addEventListener("dblclick", reset);
+    return () => {
+      el.removeEventListener("pointerdown", down);
+      el.removeEventListener("pointermove", move);
+      el.removeEventListener("pointerup", up);
+      el.removeEventListener("pointercancel", up);
+      el.removeEventListener("wheel", wheel);
+      el.removeEventListener("dblclick", reset);
+      el.style.cursor = "";
+    };
+  }, [gl, mode]);
 
   // Reset to a framed three-quarter view when the flight or mode changes.
   useEffect(() => {
@@ -154,12 +269,27 @@ function CameraRig({ series, meta, mode }: { series: FlightSeries; meta: FlightM
       controls.update();
       return;
     }
-    const k = 1 - Math.exp(-delta * 4);
+    let k = 1 - Math.exp(-delta * 4);
     const [x, y, z] = [dronePose.x, dronePose.y, dronePose.z];
     if (mode === "chase") {
-      const back = 26;
-      tmpPos.set(x + Math.sin(dronePose.headingRad) * -back, y + 10, z + Math.cos(dronePose.headingRad) * back);
-      tmpLook.set(x, y + 1, z);
+      // Locked onto the drone; only the heading and the viewer's drag are eased.
+      const c = chase.current;
+      const kv = 1 - Math.exp(-delta * 12);
+      c.heading += wrapAngle(dronePose.headingRad - c.heading) * (1 - Math.exp(-delta * 3));
+      c.sYaw += (c.yaw - c.sYaw) * kv;
+      c.sPitch += (c.pitch - c.sPitch) * kv;
+      c.sDist += (c.dist - c.sDist) * kv;
+      const theta = c.heading + c.sYaw;
+      const horiz = c.sDist * Math.cos(c.sPitch);
+      const cy = y + BODY_LIFT;
+      tmpPos.set(x - Math.sin(theta) * horiz, cy + c.sDist * Math.sin(c.sPitch), z + Math.cos(theta) * horiz);
+      // Never dip under the terrain.
+      const ground = useStore.getState().ground;
+      tmpPos.y = Math.max(tmpPos.y, (ground ? ground(tmpPos.x, tmpPos.z) : 0) + 2);
+      tmpLook.set(x, cy, z);
+      // Glide in when switching to chase, then stay locked.
+      c.settle = Math.min(c.settle + delta * 1.5, 1);
+      if (c.settle >= 1) k = 1;
     } else {
       const { center, radius } = bounds;
       tmpPos.set(center.x, radius * 4.2 + 80, center.z + 0.01);

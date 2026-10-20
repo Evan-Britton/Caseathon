@@ -12,7 +12,7 @@ const H = 190;
 const PAD = 16;
 const PROFILE_H = 54;
 
-/** Top-down route (north up) plus an altitude profile over time. */
+/** The flight plan, top-down route (north up) and altitude profile; the bottom half of the flight panel. */
 export function RouteMap() {
   const series = useStore((s) => s.series);
   const meta = useStore((s) => s.meta);
@@ -63,9 +63,9 @@ export function RouteMap() {
   const playX = (uiTime / geo.end) * W;
 
   return (
-    <section className="route-map glass" aria-label="Route map">
-      <div className="panel-head">
-        <h2>Route</h2>
+    <div className="flight-route" aria-label="Route">
+      <div className="panel-head sub">
+        <h3>Route</h3>
         <span className="muted">Top view, north up</span>
       </div>
       {meta && <FlightSpecs meta={meta} />}
@@ -113,14 +113,14 @@ export function RouteMap() {
       <svg viewBox={`0 0 ${W} ${PROFILE_H}`} className="profile" preserveAspectRatio="none">
         <defs>
           <linearGradient id="altfill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#9a8cff" stopOpacity="0.45" />
-            <stop offset="1" stopColor="#9a8cff" stopOpacity="0" />
+            <stop offset="0" style={{ stopColor: "var(--accent)" }} stopOpacity="0.45" />
+            <stop offset="1" style={{ stopColor: "var(--accent)" }} stopOpacity="0" />
           </linearGradient>
         </defs>
-        <path d={geo.profile} fill="url(#altfill)" stroke="#9a8cff" strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
+        <path d={geo.profile} fill="url(#altfill)" style={{ stroke: "var(--accent)" }} strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
         <line x1={playX} x2={playX} y1={0} y2={PROFILE_H} className="playhead" vectorEffect="non-scaling-stroke" />
       </svg>
-    </section>
+    </div>
   );
 }
 

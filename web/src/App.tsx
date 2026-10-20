@@ -4,10 +4,13 @@ import { reticle } from "./scene/Drone";
 import { Scene } from "./scene/Scene";
 import { useStore } from "./store";
 import { Dock } from "./ui/Dock";
+import { Lab } from "./ui/Lab";
 import { Mission } from "./ui/Mission";
+import { Results } from "./ui/Results";
 import { RouteMap } from "./ui/RouteMap";
 import { Telemetry } from "./ui/Telemetry";
 import { TopBar } from "./ui/TopBar";
+import { fmtNum } from "./ui/format";
 
 export default function App() {
   const init = useStore((s) => s.init);
@@ -36,15 +39,44 @@ export default function App() {
         </div>
         <PowerLegend />
         <StageMessage />
+        <Caution />
       </main>
       <TopBar />
-      <div className="left-stack">
-        <Mission />
+      <LeftColumn />
+      <Lab />
+      <section className="flight-panel glass" aria-label="Flight">
         <Telemetry />
-      </div>
-      <RouteMap />
+        <RouteMap />
+      </section>
       <Dock />
       <Attribution />
+    </div>
+  );
+}
+
+/** Mission check or the results scorecard, switched by tabs so each gets the full column. */
+function LeftColumn() {
+  const tab = useStore((s) => s.leftTab);
+  const hasResults = useStore((s) => !!s.results);
+  const setLeftTab = useStore((s) => s.setLeftTab);
+  const tabs = [
+    ["mission", "Mission check"],
+    ["results", "Results"],
+  ] as const;
+  return (
+    <div className="left-stack">
+      {hasResults && (
+        <div className="left-tabs glass" role="tablist" aria-label="Left panel">
+          {tabs.map(([id, label]) => (
+            <button key={id} role="tab" id={`tab-${id}`} aria-selected={tab === id} aria-controls="left-panel" onClick={() => setLeftTab(id)}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+      <div id="left-panel" role={hasResults ? "tabpanel" : undefined} aria-labelledby={hasResults ? `tab-${tab}` : undefined} className="left-panel">
+        {tab === "results" && hasResults ? <Results /> : <Mission />}
+      </div>
     </div>
   );
 }
@@ -62,6 +94,22 @@ function PowerLegend() {
         <span>{Math.round(hi)} W</span>
       </div>
     </div>
+  );
+}
+
+/** Simulated power loss: master caution lamp and a pulsing red edge from the cutoff onwards. */
+function Caution() {
+  const meta = useStore((s) => s.meta);
+  const uiTime = useStore((s) => s.uiTime);
+  if (!meta?.simulated || meta.failureS === undefined || uiTime < meta.failureS) return null;
+  return (
+    <>
+      <div className="caution-edge" aria-hidden />
+      <div className="caution" role="alert">
+        <span className="caution-lamp">Master caution</span>
+        <span>Battery cutoff, power lost at {fmtNum(meta.failureAltM ?? 0, 0)} m. Simulated.</span>
+      </div>
+    </>
   );
 }
 

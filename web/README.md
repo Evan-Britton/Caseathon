@@ -20,9 +20,28 @@ Built with React 19, three.js (via React Three Fiber) and Vite. It deploys to Cl
   - a hindsight line comparing the call with what the flight really used.
 
   The timeline shades the decision window and flags the call, the route map marks halfway and where the call was made, and the drone's reticle and ground ring turn amber or red. Hover tests have no route, so they show "Not rated". Simulated flight 900 uses its own depleted pack (11.8 Wh) instead of the slider.
-- **Route.** The flight's plan in a compact grid (cruise speed, payload, altitude, duration, total energy, date flown), a top-down map (north up) with a scale bar, and an altitude profile.
-- **Telemetry.** Altitude above launch, ground speed, airflow from the onboard anemometer, battery voltage, current, power, and energy used so far.
-- **Playback.** Play/pause, a power-draw scrubber, speed (1–16×), a map layer (Grid or Terrain) and three camera modes: Orbit, Chase and Top.
+- **Poisoning lab (simulated).** Replays the same flight with the model each training-data condition would have produced, from the simulated timeline in `results/countermeasure` (seed 0). Every element is labelled SIMULATED.
+  - **Training data:**
+    - Clean.
+    - Stale: the accurate logger's uploads stopped after window 1.
+    - Low quality: a cheap feed whose current reads 12% low, at twice the record rate.
+    - Both.
+  - **Countermeasure switch:** the reference-flight audit, recalibration and trusted P90 calibration.
+  - **Health rows:** what the training data really contains (age of the newest upload, the cheap feed's share), and what the fix's health check reports. Without the fix it reads "Not monitored · nothing flags it".
+  - **Two charts by window:** forecast error and how often the P90 really holds, for clean, poisoned and fixed.
+  - **Demo buttons:** jump to flights where poisoning flips the call. In the top case, flight 268 with a 28.5 Wh battery, the poisoned model says continue while the flight really comes up 0.15 Wh short; the clean and fixed models both say it's too close to call.
+
+  While the lab is open, the mission check, timeline, route map and reticle all use the lab's forecast. The forecast chart adds an "actual" line, so you can see the P90 band falling below what the flight really used. Window 0 flights have no scenario (nothing earlier to train on), and the lab says so.
+- **Results tab.** The left column switches between the mission check and a results scorecard. Each block is tagged with the case-prompt requirement it answers (R2–R7, with the requirement's name on hover):
+  - clean baseline accuracy;
+  - the four data conditions without and with the fix (error, how often the safety margin held, unsafe continue calls);
+  - error by simulated window;
+  - the chain from bad data to bad decisions;
+  - unseen-defect tests, the main limit, and the cost.
+
+  Opening the poisoning lab switches back to the mission check.
+- **Flight panel (right).** Live telemetry at the top: altitude above launch, ground speed, airflow from the onboard anemometer, battery voltage, current, power, and energy used so far. Below it, the route: the flight's plan in a compact grid (cruise speed, payload, altitude, duration, total energy, date flown), a top-down map (north up) with a scale bar, and an altitude profile.
+- **Playback.** Play/pause, a power-draw scrubber, speed (1–16×), a map layer (Grid or Terrain) and three camera modes: Orbit, Chase and Top. It opens in Chase at 8×. In Chase, drag to swing around the drone, scroll to zoom and double-click to go back behind it; the camera stays locked on the drone.
 - **Simulated flight 900.** A labelled battery-failure scenario, built by `scripts/make_sim_failure.py` from flight 142's real path. It is not CMU data: the picker, a banner, the telemetry chip and the 3D reticle all mark it, and the rotors stop when power is lost.
 
 Keyboard: Space plays or pauses. With the scrubber focused, the arrow keys step 1 s (10 s with Shift), and Home/End jump to the start or end. The URL hash (`#flight=142`) links to a specific flight.
@@ -87,6 +106,24 @@ npm run model
 
 This runs `scripts/export_web_model.py` with Python 3, numpy, pandas and scikit-learn, and takes about 10 s. **Every flight is scored by a model that never saw it:** flights are split into 5 groups by flight day, and each group is forecast by a model trained on the other four. Out of sample, the forecasts are off by 0.38 Wh on average, and the P90 holds 95% of the time. The call itself (on track / turn back / too close) is made in the browser from these numbers and the battery slider, so dragging the slider updates it instantly.
 
+### Poisoning lab scenarios (simulated)
+
+`public/data/scenarios/` holds the lab's data: `index.json` (conditions, each flight's simulated window, training-data health per window, by-window error and coverage, demo cases) plus `flights/<id>.json` (P50/P90 forecasts under every condition, with and without the fix, aligned point for point with `model/flights/<id>.json`). To rebuild them (about 2 minutes), run:
+
+```bash
+npm run scenarios
+```
+
+This runs `scripts/export_web_scenarios.py`. It retrains the hybrid model at each simulated window for each condition, exactly as `scripts/run_countermeasure.py` does with seed 0, and reads the chart values from `results/countermeasure/metrics.json` (5-seed means).
+
+### Results scorecard
+
+`public/data/results.json` holds the headline numbers for the Results tab, copied (not recomputed) from `results/baseline/metrics.json` and `results/countermeasure/metrics.json`. After rerunning those experiments, refresh it with:
+
+```bash
+npm run results
+```
+
 ## Deploy to Cloudflare Workers
 
 `wrangler.jsonc` serves `dist/` as static assets, with single-page-app fallback. No Worker script is needed. `public/_headers` sets long-lived caching for hashed JS/CSS and one-hour caching for flight data.
@@ -133,4 +170,4 @@ Graphite panels with an ultraviolet accent, after a tactical drone-ops dashboard
 | `src/data.ts` | Fetching, caching and time interpolation helpers. |
 | `src/mission.ts` | The mission check: on track / turn back / too close, the halfway deadline, and the hindsight outcome. Pure functions shared by the panel, the timeline, the route map and the 3D reticle. |
 | `src/scene/` | `Scene` (lights, ground, camera modes), `Terrain` (elevation tiles to topo mesh and shader, with narrow pits filled), `Stars`, `FlightPath` (ribbon and curtain), `Drone` (model and reticle), `palette` (colours shared with CSS). |
-| `src/ui/` | `TopBar`, `Mission` (mission check panel), `useMission` (shared hook), `RouteMap`, `Telemetry`, `Dock` (playback). |
+| `src/ui/` | `TopBar`, `Mission` (mission check panel), `Lab` (poisoning lab), `useMission` (shared hook), `RouteMap`, `Telemetry`, `Dock` (playback). |
