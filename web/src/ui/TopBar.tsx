@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useStore } from "../store";
 import type { FlightMeta } from "../types";
 import { fmtAltitude, fmtClock, fmtDate, fmtNum } from "./format";
+import { FleetButton } from "./Fleet";
 import { Icons } from "./icons";
 
 export function TopBar() {
@@ -39,6 +40,7 @@ export function TopBar() {
         </label>
         <button onClick={() => stepFlight(1)} aria-label="Next flight">{Icons.next}</button>
       </div>
+      <FleetButton />
 
       {meta?.simulated && (
         <div className="sim-banner glass" role="status">

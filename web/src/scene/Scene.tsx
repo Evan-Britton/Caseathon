@@ -3,11 +3,13 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { CanvasTexture, CircleGeometry, GridHelper, PMREMGenerator, RingGeometry, SRGBColorSpace, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { useFleet } from "../fleetStore";
 import { clock, useStore } from "../store";
 import type { CameraMode, FlightMeta, FlightSeries } from "../types";
 import { BODY_LIFT, Drone, dronePose } from "./Drone";
 import { drape } from "./drape";
 import { Effects } from "./Effects";
+import { FleetScene } from "./FleetScene";
 import { FlightPath } from "./FlightPath";
 import { SCENE } from "./palette";
 import { Stars } from "./Stars";
@@ -19,7 +21,8 @@ export function Scene() {
   const camera = useStore((s) => s.camera);
   const basemap = useStore((s) => s.basemap);
   const ground = useStore((s) => s.ground);
-  const onMap = basemap !== "grid";
+  const fleet = useFleet((s) => (s.open ? s.loaded : null));
+  const onMap = basemap !== "grid" || !!fleet;
 
   return (
     <Canvas
@@ -37,11 +40,13 @@ export function Scene() {
       <Reflections />
       <Effects />
       <Ticker />
-      {basemap === "grid" && <Ground />}
-      <LaunchPad />
+      {((basemap === "grid" && !fleet) || (fleet && !ground)) && <Ground />}
+      {!fleet && <LaunchPad />}
       <Stars />
-      {meta && basemap === "terrain" && <Terrain meta={meta} />}
-      {series && meta && (
+      {fleet && <Terrain meta={fleet[0].meta} />}
+      {fleet && <FleetScene loaded={fleet} />}
+      {!fleet && meta && basemap === "terrain" && <Terrain meta={meta} />}
+      {!fleet && series && meta && (
         <>
           <FlightPath series={series} ground={ground} failureS={meta.simulated ? meta.failureS : undefined} />
           <Drone series={series} meta={meta} />
