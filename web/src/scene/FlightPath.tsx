@@ -18,11 +18,14 @@ export function FlightPath({
   series,
   ground,
   getTime,
+  fade = false,
 }: {
   series: FlightSeries;
   ground: GroundSampler | null;
   /** Playback time for this path; the single-flight clock if omitted. */
   getTime?: () => number;
+  /** Draw the path faintly, so another one can stand out. */
+  fade?: boolean;
 }) {
   const { flown, guide, curtain } = useMemo(() => build(series, ground), [series, ground]);
 
@@ -37,6 +40,14 @@ export function FlightPath({
     [flown, guide, curtain],
   );
 
+  useEffect(() => {
+    for (const [line, full] of [[flown, 1], [guide, 0.3]] as const) {
+      line.material.transparent = true;
+      line.material.opacity = fade ? full * 0.15 : full;
+      line.material.needsUpdate = true;
+    }
+  }, [flown, guide, fade]);
+
   useFrame(() => {
     const { i } = sampleAt(series.t, getTime ? getTime() : clock.time);
     flown.geometry.instanceCount = i;
@@ -49,7 +60,7 @@ export function FlightPath({
       <primitive object={flown} />
       <mesh geometry={curtain} renderOrder={-1}>
         {/* Additive glow reads well over the dark grid and the topo map */}
-        <meshBasicMaterial vertexColors transparent side={DoubleSide} depthWrite={false} blending={AdditiveBlending} />
+        <meshBasicMaterial vertexColors transparent opacity={fade ? 0.12 : 1} side={DoubleSide} depthWrite={false} blending={AdditiveBlending} />
       </mesh>
     </group>
   );

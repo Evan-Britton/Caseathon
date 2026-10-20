@@ -1,5 +1,5 @@
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Color, Group, Mesh, MeshBasicMaterial, PerspectiveCamera, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { lerpAt, sampleAt } from "../data";
@@ -49,12 +49,14 @@ function droneTime(d: LoadedDrone): number {
 export function FleetScene({ loaded }: { loaded: LoadedDrone[] }) {
   const offsets = useMemo(() => realOffsets(loaded), [loaded]);
   const ground = useStore((s) => s.ground);
+  const follow = useFleet((s) => s.follow);
+  const selected = useFleet((s) => s.selected);
   return (
     <>
       {loaded.map((d, i) => (
         <group key={d.slot.flight} position={[offsets[i].x, 0, offsets[i].z]}>
           <Pad />
-          <FlightPath series={d.series} ground={ground} getTime={() => droneTime(d)} />
+          <FlightPath series={d.series} ground={ground} getTime={() => droneTime(d)} fade={follow && selected !== d.slot.flight} />
           <FleetDrone d={d} index={i} offset={offsets[i]} />
         </group>
       ))}
@@ -129,19 +131,25 @@ function FleetDrone({ d, index, offset }: { d: LoadedDrone; index: number; offse
       const visible = projected.z < 1;
       tag.style.opacity = visible ? "1" : "0";
       // The five flew from the same launch site, so stagger the tags to keep them from stacking.
-      const lift = index * 38;
+      const lift = index * 26;
       tag.style.transform = `translate(${((projected.x + 1) / 2) * size.width}px, ${((1 - projected.y) / 2) * size.height - lift}px) translate(-50%, -100%)`;
-      const text = `${index + 1} · ${d.slot.cargo}|${st?.status ?? ""}|${st?.tone ?? "idle"}`;
+      // A compact numbered badge. Name and status only show when the drone needs attention or is selected.
+      const tone = st?.tone ?? "idle";
+      const detail = tone === "warn" || tone === "stop" || useFleet.getState().selected === d.slot.flight;
+      const text = `${index + 1}|${detail ? `${d.slot.cargo}: ${st?.status ?? ""}` : ""}|${tone}`;
       if (text !== lastTag.current) {
         lastTag.current = text;
-        const [name, status, tone] = text.split("|");
-        tag.className = `fleet-tag tone-${tone}`;
+        const [num, status] = text.split("|");
+        tag.className = `fleet-tag tone-${tone} ${status ? "" : "compact"}`;
         tag.innerHTML = "";
         const a = document.createElement("strong");
-        a.textContent = name;
-        const b = document.createElement("span");
-        b.textContent = status;
-        tag.append(a, b);
+        a.textContent = num;
+        tag.append(a);
+        if (status) {
+          const b = document.createElement("span");
+          b.textContent = status;
+          tag.append(b);
+        }
       }
     }
   });
@@ -219,7 +227,8 @@ function FleetCamera({ loaded, offsets }: { loaded: LoadedDrone[]; offsets: { x:
   }, [controls, gl]);
 
   const aspect = size.width / size.height;
-  useEffect(() => {
+  // Frame all five routes together (the overview).
+  const frame = useCallback(() => {
     let minX = Infinity;
     let maxX = -Infinity;
     let minZ = Infinity;
@@ -241,9 +250,15 @@ function FleetCamera({ loaded, offsets }: { loaded: LoadedDrone[]; offsets: { x:
     camera.position.set(cx + dist * 0.45, top + dist * 0.55, cz + dist * 0.85);
     controls.target.set(cx, top / 3, cz);
     controls.update();
-    // Frame once when the fleet appears or the window is resized to a different shape.
+  }, [loaded, offsets, camera, controls, aspect]);
+
+  // Frame once when the fleet appears or the window is resized to a different shape.
+  useEffect(() => {
+    frame();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded, offsets, Math.round(aspect * 4)]);
+
+  const wasFollowing = useRef(false);
 
   // The console's panels frame the 3D view; shift the camera so the fleet is centred in the open map area.
   useEffect(() => {
@@ -267,10 +282,32 @@ function FleetCamera({ loaded, offsets }: { loaded: LoadedDrone[]; offsets: { x:
     };
   }, [camera, gl, size.width, size.height]);
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     camera.up.set(0, 1, 0);
+    const following = useFleet.getState().follow;
+    if (following) {
+      if (!wasFollowing.current) {
+        // Zoom in on the drone the first time, keeping the viewer's current angle.
+        wasFollowing.current = true;
+        tmpOff.copy(camera.position).sub(controls.target).setLength(150);
+        camera.position.copy(controls.target).add(tmpOff);
+      }
+      // Glide the orbit target onto the selected drone, carrying the camera with it.
+      const k = 1 - Math.exp(-delta * 9);
+      tmpGoal.set(dronePose.x, dronePose.y * 0.6, dronePose.z);
+      tmpStep.copy(tmpGoal).sub(controls.target).multiplyScalar(k);
+      controls.target.add(tmpStep);
+      camera.position.add(tmpStep);
+    } else if (wasFollowing.current) {
+      wasFollowing.current = false;
+      frame();
+    }
     controls.update();
   });
   return null;
 }
+
+const tmpOff = new Vector3();
+const tmpGoal = new Vector3();
+const tmpStep = new Vector3();
 

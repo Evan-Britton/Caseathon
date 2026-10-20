@@ -81,8 +81,14 @@ export function Fleet() {
       </aside>
 
       {/* The 3D map shows through this empty cell; the scene's camera is centred on it. */}
-      <div className="ops-map" aria-hidden>
-        <p className="ops-credit">
+      <div className="ops-map">
+        <div className="seg ops-cam" role="radiogroup" aria-label="Camera">
+          <button role="radio" aria-checked={!s.follow} onClick={() => s.setFollow(false)}>Overview</button>
+          <button role="radio" aria-checked={s.follow} onClick={() => s.setFollow(true)} title="Lock onto the selected drone and fade the other paths">
+            Follow drone {sel >= 0 ? sel + 1 : ""}
+          </button>
+        </div>
+        <p className="ops-credit" aria-hidden>
           {source && <>Data: {source.authors}, {source.license}</>}
           {mapCredits && <> · {mapCredits}</>}
         </p>
@@ -99,15 +105,19 @@ export function Fleet() {
   );
 }
 
+function openInReplay(d: LoadedDrone) {
+  const f = useFleet.getState();
+  const st = useStore.getState();
+  st.setLab({ on: true, condition: f.condition, fix: f.fix });
+  st.setBudget(d.slot.budgetWh);
+  void st.selectFlight(d.slot.flight).then(() => useStore.getState().seek(f.t));
+  f.closeConsole();
+}
+
 function OpsBar({ views }: { views: DroneView[] }) {
   const s = useFleet();
   const end = s.loaded ? fleetEnd(s.loaded) : 0;
   const decisions = s.log.filter((l) => l.kind === "decision");
-  const timed = decisions.filter((l) => l.seconds !== null && l.seconds > 0);
-  const mean = timed.length ? timed.reduce((a, l) => a + (l.seconds ?? 0), 0) / timed.length : null;
-  const airborne = views.filter(
-    (v) => (v.state.phase === "deciding" || v.state.phase === "committed") && v.verdict !== "returned-right" && v.verdict !== "returned-needless",
-  ).length;
   const alerts = views.filter((v) => v.needsDecision).length;
   const short = views.filter((v) => v.verdict === "ran-short" || v.verdict === "no-decision-short").length;
 
@@ -128,10 +138,8 @@ function OpsBar({ views }: { views: DroneView[] }) {
       </div>
 
       <dl className="ops-stats">
-        <div><dt>Airborne</dt><dd className="num">{airborne}</dd></div>
         <div className={alerts ? "alert" : ""}><dt>Alerts</dt><dd className="num">{alerts}</dd></div>
         <div><dt>Your decisions</dt><dd className="num">{decisions.length}</dd></div>
-        <div><dt>Avg response</dt><dd className="num">{mean === null ? "–" : `${fmtNum(mean)} s`}</dd></div>
         <div className={short ? "alert" : ""}><dt>Would have run out</dt><dd className="num">{short}</dd></div>
       </dl>
 
@@ -164,6 +172,7 @@ function Panel({ title, tag, children, className = "" }: { title: string; tag?: 
 function Scenario() {
   const s = useFleet();
   const idx = useStore((st) => st.scenarioIndex);
+  const sel = s.loaded?.find((d) => d.slot.flight === s.selected);
   if (!idx) return null;
   return (
     <Panel title="Scenario" tag="simulated">
@@ -191,24 +200,30 @@ function Scenario() {
           {s.fix ? "On: audit + trusted calibration" : "Off"}
         </button>
       </div>
-      <div className="ops-row">
-        <span className="lab-label">Speed</span>
-        <div className="seg" role="radiogroup" aria-label="Playback speed">
-          {RATES.map((r) => (
-            <button key={r} role="radio" aria-checked={s.rate === r} onClick={() => s.setRate(r)}>{r}×</button>
-          ))}
+      <details className="ops-more">
+        <summary>Presenter controls</summary>
+        <div className="ops-row">
+          <span className="lab-label">Speed</span>
+          <div className="seg" role="radiogroup" aria-label="Playback speed">
+            {RATES.map((r) => (
+              <button key={r} role="radio" aria-checked={s.rate === r} onClick={() => s.setRate(r)}>{r}×</button>
+            ))}
+          </div>
         </div>
-        <button
-          className={`switch ${s.hold ? "on" : ""}`}
-          role="switch"
-          aria-checked={s.hold}
-          onClick={() => s.setHold(!s.hold)}
-          title="Pause the clock when the system asks for a decision"
-        >
-          <i aria-hidden />
-          Hold for decisions
-        </button>
-      </div>
+        <div className="ops-row">
+          <button
+            className={`switch ${s.hold ? "on" : ""}`}
+            role="switch"
+            aria-checked={s.hold}
+            onClick={() => s.setHold(!s.hold)}
+            title="Pause the clock when the system asks for a decision"
+          >
+            <i aria-hidden />
+            Hold for decisions
+          </button>
+          {sel && <button className="link-btn" onClick={() => openInReplay(sel)}>Open {sel.slot.callsign} in the replay</button>}
+        </div>
+      </details>
     </Panel>
   );
 }
@@ -235,9 +250,6 @@ function Queue({ loaded, views }: { loaded: LoadedDrone[]; views: DroneView[] })
           </article>
         );
       })}
-      <button className="link-btn" disabled={s.flagged} onClick={s.flag} title="Tell the data-quality owner that this feed needs checking">
-        {s.flagged ? "Data source flagged to the data-quality owner" : "Flag data source"}
-      </button>
     </Panel>
   );
 }
@@ -251,30 +263,23 @@ function Detail({ d, v }: { d: LoadedDrone; v: DroneView }) {
   const health = idx?.health[`${s.condition}/${s.fix ? "on" : "off"}/${d.window}`];
   const live = v.state.live;
 
-  const openFlight = () => {
-    const st = useStore.getState();
-    st.setLab({ on: true, condition: s.condition, fix: s.fix });
-    st.setBudget(d.slot.budgetWh);
-    void st.selectFlight(d.slot.flight).then(() => useStore.getState().seek(s.t));
-    s.closeConsole();
-  };
-
   return (
-    <Panel title={`${d.slot.callsign}: ${d.slot.cargo}`} tag={`flight ${d.slot.flight}`}>
-      <p className="fc-sub">{d.meta.payload} g · {d.meta.speed} m/s · {fmtNum(d.slot.budgetWh)} Wh pack · model trained through window {d.window}</p>
-
+    <Panel title={`${d.slot.callsign}: ${d.slot.cargo}`} tag={`${fmtNum(v.budget)} Wh pack`}>
       <div className={`fd-rec tone-${live === "return" ? "stop" : live === "review" ? "warn" : live === "continue" ? "go" : "idle"}`}>
         <span className="fd-rec-label">System recommends</span>
         <strong>{live ? callLabel(live) : "Waiting for takeoff"}</strong>
         {e && (
           <p>
             Forecast {fmtNum(e.need50)}–{fmtNum(e.need90)} Wh against {fmtNum(v.budget)} Wh
-            {e.margin >= 0 ? `: ${fmtNum(e.margin)} Wh to spare even at the cautious end.` : `: the cautious end is ${fmtNum(-e.margin)} Wh over.`}
+            {e.margin >= 0 ? `: ${fmtNum(e.margin)} Wh to spare.` : `: the cautious end is ${fmtNum(-e.margin)} Wh over.`}
           </p>
         )}
       </div>
 
-      <Evidence d={d} v={v} t={s.t} />
+      <details className="ops-more">
+        <summary>Forecast chart</summary>
+        <Evidence d={d} v={v} t={s.t} />
+      </details>
       {health && <Health health={health} fix={s.fix} feedLow={idx ? Math.round((1 - idx.feed.currentFactor) * 100) : 12} />}
 
       {decision ? (
@@ -283,17 +288,18 @@ function Detail({ d, v }: { d: LoadedDrone; v: DroneView }) {
           {decision.seconds > 0 && <> after {fmtNum(decision.seconds)} s</>}.
         </p>
       ) : (
-        <div className="fd-actions">
-          <button className="btn btn-stop" disabled={!canAct} onClick={() => s.act(d.slot.flight, "return")}>Return now</button>
-          <button className="btn" disabled={!canAct} onClick={() => s.act(d.slot.flight, "continue")}>Continue anyway</button>
-        </div>
+        // A drone the system is happy with isn't in the queue, but the operator can still recall it.
+        canAct && !v.needsDecision && (
+          <div className="fd-actions">
+            <button className="btn" onClick={() => s.act(d.slot.flight, "return")}>Recall drone</button>
+          </div>
+        )
       )}
       {v.verdict && (
         <p className={`fd-verdict ${VERDICT_TEXT[v.verdict].good ? "good" : "bad"}`}>
-          Hindsight: {VERDICT_TEXT[v.verdict].label}. The flight really used {fmtNum(v.fc.totalWh, 1)} Wh.
+          Hindsight: {VERDICT_TEXT[v.verdict].label}. It really used {fmtNum(v.fc.totalWh, 1)} Wh.
         </p>
       )}
-      <button className="link-btn" onClick={openFlight}>Open this flight in the replay</button>
     </Panel>
   );
 }
@@ -302,7 +308,11 @@ function Log() {
   const log = useFleet((s) => s.log);
   const name = (f: number) => FLEET.find((x) => x.flight === f)?.callsign ?? `Flight ${f}`;
   return (
-    <Panel title="Event log" tag={`${log.length}`}>
+    <details className="ops-panel ops-log">
+      <summary>
+        <span>Event log</span>
+        <em>{log.length}</em>
+      </summary>
       <ol className="decision-log" aria-label="Decision log">
         {log.length === 0 && <li className="muted">Your calls appear here, with how long each took.</li>}
         {[...log].reverse().map((l) => (
@@ -320,7 +330,7 @@ function Log() {
         ))}
       </ol>
       <p className="fine">Simulated. Response time is wall-clock and measures this demo, not operator readiness.</p>
-    </Panel>
+    </details>
   );
 }
 
@@ -332,11 +342,9 @@ function DronePanel({ d, v, index, selected, onSelect }: { d: LoadedDrone; v: Dr
   const started = v.state.phase !== "standby" && v.state.phase !== "na";
   const { i, f } = sampleAt(series.t, Math.min(pathTime(t, decision), series.t[series.t.length - 1]));
   const at = (a: number[]) => lerpAt(a, i, f);
-  const frac = v.state.idx >= 0 ? Math.min(1, v.fc.frac[v.state.idx]) : 0;
   const e = v.state.est;
   const top = Math.max(v.budget, e?.need90 ?? 0) * 1.12;
   const pct = (x: number) => `${Math.min(100, Math.max(0, (x / top) * 100))}%`;
-  const num = (x: number, digits = 0) => (started ? fmtNum(x, digits) : "–");
 
   return (
     <button className={`dp tone-${v.tone} ${selected ? "selected" : ""} ${v.needsDecision ? "asking" : ""}`} onClick={onSelect} aria-pressed={selected}>
@@ -345,21 +353,17 @@ function DronePanel({ d, v, index, selected, onSelect }: { d: LoadedDrone; v: Dr
         <strong>{index + 1} · {d.slot.cargo}</strong>
         <span className="dp-status">{v.status}</span>
       </div>
-      <dl className="dp-tele">
-        <div><dt>Alt</dt><dd className="num">{num(Math.max(at(series.up), 0))}<small> m</small></dd></div>
-        <div><dt>Speed</dt><dd className="num">{num(at(series.groundSpeed), 1)}<small> m/s</small></dd></div>
-        <div><dt>Volt</dt><dd className="num">{num(at(series.voltage), 1)}<small> V</small></dd></div>
-        <div><dt>Power</dt><dd className="num">{num(Math.max(at(series.power), 0))}<small> W</small></dd></div>
-      </dl>
+      <p className="dp-line num">
+        {started
+          ? `${fmtNum(Math.max(at(series.up), 0), 0)} m · ${fmtNum(at(series.groundSpeed), 1)} m/s · ${fmtNum(at(series.voltage), 1)} V · ${fmtNum(Math.max(at(series.power), 0), 0)} W`
+          : "Preparing for launch"}
+      </p>
       <div className="fc-gauge" aria-hidden>
         <div className="fc-used" style={{ width: pct(e?.used ?? 0) }} />
         {e && <div className="fc-need" style={{ left: pct(e.used), width: `calc(${pct(e.need90)} - ${pct(e.used)})` }} />}
         <div className="fc-budget" style={{ left: pct(v.budget) }} />
       </div>
-      <div className="dp-foot">
-        <span className="num">{e ? `${fmtNum(e.used, 1)} / ${fmtNum(v.budget)} Wh` : `${fmtNum(v.budget)} Wh pack`}</span>
-        <div className="fc-route" aria-hidden><i style={{ width: `${frac * 100}%` }} /></div>
-      </div>
+      <span className="dp-foot num">{e ? `${fmtNum(e.used, 1)} of ${fmtNum(v.budget)} Wh used` : `${fmtNum(v.budget)} Wh pack`}</span>
       {v.verdict && <p className={`fc-verdict ${VERDICT_TEXT[v.verdict].good ? "good" : "bad"}`}>{VERDICT_TEXT[v.verdict].label}</p>}
     </button>
   );
@@ -400,10 +404,6 @@ function Evidence({ d, v, t }: { d: LoadedDrone; v: DroneView; t: number }) {
         <line x1={now} x2={now} y1={2} y2={CH - 4} className="ev-now" />
         {v.settled && <line x1={6} x2={CW - 6} y1={y(fc.totalWh)} y2={y(fc.totalWh)} className="ev-actual" />}
       </svg>
-      <div className="lab-key">
-        <span><i className="k-clean" />Median to cautious (P90)</span>
-        <span className="muted">dashed: decision window closes at halfway{v.settled ? " · dotted: what it really used" : ""}</span>
-      </div>
     </figure>
   );
 }
@@ -437,6 +437,17 @@ function Health({ health, fix, feedLow }: { health: ScenarioHealth; fix: boolean
         </div>
       </dl>
       {found.length > 0 && <p className="lab-findings">Fix: {found.join(" · ")}.</p>}
+      <FlagLink />
     </div>
+  );
+}
+
+function FlagLink() {
+  const flagged = useFleet((s) => s.flagged);
+  const flag = useFleet((s) => s.flag);
+  return (
+    <button className="link-btn" disabled={flagged} onClick={flag} title="Tell the data-quality owner that this feed needs checking">
+      {flagged ? "Data source flagged to the data-quality owner" : "Flag data source"}
+    </button>
   );
 }
