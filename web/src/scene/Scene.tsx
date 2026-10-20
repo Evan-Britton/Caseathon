@@ -1,11 +1,12 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
-import { CanvasTexture, GridHelper, PMREMGenerator, SRGBColorSpace, Vector3 } from "three";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { CanvasTexture, CircleGeometry, GridHelper, PMREMGenerator, RingGeometry, SRGBColorSpace, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { clock, useStore } from "../store";
 import type { CameraMode, FlightMeta, FlightSeries } from "../types";
 import { BODY_LIFT, Drone, dronePose } from "./Drone";
+import { drape } from "./drape";
 import { Effects } from "./Effects";
 import { FlightPath } from "./FlightPath";
 import { SCENE } from "./palette";
@@ -142,17 +143,31 @@ function Ground() {
 }
 
 function LaunchPad() {
+  const ground = useStore((s) => s.ground);
+  const ring = useMemo(() => new RingGeometry(5, 5.6, 64, 2).rotateX(-Math.PI / 2), []);
+  const disc = useMemo(() => new CircleGeometry(1.2, 32).rotateX(-Math.PI / 2), []);
+  useEffect(
+    () => () => {
+      ring.dispose();
+      disc.dispose();
+    },
+    [ring, disc],
+  );
+  // The launch point is rarely level: drape the pad over the terrain so no part of it ends up underground.
+  useLayoutEffect(() => {
+    drape(ring, ground, 0, 0, 0.15);
+    drape(disc, ground, 0, 0, 0.15);
+  }, [ground, ring, disc]);
+
   return (
-    <group position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <mesh>
-        <ringGeometry args={[5, 5.6, 64]} />
-        <meshBasicMaterial color={SCENE.warn} />
+    <>
+      <mesh geometry={ring}>
+        <meshBasicMaterial color={SCENE.warn} polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-2} />
       </mesh>
-      <mesh>
-        <circleGeometry args={[1.2, 32]} />
-        <meshBasicMaterial color={SCENE.warn} />
+      <mesh geometry={disc}>
+        <meshBasicMaterial color={SCENE.warn} polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-2} />
       </mesh>
-    </group>
+    </>
   );
 }
 
