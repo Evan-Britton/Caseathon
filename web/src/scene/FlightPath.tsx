@@ -14,7 +14,16 @@ import { powerColor, powerRange, toWorld } from "./palette";
  * translucent "curtain" dropped to the ground (or terrain) beneath it. Both grow with
  * playback; the remaining route shows as a faint dashed guide.
  */
-export function FlightPath({ series, ground }: { series: FlightSeries; ground: GroundSampler | null }) {
+export function FlightPath({
+  series,
+  ground,
+  getTime,
+}: {
+  series: FlightSeries;
+  ground: GroundSampler | null;
+  /** Playback time for this path; the single-flight clock if omitted. */
+  getTime?: () => number;
+}) {
   const { flown, guide, curtain } = useMemo(() => build(series, ground), [series, ground]);
 
   useEffect(
@@ -29,7 +38,7 @@ export function FlightPath({ series, ground }: { series: FlightSeries; ground: G
   );
 
   useFrame(() => {
-    const { i } = sampleAt(series.t, clock.time);
+    const { i } = sampleAt(series.t, getTime ? getTime() : clock.time);
     flown.geometry.instanceCount = i;
     curtain.setDrawRange(0, i * 6);
   });

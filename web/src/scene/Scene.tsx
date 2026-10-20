@@ -2,9 +2,11 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { GridHelper, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { useFleet } from "../fleetStore";
 import { clock, useStore } from "../store";
 import type { CameraMode, FlightMeta, FlightSeries } from "../types";
 import { Drone, dronePose } from "./Drone";
+import { FleetScene } from "./FleetScene";
 import { FlightPath } from "./FlightPath";
 import { SCENE } from "./palette";
 import { Stars } from "./Stars";
@@ -16,7 +18,8 @@ export function Scene() {
   const camera = useStore((s) => s.camera);
   const basemap = useStore((s) => s.basemap);
   const ground = useStore((s) => s.ground);
-  const onMap = basemap !== "grid";
+  const fleet = useFleet((s) => (s.open ? s.loaded : null));
+  const onMap = basemap !== "grid" || !!fleet;
 
   return (
     <Canvas
@@ -31,11 +34,13 @@ export function Scene() {
       <directionalLight position={[120, 300, 80]} intensity={1.6} />
       <directionalLight position={[-200, 80, -120]} intensity={0.5} color={SCENE.accent} />
       <Ticker />
-      {basemap === "grid" && <Ground />}
-      <LaunchPad />
+      {((basemap === "grid" && !fleet) || (fleet && !ground)) && <Ground />}
+      {!fleet && <LaunchPad />}
       <Stars />
-      {meta && basemap === "terrain" && <Terrain meta={meta} />}
-      {series && meta && (
+      {fleet && <Terrain meta={fleet[0].meta} />}
+      {fleet && <FleetScene loaded={fleet} />}
+      {!fleet && meta && basemap === "terrain" && <Terrain meta={meta} />}
+      {!fleet && series && meta && (
         <>
           <FlightPath series={series} ground={ground} />
           <Drone series={series} meta={meta} />
