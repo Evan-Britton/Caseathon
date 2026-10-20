@@ -82,7 +82,7 @@ export function Mission() {
 
       {m.model && m.forecast && (
         <p className="mission-foot" title={m.model.validation}>
-          Out-of-sample · typical error {fmtNum(m.model.metrics.maeWh, 2)} Wh · P90 held {Math.round(m.model.metrics.p90Coverage * 100)}%
+          Tested on flights it never saw · off by about {fmtNum(m.model.metrics.maeWh, 2)} Wh on average · safety margin held {Math.round(m.model.metrics.p90Coverage * 100)}% of the time
         </p>
       )}
     </section>

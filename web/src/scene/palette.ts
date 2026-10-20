@@ -13,6 +13,10 @@ export const SCENE = {
   rampLow: "#5b6cff",
   rampMid: "#b45cff",
   rampHigh: "#ff5c8a",
+  terrainLow: "#0b0a12",
+  terrainHigh: "#2c2844",
+  halo: "#dcd6ff", // pale glow under the drone, distinct from the power ramp
+  bg: ["#1b1926", "#111017", "#0a0a0e"], // sky gradient, inner to outer
 };
 
 const low = new Color(SCENE.rampLow);
@@ -30,7 +34,7 @@ export function powerCss(p: number, lo: number, hi: number): string {
 }
 
 // Below this the motors aren't driving the aircraft (ground idle, or power lost in a simulated failure).
-const MOTORS_ON_W = 50;
+export const MOTORS_ON_W = 50;
 
 /** Robust power range for colouring: 5th to 95th percentile of airborne samples with motors running. */
 export function powerRange(power: number[], up: number[]): [number, number] {

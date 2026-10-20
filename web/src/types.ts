@@ -53,6 +53,9 @@ export interface DataIndex {
 
 export type CameraMode = "orbit" | "chase" | "top";
 
+/** What the left column shows: the live mission check or the experiment results. */
+export type LeftTab = "mission" | "results";
+
 /** Ground layer: dark grid, or 3D terrain from elevation tiles. */
 export type Basemap = "grid" | "terrain";
 
@@ -81,6 +84,42 @@ export interface ModelIndex {
   budget: { default: number; min: number; max: number; step: number };
   flights: number[]; // flights with a forecast
   simulated: Record<string, { basedOn: number; budgetWh: number; note: string }>;
+}
+
+/** One condition with or without the fix (scripts/export_web_results.py, from results/countermeasure). */
+export interface ResultCell {
+  maeWh: number; // mean absolute error of the energy-still-needed forecast
+  biasWh: number; // mean signed error; negative means it under-forecasts the energy needed
+  p90: number; // share of checkpoints where the P90 safety margin really covered the need
+  unsafe: number; // continue calls on flights that should have turned back (summed over budgets, seed mean)
+  aborts: number; // needless turn-backs
+  deferred: number; // calls sent to the operator
+}
+
+export interface ResultRow {
+  key: string;
+  label: string;
+  off: ResultCell;
+  on: ResultCell;
+}
+
+/** Headline experiment results for the scorecard. Degradation rows are on a SIMULATED timeline. */
+export interface ResultsSummary {
+  simulated: string;
+  baseline: {
+    flights: number;
+    checkpoints: number;
+    split: string;
+    models: Record<"physics_only" | "direct_ml" | "hybrid", { maeWh: number; p90: number }>;
+  };
+  windows: number[]; // simulated windows the grid averages over
+  seeds: number;
+  decisions: { total: number; shouldReturn: number };
+  grid: ResultRow[];
+  overTime: { windows: number[]; maeOff: number[]; maeOn: number[]; p90Off: number[]; p90On: number[] };
+  unseen: ResultRow[];
+  failure: ResultRow;
+  cost: string;
 }
 
 /** SIMULATED data-poisoning scenarios (scripts/export_web_scenarios.py). */

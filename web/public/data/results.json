@@ -1,0 +1,266 @@
+{
+ "simulated": "Degradation results use a SIMULATED timeline built from the 196 CMU flights; see results/degradation and results/countermeasure.",
+ "baseline": {
+  "flights": 196,
+  "checkpoints": 2775,
+  "split": "chronological folds, whole flights kept together",
+  "models": {
+   "physics_only": {
+    "maeWh": 2.47,
+    "p90": 0.901
+   },
+   "direct_ml": {
+    "maeWh": 0.46,
+    "p90": 0.893
+   },
+   "hybrid": {
+    "maeWh": 0.36,
+    "p90": 0.916
+   }
+  }
+ },
+ "windows": [
+  3,
+  4,
+  5,
+  6,
+  7
+ ],
+ "seeds": 5,
+ "decisions": {
+  "total": 732,
+  "shouldReturn": 386
+ },
+ "grid": [
+  {
+   "key": "reference",
+   "label": "Clean",
+   "off": {
+    "maeWh": 0.39,
+    "biasWh": 0.03,
+    "p90": 0.895,
+    "unsafe": 0.0,
+    "aborts": 65.4,
+    "deferred": 0.0
+   },
+   "on": {
+    "maeWh": 0.39,
+    "biasWh": 0.03,
+    "p90": 0.889,
+    "unsafe": 0.0,
+    "aborts": 66.4,
+    "deferred": 66.0
+   }
+  },
+  {
+   "key": "stale",
+   "label": "Stale",
+   "off": {
+    "maeWh": 0.47,
+    "biasWh": 0.07,
+    "p90": 0.952,
+    "unsafe": 0.8,
+    "aborts": 97.4,
+    "deferred": 0.0
+   },
+   "on": {
+    "maeWh": 0.46,
+    "biasWh": 0.01,
+    "p90": 0.919,
+    "unsafe": 0.4,
+    "aborts": 93.8,
+    "deferred": 105.0
+   }
+  },
+  {
+   "key": "low_quality",
+   "label": "Low quality",
+   "off": {
+    "maeWh": 0.56,
+    "biasWh": -0.34,
+    "p90": 0.724,
+    "unsafe": 0.2,
+    "aborts": 54.2,
+    "deferred": 0.0
+   },
+   "on": {
+    "maeWh": 0.4,
+    "biasWh": 0.03,
+    "p90": 0.909,
+    "unsafe": 0.0,
+    "aborts": 69.4,
+    "deferred": 69.8
+   }
+  },
+  {
+   "key": "combined",
+   "label": "Both",
+   "off": {
+    "maeWh": 0.84,
+    "biasWh": -0.65,
+    "p90": 0.512,
+    "unsafe": 4.0,
+    "aborts": 39.4,
+    "deferred": 0.0
+   },
+   "on": {
+    "maeWh": 0.41,
+    "biasWh": 0.01,
+    "p90": 0.923,
+    "unsafe": 0.4,
+    "aborts": 76.4,
+    "deferred": 82.6
+   }
+  }
+ ],
+ "overTime": {
+  "windows": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "maeOff": [
+   0.608,
+   0.423,
+   0.483,
+   0.587,
+   0.892,
+   1.018,
+   1.231
+  ],
+  "p90Off": [
+   0.911,
+   0.851,
+   0.761,
+   0.42,
+   0.433,
+   0.613,
+   0.336
+  ],
+  "maeOn": [
+   0.61,
+   0.382,
+   0.558,
+   0.434,
+   0.434,
+   0.323,
+   0.313
+  ],
+  "p90On": [
+   0.971,
+   0.88,
+   0.93,
+   0.949,
+   0.883,
+   0.911,
+   0.941
+  ]
+ },
+ "unseen": [
+  {
+   "key": "unseen_bias_20pct",
+   "label": "Feed reads 20% low",
+   "off": {
+    "maeWh": 0.87,
+    "biasWh": -0.62,
+    "p90": 0.629,
+    "unsafe": 2.2,
+    "aborts": 55.4,
+    "deferred": 0.0
+   },
+   "on": {
+    "maeWh": 0.41,
+    "biasWh": 0.01,
+    "p90": 0.925,
+    "unsafe": 0.4,
+    "aborts": 76.6,
+    "deferred": 80.2
+   }
+  },
+  {
+   "key": "unseen_drifting_bias",
+   "label": "Bias drifts each window",
+   "off": {
+    "maeWh": 0.83,
+    "biasWh": -0.62,
+    "p90": 0.461,
+    "unsafe": 5.2,
+    "aborts": 30.0,
+    "deferred": 0.0
+   },
+   "on": {
+    "maeWh": 0.41,
+    "biasWh": 0.01,
+    "p90": 0.921,
+    "unsafe": 0.2,
+    "aborts": 77.0,
+    "deferred": 84.6
+   }
+  },
+  {
+   "key": "unseen_offset",
+   "label": "Fixed 2.5 A offset",
+   "off": {
+    "maeWh": 0.8,
+    "biasWh": -0.62,
+    "p90": 0.498,
+    "unsafe": 5.4,
+    "aborts": 34.4,
+    "deferred": 0.0
+   },
+   "on": {
+    "maeWh": 0.41,
+    "biasWh": 0.02,
+    "p90": 0.928,
+    "unsafe": 0.2,
+    "aborts": 78.2,
+    "deferred": 81.2
+   }
+  },
+  {
+   "key": "unseen_overreading",
+   "label": "Feed reads 10% high",
+   "off": {
+    "maeWh": 0.83,
+    "biasWh": 0.7,
+    "p90": 0.987,
+    "unsafe": 0.0,
+    "aborts": 145.0,
+    "deferred": 0.0
+   },
+   "on": {
+    "maeWh": 0.41,
+    "biasWh": 0.0,
+    "p90": 0.928,
+    "unsafe": 0.2,
+    "aborts": 78.4,
+    "deferred": 84.0
+   }
+  }
+ ],
+ "failure": {
+  "key": "failure_no_reference_flights",
+  "label": "No reference flights",
+  "off": {
+   "maeWh": 0.84,
+   "biasWh": -0.65,
+   "p90": 0.512,
+   "unsafe": 4.0,
+   "aborts": 39.4,
+   "deferred": 0.0
+  },
+  "on": {
+   "maeWh": 0.74,
+   "biasWh": -0.52,
+   "p90": 0.632,
+   "unsafe": 0.0,
+   "aborts": 100.2,
+   "deferred": 173.8
+  }
+ },
+ "cost": "3 dual-logged reference flights per window (about 12% of flights)"
+}

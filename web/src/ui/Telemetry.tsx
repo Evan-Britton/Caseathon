@@ -2,6 +2,7 @@ import { lerpAt, sampleAt } from "../data";
 import { useStore } from "../store";
 import { fmtNum } from "./format";
 
+/** Live readouts at the playhead; the top half of the flight panel. */
 export function Telemetry() {
   const series = useStore((s) => s.series);
   const meta = useStore((s) => s.meta);
@@ -17,7 +18,7 @@ export function Telemetry() {
   const total = series.energyWh[series.energyWh.length - 1];
 
   return (
-    <section className="telemetry glass" aria-label="Telemetry">
+    <div className="flight-tele" aria-label="Telemetry">
       <div className="panel-head">
         <h2>DJI Matrice 100</h2>
         <span className={`state ${powerLost ? "state-fail" : airborne ? "state-air" : "state-ground"}`}>
@@ -48,7 +49,7 @@ export function Telemetry() {
           <div className="energy-fill" style={{ width: `${Math.min((used / Math.max(total, 0.01)) * 100, 100)}%` }} />
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -84,7 +85,7 @@ function DroneGlyph({ spinning }: { spinning: boolean }) {
         </g>
       ))}
       <rect x={38} y={36} width={24} height={28} rx={6} fill="#2a333d" stroke="#8a95a3" strokeWidth={1.5} />
-      <path d="M50 30l5 6h-10z" fill="#9a8cff" />
+      <path d="M50 30l5 6h-10z" style={{ fill: "var(--accent)" }} />
     </svg>
   );
 }

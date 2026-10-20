@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { loadFlight, loadForecast, loadIndex, loadModelIndex, loadScenarioIndex, loadScenarios } from "./data";
+import { loadFlight, loadForecast, loadIndex, loadModelIndex, loadResults, loadScenarioIndex, loadScenarios } from "./data";
 import type {
   Basemap,
   CameraMode,
@@ -10,7 +10,9 @@ import type {
   FlightSeries,
   GroundSampler,
   LabState,
+  LeftTab,
   ModelIndex,
+  ResultsSummary,
   ScenarioDemo,
   ScenarioIndex,
 } from "./types";
@@ -45,6 +47,9 @@ interface State {
   scenarioIndex: ScenarioIndex | null;
   scenarios: FlightScenarios | null;
   lab: LabState;
+  /** Headline experiment results for the scorecard, or null if not exported. */
+  results: ResultsSummary | null;
+  leftTab: LeftTab;
   init: () => Promise<void>;
   selectFlight: (id: number) => Promise<void>;
   stepFlight: (dir: 1 | -1) => void;
@@ -58,6 +63,7 @@ interface State {
   setGround: (ground: GroundSampler | null) => void;
   setBudget: (wh: number) => void;
   setLab: (lab: Partial<LabState>) => void;
+  setLeftTab: (tab: LeftTab) => void;
   /** Jump to a demo case: its flight, battery and poisoned condition, with the fix off. */
   runDemo: (demo: ScenarioDemo) => Promise<void>;
 }
@@ -111,8 +117,8 @@ export const useStore = create<State>((set, get) => ({
   loading: true,
   uiTime: 0,
   playing: false,
-  rate: 4,
-  camera: "orbit",
+  rate: 8,
+  camera: "chase",
   basemap: "terrain",
   mapCredits: "",
   ground: null,
@@ -123,19 +129,22 @@ export const useStore = create<State>((set, get) => ({
   scenarioIndex: null,
   scenarios: null,
   lab: { on: false, condition: "combined", fix: false },
+  results: null,
+  leftTab: "mission",
 
   init: async () => {
     try {
-      const [index, model, scenarioIndex] = await Promise.all([
+      const [index, model, scenarioIndex, results] = await Promise.all([
         loadIndex(),
         loadModelIndex().catch((e: Error) => {
           set({ modelError: e.message });
           return null;
         }),
         loadScenarioIndex().catch(() => null),
+        loadResults().catch(() => null),
       ]);
       const budgetWh = savedBudget() ?? model?.budget.default ?? 20;
-      set({ index, model, budgetWh, scenarioIndex });
+      set({ index, model, budgetWh, scenarioIndex, results });
       const wanted = flightFromHash() ?? DEFAULT_FLIGHT;
       const id = index.flights.some((f) => f.id === wanted) ? wanted : index.flights[0].id;
       await get().selectFlight(id);
@@ -198,9 +207,11 @@ export const useStore = create<State>((set, get) => ({
     }
     set({ budgetWh });
   },
-  setLab: (lab) => set({ lab: { ...get().lab, ...lab } }),
+  // Opening the lab shows its effect in the mission check, so bring that tab forward.
+  setLab: (lab) => set({ lab: { ...get().lab, ...lab }, ...(lab.on ? { leftTab: "mission" as const } : {}) }),
+  setLeftTab: (leftTab) => set({ leftTab }),
   runDemo: async (demo) => {
-    set({ lab: { on: true, condition: demo.condition, fix: false } });
+    set({ lab: { on: true, condition: demo.condition, fix: false }, leftTab: "mission" });
     get().setBudget(demo.budgetWh);
     if (get().meta?.id !== demo.flight) await get().selectFlight(demo.flight);
     else get().seek(0);

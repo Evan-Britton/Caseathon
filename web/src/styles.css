@@ -10,6 +10,7 @@
   --text: #eeedf4;
   --muted: #8f8ea3;
   --accent: #9a8cff; /* ultraviolet: selection, highlights, data */
+  --accent-rgb: 154, 140, 255; /* same colour, for rgba() */
   --warn: #ffb84d;
   --stop: #ff4f5e;
   --go: #3ee8a8;
@@ -20,6 +21,7 @@
   --body: "Geist", system-ui, sans-serif;
   --r: 18px;
   --gap: 16px;
+  --left-w: 400px; /* mission check / results column */
 
   color-scheme: dark;
   font-family: var(--body);
@@ -128,21 +130,34 @@ select {
   pointer-events: auto;
 }
 
-.route-map {
+/* Live telemetry and the route in one panel on the right; it stops above the dock and scrolls if short. */
+.flight-panel {
   position: absolute;
   top: var(--gap);
   right: var(--gap);
   width: 300px;
+  max-height: calc(100% - var(--gap) * 3 - 80px);
+  overflow-y: auto;
+  scrollbar-width: none;
   z-index: 20;
 }
 
-/* Mission check above telemetry; the column scrolls if the window is too short for both. */
+.flight-panel::-webkit-scrollbar {
+  display: none;
+}
+
+.flight-route {
+  margin-top: 2px;
+  border-top: 1px solid var(--edge);
+}
+
+/* Mission check above the results scorecard; the column scrolls if the window is too short for both. */
 .left-stack {
   position: absolute;
   top: 80px;
   bottom: var(--gap);
   left: var(--gap);
-  width: 330px;
+  width: var(--left-w);
   z-index: 20;
   display: flex;
   flex-direction: column;
@@ -161,19 +176,74 @@ select {
   pointer-events: auto;
 }
 
-.telemetry {
-  margin-top: auto;
-}
-
 .dock {
   position: absolute;
-  left: calc(330px + var(--gap) * 2);
+  left: calc(var(--left-w) + var(--gap) * 2);
   right: var(--gap);
   bottom: var(--gap);
   z-index: 20;
 }
 
 /* ---------- top bar ---------- */
+
+/* ---------- power-loss caution ---------- */
+
+.caution-edge {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  box-shadow: inset 0 0 140px 24px rgba(255, 40, 60, 0.42);
+  animation: caution-pulse 1.1s ease-in-out infinite;
+}
+
+.caution {
+  position: absolute;
+  left: calc(50% + (var(--left-w) + var(--gap) - 300px - var(--gap)) / 2);
+  bottom: calc(var(--gap) + 150px);
+  z-index: 21;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100% - 2 * var(--gap));
+  padding: 8px 16px 8px 8px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(255, 79, 94, 0.6);
+  border-radius: 10px;
+  background: rgba(38, 6, 10, 0.86);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 0 32px rgba(255, 40, 60, 0.35);
+  color: #ffd9dc;
+  font-size: 13px;
+}
+
+.caution-lamp {
+  flex: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: var(--stop);
+  color: #1a0003;
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  animation: caution-blink 0.9s steps(1) infinite;
+}
+
+@keyframes caution-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes caution-blink {
+  50% {
+    background: #4a0d14;
+    color: var(--stop);
+  }
+}
 
 .picker {
   display: flex;
@@ -277,7 +347,7 @@ select {
 }
 
 .map-drone-halo {
-  fill: rgba(154, 140, 255, 0.22);
+  fill: rgba(var(--accent-rgb), 0.22);
   stroke: var(--accent);
   stroke-width: 1;
 }
@@ -424,7 +494,7 @@ select {
   height: 100%;
   border-radius: 3px;
   background: var(--ramp);
-  background-size: 330px 100%;
+  background-size: 268px 100%; /* the ramp spans the full track */
 }
 
 /* dock */
@@ -622,7 +692,7 @@ select {
 .power-legend {
   position: absolute;
   bottom: calc(var(--gap) + 100px); /* just above the dock */
-  left: calc(330px + var(--gap) * 2);
+  left: calc(var(--left-w) + var(--gap) * 2);
   width: 200px;
   font-size: 12px;
   color: var(--muted);
@@ -660,7 +730,7 @@ select {
 
 .attribution {
   position: absolute;
-  right: var(--gap);
+  right: calc(300px + var(--gap) * 2);
   bottom: calc(var(--gap) + 86px);
   z-index: 20;
   font-size: 11px;
@@ -674,11 +744,11 @@ select {
 /* mission markers on the scrubber and route map */
 
 .scrub-window {
-  fill: rgba(154, 140, 255, 0.1);
+  fill: rgba(var(--accent-rgb), 0.1);
 }
 
 .scrub-deadline {
-  stroke: rgba(154, 140, 255, 0.75);
+  stroke: rgba(var(--accent-rgb), 0.75);
   stroke-dasharray: 3 3;
 }
 
@@ -730,7 +800,7 @@ select {
   text-transform: uppercase;
   color: var(--accent);
   padding: 2px 8px;
-  border: 1px solid rgba(154, 140, 255, 0.35);
+  border: 1px solid rgba(var(--accent-rgb), 0.35);
   border-radius: 999px;
 }
 
@@ -910,8 +980,8 @@ select {
 }
 
 .sw-window {
-  background: rgba(154, 140, 255, 0.16);
-  border: 1px solid rgba(154, 140, 255, 0.4);
+  background: rgba(var(--accent-rgb), 0.16);
+  border: 1px solid rgba(var(--accent-rgb), 0.4);
 }
 
 .fchart {
@@ -950,11 +1020,11 @@ select {
 }
 
 .fc-window {
-  fill: rgba(154, 140, 255, 0.08);
+  fill: rgba(var(--accent-rgb), 0.08);
 }
 
 .fc-deadline {
-  stroke: rgba(154, 140, 255, 0.6);
+  stroke: rgba(var(--accent-rgb), 0.6);
   stroke-dasharray: 3 3;
 }
 
@@ -1119,7 +1189,7 @@ select {
   font-size: 12px;
   cursor: pointer;
   text-decoration: underline;
-  text-decoration-color: rgba(154, 140, 255, 0.4);
+  text-decoration-color: rgba(var(--accent-rgb), 0.4);
   text-underline-offset: 3px;
 }
 
@@ -1148,6 +1218,302 @@ select {
   letter-spacing: 0.12em;
 }
 
+/* Section headings inside a combined panel read like small panel titles. */
+.flight-route > .panel-head h3 {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+/* ---------- results scorecard ---------- */
+
+.left-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+}
+
+.left-tabs button {
+  flex: 1;
+  height: 34px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.left-tabs button:hover {
+  color: var(--text);
+}
+
+.left-tabs button[aria-selected="true"] {
+  background: rgba(var(--accent-rgb), 0.18);
+  color: var(--text);
+}
+
+.res-block {
+  padding: 8px 16px 10px;
+}
+
+.res-block + .res-block {
+  border-top: 1px solid var(--edge);
+}
+
+.res-block:first-child {
+  padding-top: 12px;
+}
+
+.res-block h3 {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.req {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(var(--accent-rgb), 0.16);
+  color: var(--accent);
+  font-family: var(--display);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  cursor: help;
+}
+
+.req + .req {
+  margin-left: -2px;
+}
+
+.res-hero {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.res-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 9px 6px;
+  border-radius: 10px;
+  background: var(--inset);
+  border: 1px solid var(--inset-edge);
+}
+
+.res-value {
+  font-family: var(--num);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.res-value .unit {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.res-label {
+  font-size: 10px;
+  line-height: 1.25;
+  color: var(--muted);
+}
+
+.res-note {
+  margin-top: 5px;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.res-grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.res-grid th {
+  font-weight: 500;
+  text-align: left;
+  color: var(--muted);
+}
+
+.res-grid thead th {
+  padding-bottom: 4px;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: help;
+}
+
+.res-grid tbody th {
+  padding-right: 6px;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.res-grid td {
+  padding: 3px 0;
+  font-family: var(--num);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.res-grid tbody tr + tr {
+  border-top: 1px solid var(--inset-edge);
+}
+
+.res-grid td i {
+  margin: 0 3px;
+  font-style: normal;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.res-key-row {
+  background: rgba(255, 79, 94, 0.07);
+}
+
+.res-off {
+  color: var(--muted);
+}
+
+.res-on {
+  color: var(--text);
+}
+
+.res-bad {
+  color: var(--stop);
+  fill: var(--stop);
+}
+
+.res-good {
+  color: var(--go);
+  fill: var(--go);
+}
+
+.res-time svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.res-line-off,
+.res-line-on {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.res-line-off {
+  stroke: var(--stop);
+}
+
+.res-line-on {
+  stroke: var(--go);
+}
+
+.res-dot-off {
+  fill: var(--stop);
+}
+
+.res-dot-on {
+  fill: var(--go);
+}
+
+.res-clean {
+  stroke: var(--muted);
+  stroke-dasharray: 3 3;
+  stroke-width: 1;
+}
+
+.res-axis {
+  font-size: 8.5px;
+  fill: var(--muted);
+}
+
+.res-end {
+  font-family: var(--num);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.res-time figcaption {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+  font-size: 10.5px;
+}
+
+.res-time figcaption i {
+  display: inline-block;
+  width: 10px;
+  height: 2px;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+.res-time figcaption .k-off {
+  background: var(--stop);
+}
+
+.res-time figcaption .k-on {
+  background: var(--go);
+}
+
+.res-time figcaption .muted {
+  margin-left: auto;
+}
+
+.res-chain {
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.res-chain i {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.res-facts {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.res-facts li {
+  padding-left: 10px;
+  border-left: 2px solid var(--inset-edge);
+}
+
+.res-facts li.good {
+  border-left-color: var(--go);
+}
+
+.res-facts li.bad {
+  border-left-color: var(--warn);
+}
+
 .panel-head h3 {
   font-size: 10.5px;
   letter-spacing: 0.08em;
@@ -1166,7 +1532,7 @@ select {
 
 .picker {
   flex: none;
-  width: 330px; /* lines up with the left column */
+  width: var(--left-w); /* lines up with the left column */
   height: 52px;
 }
 
@@ -1232,6 +1598,7 @@ select {
 
 .readouts dd {
   font-size: 17px;
+  white-space: nowrap;
 }
 
 /* inset surfaces inside panels */
@@ -1249,7 +1616,7 @@ select {
 /* dock */
 .play {
   background: var(--accent);
-  box-shadow: 0 0 0 5px rgba(154, 140, 255, 0.14), 0 8px 24px rgba(154, 140, 255, 0.35);
+  box-shadow: 0 0 0 5px rgba(var(--accent-rgb), 0.14), 0 8px 24px rgba(var(--accent-rgb), 0.35);
   transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
 
@@ -1265,9 +1632,9 @@ select {
 }
 
 .cams button[aria-pressed="true"] {
-  background: rgba(154, 140, 255, 0.18);
+  background: rgba(var(--accent-rgb), 0.18);
   color: var(--text);
-  box-shadow: inset 0 0 0 1px rgba(154, 140, 255, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.35);
 }
 
 .rate select {
@@ -1322,8 +1689,8 @@ select {
 .lab {
   position: absolute;
   top: 80px;
-  left: calc(330px + var(--gap) * 2);
-  width: min(440px, calc(100vw - 330px - 300px - var(--gap) * 4));
+  left: calc(var(--left-w) + var(--gap) * 2);
+  width: min(440px, calc(100vw - var(--left-w) - 300px - var(--gap) * 4));
   z-index: 20;
   padding-bottom: 2px;
 }
@@ -1747,7 +2114,7 @@ select {
 }
 
 .chip-btn:hover {
-  border-color: rgba(154, 140, 255, 0.5);
+  border-color: rgba(var(--accent-rgb), 0.5);
 }
 
 .chip-btn.active {
@@ -1792,8 +2159,16 @@ select {
 }
 
 @media (max-width: 1060px) {
-  .route-map {
+  :root {
+    --left-w: 330px;
+  }
+
+  .flight-panel {
     width: 250px;
+  }
+
+  .attribution {
+    right: calc(250px + var(--gap) * 2);
   }
 
   .topbar {
@@ -1801,11 +2176,16 @@ select {
   }
 
   .lab {
-    width: min(440px, calc(100vw - 330px - 250px - var(--gap) * 4));
+    width: min(440px, calc(100vw - var(--left-w) - 250px - var(--gap) * 4));
   }
 }
 
 @media (max-width: 820px) {
+  .caution {
+    left: 50%;
+    bottom: 12px;
+  }
+
   .hud {
     height: auto;
     overflow: visible;
@@ -1867,7 +2247,8 @@ select {
     display: contents;
   }
 
-  .mission {
+  .left-tabs,
+  .left-panel {
     order: 3;
     margin: 0 12px;
   }
@@ -1882,13 +2263,9 @@ select {
     padding-top: 6px;
   }
 
-  .telemetry {
-    order: 5;
-    margin: 0 12px;
-  }
-
-  .route-map {
+  .flight-panel {
     order: 6;
+    max-height: none;
   }
 
   .attribution {
@@ -1911,6 +2288,11 @@ select {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .caution-edge,
+  .caution-lamp {
+    animation: none;
+  }
+
   .glyph.spin .prop {
     animation: none;
   }
