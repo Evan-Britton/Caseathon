@@ -9,8 +9,10 @@ import {
   Material,
   Mesh,
   MeshBasicMaterial,
+  PlaneGeometry,
   MeshStandardMaterial,
   Quaternion,
+  RingGeometry,
   SphereGeometry,
   SRGBColorSpace,
   Vector3,
@@ -19,6 +21,7 @@ import { lerpAt, sampleAt } from "../data";
 import { missionState } from "../mission";
 import { activeForecast, budgetFor, clock, useStore } from "../store";
 import type { FlightMeta, FlightSeries } from "../types";
+import { drape } from "./drape";
 import { MOTORS_ON_W, SCENE, powerRange, toWorld } from "./palette";
 import { Smoke } from "./Smoke";
 
@@ -69,6 +72,9 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
   const deck = useMemo(() => deckMaterial(meta.id), [meta.id]);
   const bladeGeo = useMemo(() => new SphereGeometry(1, 16, 8), []);
   const discGeo = useMemo(() => new CircleGeometry(0.17, 40), []);
+  // Ground marker geometry, re-draped over the terrain every frame as the drone moves.
+  const shadowGeo = useMemo(() => new PlaneGeometry(9, 9, 12, 12).rotateX(-Math.PI / 2), []);
+  const ringGeo = useMemo(() => new RingGeometry(4.2, 4.5, 48, 2).rotateX(-Math.PI / 2), []);
   const [lo, hi] = useMemo(() => powerRange(series.power, series.up), [series]);
 
   // Power-loss flights tumble from the cutoff until they hit the ground.
@@ -88,8 +94,10 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
       }
       bladeGeo.dispose();
       discGeo.dispose();
+      shadowGeo.dispose();
+      ringGeo.dispose();
     },
-    [mats, bladeGeo, discGeo],
+    [mats, bladeGeo, discGeo, shadowGeo, ringGeo],
   );
 
   useFrame((state, delta) => {
@@ -165,7 +173,9 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
 
     const ground = useStore.getState().ground;
     const g = ground ? ground(x, z) : 0;
-    marker.current?.position.set(x, g + 0.3, z);
+    marker.current?.position.set(x, 0, z);
+    drape(shadowGeo, ground, x, z, 0.3);
+    drape(ringGeo, ground, x, z, 0.3);
     if (drop.current) {
       const h = Math.max(y - g, 0.01);
       drop.current.scale.y = h;
@@ -343,13 +353,11 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
         </mesh>
       </group>
       <group ref={marker}>
-        <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[9, 9]} />
-          <meshBasicMaterial map={shadowTex} transparent depthWrite={false} />
+        <mesh geometry={shadowGeo}>
+          <meshBasicMaterial map={shadowTex} transparent depthWrite={false} polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-2} />
         </mesh>
-        <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[4.2, 4.5, 48]} />
-          <meshBasicMaterial ref={ring} color={SCENE.accent} transparent opacity={0.6} />
+        <mesh geometry={ringGeo}>
+          <meshBasicMaterial ref={ring} color={SCENE.accent} transparent opacity={0.6} polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-2} />
         </mesh>
       </group>
       {meta.simulated && meta.failureS !== undefined && <Smoke series={series} failureS={meta.failureS} />}
