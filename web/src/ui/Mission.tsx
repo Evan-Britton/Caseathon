@@ -3,6 +3,7 @@ import { outcome, type MissionCall, type MissionState, type OutcomeKind } from "
 import { useStore } from "../store";
 import type { FlightForecast, FlightMeta } from "../types";
 import { fmtClock, fmtNum } from "./format";
+import { HeavyDemos, LabControls } from "./Lab";
 import { useMission } from "./useMission";
 
 type Tone = "go" | "warn" | "stop" | "idle" | "fail";
@@ -39,6 +40,8 @@ export function Mission() {
           <span className="ai-tag" title={m.model?.model}>AI forecast</span>
         )}
       </div>
+
+      <LabControls />
 
       <div className={`verdict tone-${head.tone}`} role="status" aria-live="polite">
         <VerdictIcon kind={head.icon} />
@@ -79,6 +82,8 @@ export function Mission() {
           )}
         </div>
       )}
+
+      <HeavyDemos />
 
       {m.model && m.forecast && (
         <p className="mission-foot" title={m.model.validation}>

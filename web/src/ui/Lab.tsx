@@ -1,94 +1,98 @@
 import { useStore } from "../store";
-import type { ScenarioCondition, ScenarioHealth, ScenarioIndex } from "../types";
+import type { ScenarioCondition, ScenarioDemo, ScenarioHealth, ScenarioIndex } from "../types";
 import { fmtNum } from "./format";
 import { useMission } from "./useMission";
 
 const ORDER: ScenarioCondition[] = ["reference", "stale", "low_quality", "combined"];
 
+/** Heaviest regular package in the data, g. Under "Both", these only reached training through the faulty sensor. */
+const HEAVY_G = 500;
+
+/** Demo cases on heavy-package flights: the poisoned model says continue on a flight that runs short. */
+export function heavyDemos(idx: ScenarioIndex | null): ScenarioDemo[] {
+  return idx ? idx.demos.filter((d) => d.payload >= HEAVY_G && d.condition === "combined") : [];
+}
+
 /**
- * The SIMULATED data-poisoning lab: replay the same flight with the model each training-data
- * condition would have produced, with and without the countermeasure.
+ * The SIMULATED data-poisoning lab, folded into the mission check: switch from the standard model to
+ * the model each training-data condition would have produced, with and without the countermeasure.
  */
-export function Lab() {
+export function LabControls() {
   const idx = useStore((s) => s.scenarioIndex);
   const setLab = useStore((s) => s.setLab);
-  const runDemo = useStore((s) => s.runDemo);
   const m = useMission();
   if (!idx || !m.meta) return null;
   const { lab } = m;
-  const demo = idx.demos[0];
-
-  if (!lab.on)
-    return (
-      <section className="lab glass lab-closed" aria-label="Data poisoning lab">
-        <div className="lab-closed-text">
-          <h2>Poisoning lab</h2>
-          <p>See this flight through a model trained on stale or biased data, then turn on the fix.</p>
-        </div>
-        <div className="lab-closed-actions">
-          <button className="btn" onClick={() => setLab({ on: true })}>Open</button>
-          {demo && (
-            <button className="btn btn-accent" onClick={() => void runDemo(demo)} title={`Flight ${demo.flight}, ${fmtNum(demo.budgetWh)} Wh battery`}>
-              Demo
-            </button>
-          )}
-        </div>
-      </section>
-    );
-
-  const window = m.meta ? idx.flightWindow[String(m.meta.id === 900 ? 142 : m.meta.id)] : undefined;
+  const window = idx.flightWindow[String(m.meta.id === 900 ? 142 : m.meta.id)];
   const health = window !== undefined ? idx.health[`${lab.condition}/${lab.fix ? "on" : "off"}/${window}`] : undefined;
 
   return (
-    <section className="lab glass" aria-label="Data poisoning lab">
-      <div className="panel-head">
-        <h2>Poisoning lab</h2>
-        <span className="sim-tag" title={idx.note}>Simulated</span>
-        <button className="icon-btn" onClick={() => setLab({ on: false })} aria-label="Close the poisoning lab" title="Back to the standard model">
-          <svg viewBox="0 0 24 24" aria-hidden><path d="M6 6l12 12M18 6L6 18" /></svg>
-        </button>
+    <div className="mlab">
+      <div className="lab-row">
+        <span className="lab-label">Model</span>
+        <div className="seg" role="radiogroup" aria-label="Model">
+          <button role="radio" aria-checked={!lab.on} onClick={() => setLab({ on: false })} title="The standard model, tested on flights it never saw">
+            Standard
+          </button>
+          <button role="radio" aria-checked={lab.on} onClick={() => setLab({ on: true })} title={idx.note}>
+            Poisoning lab
+          </button>
+        </div>
       </div>
 
-      <ScenarioControls
-        idx={idx}
-        condition={lab.condition}
-        fix={lab.fix}
-        onCondition={(condition) => setLab({ condition })}
-        onFix={(fix) => setLab({ fix })}
-        rowClass="lab-row"
-      />
-
-      <p className="lab-desc">{idx.conditions[lab.condition].desc}</p>
-
-      {m.scenarios && window !== undefined && health ? (
+      {lab.on && (
         <>
-          <Health idx={idx} health={health} window={window} fix={lab.fix} />
-          <WindowCharts idx={idx} condition={lab.condition} fix={lab.fix} window={window} />
+          <ScenarioControls
+            idx={idx}
+            condition={lab.condition}
+            fix={lab.fix}
+            onCondition={(condition) => setLab({ condition })}
+            onFix={(fix) => setLab({ fix })}
+            rowClass="lab-row"
+          />
+          <p className="lab-desc">
+            <span className="sim-tag" title={idx.note}>Simulated</span> {idx.conditions[lab.condition].desc}
+          </p>
+          {m.scenarios && window !== undefined && health ? (
+            <details className="mlab-more">
+              <summary>Data health and error over time</summary>
+              <Health idx={idx} health={health} window={window} fix={lab.fix} />
+              <WindowCharts idx={idx} condition={lab.condition} fix={lab.fix} window={window} />
+            </details>
+          ) : (
+            <p className="lab-note">
+              {m.meta.route === "H"
+                ? "Hover tests have no route, so there's no forecast to poison."
+                : `Flight ${m.meta.id} is in window 0, the first training window. There's nothing earlier to poison; try a heavy-payload demo below.`}
+            </p>
+          )}
         </>
-      ) : (
-        <p className="lab-note">
-          {m.meta.route === "H"
-            ? "Hover tests have no route, so there's no forecast to poison."
-            : `Flight ${m.meta.id} is in window 0, the first training window. There's nothing earlier to poison; try a demo below.`}
-        </p>
       )}
+    </div>
+  );
+}
 
-      {idx.demos.length > 0 && (
-        <div className="lab-demos">
-          <span className="lab-label">Demos</span>
-          {idx.demos.slice(0, 3).map((d) => (
-            <button
-              key={`${d.flight}-${d.condition}`}
-              className={`chip-btn ${m.meta?.id === d.flight ? "active" : ""}`}
-              onClick={() => void runDemo(d)}
-              title={`Poisoned (${idx.conditions[d.condition].label}) says continue with ${fmtNum(d.claimedSpareWh)} Wh to spare; it was really ${fmtNum(d.shortWh, 2)} Wh short`}
-            >
-              Flight {d.flight} · {fmtNum(d.budgetWh)} Wh
-            </button>
-          ))}
-        </div>
-      )}
-    </section>
+/** One-click demos: a heavy-package flight, its battery, and the "Both" condition with the fix off. */
+export function HeavyDemos() {
+  const idx = useStore((s) => s.scenarioIndex);
+  const runDemo = useStore((s) => s.runDemo);
+  const meta = useStore((s) => s.meta);
+  const demos = heavyDemos(idx);
+  if (!idx || demos.length === 0) return null;
+  return (
+    <div className="lab-demos">
+      <span className="lab-label">Heavy-payload demos</span>
+      {demos.map((d) => (
+        <button
+          key={`${d.flight}-${d.condition}`}
+          className={`chip-btn ${meta?.id === d.flight ? "active" : ""}`}
+          onClick={() => void runDemo(d)}
+          title={`${fmtNum(d.payload, 0)} g package. Heavier packages only reached training through the faulty sensor, so the poisoned model (${idx.conditions[d.condition].label}) says continue with ${fmtNum(d.claimedSpareWh)} Wh to spare; the flight was really ${fmtNum(d.shortWh, 2)} Wh short. Turn on the fix to see it caught.`}
+        >
+          Flight {d.flight} · {fmtNum(d.budgetWh)} Wh
+        </button>
+      ))}
+    </div>
   );
 }
 

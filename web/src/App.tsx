@@ -7,7 +7,6 @@ import { useStore } from "./store";
 import { Dock } from "./ui/Dock";
 import { Fleet } from "./ui/Fleet";
 import { FleetTags } from "./ui/FleetTags";
-import { Lab } from "./ui/Lab";
 import { Mission } from "./ui/Mission";
 import { Results } from "./ui/Results";
 import { Telemetry } from "./ui/Telemetry";
@@ -47,7 +46,6 @@ export default function App() {
       </main>
       <TopBar />
       <LeftColumn />
-      <Lab />
       <Fleet />
       <section className="flight-panel glass" aria-label="Flight">
         <Telemetry />

@@ -4,10 +4,13 @@ import type { FlightMeta } from "../types";
 import { fmtAltitude, fmtClock, fmtDate, fmtNum } from "./format";
 import { FleetButton } from "./Fleet";
 import { Icons } from "./icons";
+import { heavyDemos } from "./Lab";
 
 export function TopBar() {
   const index = useStore((s) => s.index);
   const meta = useStore((s) => s.meta);
+  const scenarioIndex = useStore((s) => s.scenarioIndex);
+  const demoIds = useMemo(() => new Set(heavyDemos(scenarioIndex).map((d) => d.flight)), [scenarioIndex]);
   const { selectFlight, stepFlight } = useStore.getState();
 
   const byDate = useMemo(() => {
@@ -32,6 +35,7 @@ export function TopBar() {
                   <option key={f.id} value={f.id}>
                     {f.simulated ? `Simulated ${f.id}, battery failure` : `Flight ${f.id}`}
                     {f.simulated ? null : f.route === "H" ? ", hover test" : `, ${f.speed} m/s, ${f.payload} g, ${fmtAltitude(f.altitude)}`}
+                    {demoIds.has(f.id) && " · heavy-payload demo"}
                   </option>
                 ))}
               </optgroup>
