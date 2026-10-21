@@ -2911,6 +2911,30 @@ select {
   color: var(--muted);
 }
 
+/* SYNTHETIC heavy-payload flights are labelled wherever they appear. */
+.dp-syn {
+  margin-left: 6px;
+  padding: 0 6px;
+  font-size: 9px;
+  vertical-align: 1px;
+}
+
+.syn-box {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.syn-box .sim-tag {
+  margin-right: 4px;
+  font-size: 9px;
+}
+
+.syn-note {
+  color: var(--warn);
+  font-weight: 600;
+}
+
 /* 5% of the pack or less: the battery readout turns red. */
 .dp-foot.low {
   color: var(--stop);

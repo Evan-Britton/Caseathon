@@ -1,0 +1,146 @@
+{
+ "synthetic": true,
+ "note": "SYNTHETIC heavy-payload flights: real CMU flights re-run at a heavier payload by scaling battery current with a payload-power rule fitted on the real 0-500 g flights. Not recorded data.",
+ "scaling": {
+  "massKgFormula": "P_new = P_recorded x ((M0 + new payload) / (M0 + recorded payload)) ^ b",
+  "m0G": 2355.0,
+  "exponent": 0.947,
+  "fitFlights": 195,
+  "maxTakeoffG": 3600.0,
+  "check": {
+   "flight": 76,
+   "peers": 7,
+   "energyErrPct": {
+    "min": 0.5,
+    "mean": 5.6,
+    "max": 9.8
+   }
+  }
+ },
+ "trainedMaxPayloadG": {
+  "reference/off": 750.0,
+  "reference/on": 750.0,
+  "stale/off": 500.0,
+  "stale/on": 750.0,
+  "low_quality/off": 750.0,
+  "low_quality/on": 750.0,
+  "combined/off": 750.0,
+  "combined/on": 750.0
+ },
+ "flights": [
+  {
+   "id": 1001,
+   "route": "R1",
+   "speed": 4.0,
+   "payload": 1200.0,
+   "altitude": "75",
+   "date": "2019-06-19",
+   "time": "17:25",
+   "durationS": 236.4,
+   "energyWh": 38.57,
+   "pathM": 468.0,
+   "maxUpM": 81.2,
+   "maxGapS": 0.22,
+   "startVoltage": 24.39,
+   "origin": {
+    "lat": 40.4589639,
+    "lon": -79.7828062,
+    "altM": 258.4
+   },
+   "synthetic": {
+    "basedOn": 97,
+    "sourcePayloadG": 500.0,
+    "currentFactor": 1.2308,
+    "packWh": 30.4,
+    "packRule": "between",
+    "window": 7,
+    "launchP90Wh": {
+     "reference/off": 32.3,
+     "reference/on": 32.33,
+     "stale/off": 37.7,
+     "stale/on": 32.39,
+     "low_quality/off": 28.76,
+     "low_quality/on": 31.99,
+     "combined/off": 28.6,
+     "combined/on": 32.01
+    }
+   }
+  },
+  {
+   "id": 1002,
+   "route": "R1",
+   "speed": 4.0,
+   "payload": 1200.0,
+   "altitude": "100",
+   "date": "2019-07-10",
+   "time": "9:12",
+   "durationS": 249.9,
+   "energyWh": 42.05,
+   "pathM": 465.2,
+   "maxUpM": 101.3,
+   "maxGapS": 0.3,
+   "startVoltage": 25.8,
+   "origin": {
+    "lat": 40.458931,
+    "lon": -79.7828103,
+    "altM": 269.8
+   },
+   "synthetic": {
+    "basedOn": 184,
+    "sourcePayloadG": 500.0,
+    "currentFactor": 1.2308,
+    "packWh": 33.3,
+    "packRule": "between",
+    "window": 7,
+    "launchP90Wh": {
+     "reference/off": 35.28,
+     "reference/on": 35.09,
+     "stale/off": 40.89,
+     "stale/on": 35.11,
+     "low_quality/off": 32.55,
+     "low_quality/on": 34.71,
+     "combined/off": 31.25,
+     "combined/on": 34.76
+    }
+   }
+  },
+  {
+   "id": 1003,
+   "route": "R1",
+   "speed": 4.0,
+   "payload": 1000.0,
+   "altitude": "100",
+   "date": "2019-06-25",
+   "time": "11:13",
+   "durationS": 262.5,
+   "energyWh": 42.19,
+   "pathM": 479.5,
+   "maxUpM": 101.3,
+   "maxGapS": 1.0,
+   "startVoltage": 24.4,
+   "origin": {
+    "lat": 40.4589016,
+    "lon": -79.7828328,
+    "altM": 269.5
+   },
+   "synthetic": {
+    "basedOn": 126,
+    "sourcePayloadG": 500.0,
+    "currentFactor": 1.1651,
+    "packWh": 36.6,
+    "packRule": "above_clean",
+    "window": 7,
+    "launchP90Wh": {
+     "reference/off": 35.81,
+     "reference/on": 35.86,
+     "stale/off": 41.01,
+     "stale/on": 35.34,
+     "low_quality/off": 32.7,
+     "low_quality/on": 35.18,
+     "combined/off": 31.95,
+     "combined/on": 35.28
+    }
+   }
+  }
+ ]
+}

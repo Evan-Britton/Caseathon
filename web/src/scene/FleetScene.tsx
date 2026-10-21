@@ -4,16 +4,17 @@ import { Color, Group, Mesh, MeshBasicMaterial, PerspectiveCamera, RingGeometry,
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { lerpAt, sampleAt } from "../data";
 import { followTerrain } from "../fleetRoutes";
-import { pathTime } from "../fleet";
-import type { LoadedDrone } from "../fleet";
+import { crashAt, pathTime } from "../fleet";
+import type { Decision, LoadedDrone } from "../fleet";
 import { fleetStatus, fleetTime, useFleet } from "../fleetStore";
 import { useStore } from "../store";
-import type { FlightSeries } from "../types";
+import type { FlightSeries, GroundSampler } from "../types";
 import { DRONE_SCALE, dronePose } from "./Drone";
 import { FlightPath } from "./FlightPath";
 import { drape } from "./drape";
 import { LaunchPad } from "./LaunchPad";
 import { SCENE, toWorld } from "./palette";
+import { Smoke } from "./Smoke";
 
 const ARM_ANGLES = [45, 135, 225, 315].map((d) => (d * Math.PI) / 180);
 const ARM_REACH = 0.33;
@@ -56,10 +57,44 @@ function droneTime(d: LoadedDrone): number {
   return pathTime(fleetTime(), useFleet.getState().decisions[d.slot.flight]);
 }
 
+const G = 9.81;
+
+/** The fall of a drone whose pack runs dry in the air: where its body is at any time after `t0`. */
+interface CrashPath {
+  t0: number;
+  fallS: number;
+  pos: (t: number) => [number, number, number];
+}
+
+/**
+ * From where the drawn drone was when the pack ran dry (flying on, or flying its path back if it was
+ * recalled): it drops under gravity, drifting on along its track while its forward speed bleeds off,
+ * and comes to rest on the ground beneath.
+ */
+function crashPath(series: FlightSeries, decision: Decision | undefined, t0: number, ground: GroundSampler | null): CrashPath {
+  const at = (t: number) => {
+    const { i, f } = sampleAt(series.t, pathTime(t, decision));
+    return toWorld(lerpAt(series.east, i, f), lerpAt(series.north, i, f), lerpAt(series.up, i, f));
+  };
+  const [x0, y0, z0] = at(t0);
+  const [x1, , z1] = at(t0 + 0.5);
+  const floor = (x: number, z: number) => (ground ? ground(x, z) : 0);
+  const fallS = Math.sqrt((2 * Math.max(y0 - floor(x0, z0), 0.5)) / G);
+  const pos = (t: number): [number, number, number] => {
+    const dt = Math.min(Math.max(t - t0, 0), fallS);
+    const drift = dt - (dt * dt) / (2 * fallS);
+    const x = x0 + (x1 - x0) * 2 * drift;
+    const z = z0 + (z1 - z0) * 2 * drift;
+    return [x, Math.max(y0 - 0.5 * G * dt * dt, floor(x, z)), z];
+  };
+  return { t0, fallS, pos };
+}
+
 export function FleetScene({ loaded }: { loaded: LoadedDrone[] }) {
   const offsets = useMemo(() => padOffsets(loaded), [loaded]);
   const ground = useStore((s) => s.ground);
   const selected = useFleet((s) => s.selected);
+  const decisions = useFleet((s) => s.decisions);
   // The routes cross hills the recorded heights never saw, so draw each flight terrain-following.
   const drawn = useMemo(
     () => loaded.map((d, i) => (ground ? followTerrain(d.series, ground, offsets[i].x, offsets[i].z) : d.series)),
@@ -69,6 +104,16 @@ export function FleetScene({ loaded }: { loaded: LoadedDrone[] }) {
   const padGround = useMemo(
     () => offsets.map((o) => (ground ? (x: number, z: number) => ground(x + o.x, z + o.z) : null)),
     [ground, offsets],
+  );
+  // Where each drone goes down if its pack runs dry in the air, given what the operator has decided.
+  const crashes = useMemo(
+    () =>
+      loaded.map((d, i) => {
+        const decision = decisions[d.slot.flight];
+        const t0 = crashAt(d, decision);
+        return t0 === null ? null : crashPath(drawn[i], decision, t0, padGround[i]);
+      }),
+    [loaded, drawn, padGround, decisions],
   );
   return (
     <>
@@ -81,8 +126,18 @@ export function FleetScene({ loaded }: { loaded: LoadedDrone[] }) {
       <RouteLabels loaded={loaded} offsets={offsets} />
       {loaded.map((d, i) => (
         <group key={d.slot.flight} position={[offsets[i].x, 0, offsets[i].z]}>
-          <FlightPath series={drawn[i]} ground={padGround[i]} getTime={() => droneTime(d)} fade={selected !== d.slot.flight} />
-          <FleetDrone d={d} series={drawn[i]} index={i} offset={offsets[i]} />
+          <FlightPath
+            series={drawn[i]}
+            ground={padGround[i]}
+            // A crashed drone's path ends where it went down.
+            getTime={() => {
+              const c = crashes[i];
+              return c && fleetTime() >= c.t0 ? pathTime(c.t0, decisions[d.slot.flight]) : droneTime(d);
+            }}
+            fade={selected !== d.slot.flight}
+          />
+          <FleetDrone d={d} series={drawn[i]} crash={crashes[i]} index={i} offset={offsets[i]} />
+          {crashes[i] && <Smoke startS={crashes[i].t0} endS={crashes[i].t0 + 90} posAt={crashes[i].pos} getTime={fleetTime} />}
         </group>
       ))}
       <FleetCamera loaded={loaded} offsets={offsets} />
@@ -109,7 +164,19 @@ function RouteLabels({ loaded, offsets }: { loaded: LoadedDrone[]; offsets: { x:
   return null;
 }
 
-function FleetDrone({ d, series, index, offset }: { d: LoadedDrone; series: FlightSeries; index: number; offset: { x: number; z: number } }) {
+function FleetDrone({
+  d,
+  series,
+  crash,
+  index,
+  offset,
+}: {
+  d: LoadedDrone;
+  series: FlightSeries;
+  crash: CrashPath | null;
+  index: number;
+  offset: { x: number; z: number };
+}) {
   const { meta } = d;
   const group = useRef<Group>(null);
   const body = useRef<Group>(null);
@@ -123,9 +190,13 @@ function FleetDrone({ d, series, index, offset }: { d: LoadedDrone; series: Flig
   useEffect(() => () => ringGeo.dispose(), [ringGeo]);
 
   useFrame((_, delta) => {
-    const te = Math.min(droneTime(d), series.t[series.t.length - 1]);
+    // Once the pack has run dry in the air, the drone falls along its crash path instead of flying on.
+    const ct = fleetTime();
+    const down = crash !== null && ct >= crash.t0;
+    const decision = useFleet.getState().decisions[d.slot.flight];
+    const te = Math.min(down ? pathTime(crash.t0, decision) : droneTime(d), series.t[series.t.length - 1]);
     const { i, f } = sampleAt(series.t, te);
-    const [x, y, z] = toWorld(lerpAt(series.east, i, f), lerpAt(series.north, i, f), lerpAt(series.up, i, f));
+    const [x, y, z] = down ? crash.pos(ct) : toWorld(lerpAt(series.east, i, f), lerpAt(series.north, i, f), lerpAt(series.up, i, f));
     const h0 = series.heading[i];
     const h1 = series.heading[Math.min(i + 1, series.heading.length - 1)];
     const dh = ((h1 - h0 + 540) % 360) - 180;
@@ -135,11 +206,13 @@ function FleetDrone({ d, series, index, offset }: { d: LoadedDrone; series: Flig
     group.current?.position.set(x, y, z);
     if (body.current) {
       const lean = Math.min(lerpAt(series.groundSpeed, i, f) * 1.3, 16) * (Math.PI / 180);
-      body.current.rotation.set(-lean, -headingRad, 0, "YXZ");
+      // Falling, it tumbles over and comes to rest on its side.
+      const p = down ? Math.min((ct - crash.t0) / crash.fallS, 1) : 0;
+      body.current.rotation.set(-lean + p * 2.6, -headingRad, p * 1.4, "YXZ");
     }
-    const airborne = lerpAt(d.series.up, i, f) > 0.5; // recorded height above the pad
+    const airborne = !down && lerpAt(d.series.up, i, f) > 0.5; // recorded height above the pad
     if (!reducedMotion) {
-      for (const [k, r] of rotors.current.entries()) if (r) r.rotation.y += (k % 2 ? 1 : -1) * delta * (airborne ? 60 : 8);
+      if (!down) for (const [k, r] of rotors.current.entries()) if (r) r.rotation.y += (k % 2 ? 1 : -1) * delta * (airborne ? 60 : 8);
     }
     // Terrain under the drone, in the hub-relative coordinates of the map.
     const gnd = useStore.getState().ground;

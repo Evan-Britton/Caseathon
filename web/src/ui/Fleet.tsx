@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { lerpAt, sampleAt } from "../data";
-import { FLEET, VERDICT_TEXT, callLabel, droneView, pathTime } from "../fleet";
+import { FLEET, VERDICT_TEXT, callLabel, crashAt, droneView, pathTime } from "../fleet";
 import type { DroneView, LoadedDrone } from "../fleet";
 import { fleetEnd, fleetStatus, useFleet } from "../fleetStore";
 import { useStore } from "../store";
@@ -85,7 +85,15 @@ export function Fleet() {
           {source && <>Data: {source.authors}, {source.license}</>}
           {mapCredits && <> · {mapCredits}</>}
           <br />
-          Routes, destinations and the levelled hub are illustrative; speed, altitude, power and energy are from the real flights.
+          Routes, destinations and the levelled hub are illustrative; speed, altitude, power and energy are from the flights.
+          {s.synth && (
+            <>
+              <br />
+              <strong className="syn-note">Synthetic:</strong> drones 1, 3 and 5 fly real CMU flights re-run at 1.0–1.2 kg, with power scaled by a
+              rule fitted on the real 0–500 g flights (checked on the real 750 g flight: {fmtPct(s.synth.scaling.check.energyErrPct.min)} to{" "}
+              {fmtPct(s.synth.scaling.check.energyErrPct.max)} energy).
+            </>
+          )}
         </p>
       </div>
 
@@ -104,7 +112,7 @@ function openInReplay(d: LoadedDrone) {
   const f = useFleet.getState();
   const st = useStore.getState();
   st.setLab({ on: true, condition: f.condition, fix: f.fix });
-  st.setBudget(d.slot.budgetWh);
+  st.setBudget(d.budgetWh);
   void st.selectFlight(d.slot.flight).then(() => useStore.getState().seek(f.t));
   f.closeConsole();
 }
@@ -114,7 +122,7 @@ function OpsBar({ views }: { views: DroneView[] }) {
   const end = s.loaded ? fleetEnd(s.loaded) : 0;
   const decisions = s.log.filter((l) => l.kind === "decision");
   const alerts = views.filter((v) => v.needsDecision).length;
-  const short = views.filter((v) => v.verdict === "landed-empty" || v.verdict === "ran-short" || v.verdict === "no-decision-short").length;
+  const crashed = views.filter((v) => v.crashed).length;
 
   return (
     <header className="ops-bar">
@@ -126,7 +134,7 @@ function OpsBar({ views }: { views: DroneView[] }) {
         </div>
         <span
           className="sim-tag"
-          title="Five real CMU flights, flown on different days from the same launch site near Pittsburgh, replayed together. The data has one aircraft, so the fleet is staged. Cargo, destinations and the out-and-back routes are illustrative; the recorded flights are all one triangle."
+          title="Five flights replayed together from the same launch site near Pittsburgh. Drones 2 and 4 are real CMU flights; drones 1, 3 and 5 are SYNTHETIC heavy-payload versions of real flights. The data has one aircraft, so the fleet is staged. Cargo, destinations and the out-and-back routes are illustrative; the recorded flights are all one triangle."
         >
           Simulated fleet
         </span>
@@ -135,7 +143,7 @@ function OpsBar({ views }: { views: DroneView[] }) {
       <dl className="ops-stats">
         <div className={alerts ? "alert" : ""}><dt>Alerts</dt><dd className="num">{alerts}</dd></div>
         <div><dt>Your decisions</dt><dd className="num">{decisions.length}</dd></div>
-        <div className={short ? "alert" : ""}><dt>Out of battery</dt><dd className="num">{short}</dd></div>
+        <div className={crashed ? "alert" : ""}><dt>Crashed</dt><dd className="num">{crashed}</dd></div>
       </dl>
 
       <div className="ops-clock">
@@ -193,7 +201,8 @@ function Scenario() {
             <i aria-hidden />
             Hold for decisions
           </button>
-          {sel && <button className="link-btn" onClick={() => openInReplay(sel)}>Open {sel.slot.callsign} in the replay</button>}
+          {/* Synthetic flights aren't in the replay's flight list. */}
+          {sel && !sel.synthetic && <button className="link-btn" onClick={() => openInReplay(sel)}>Open {sel.slot.callsign} in the replay</button>}
         </div>
       </details>
     </Panel>
@@ -212,9 +221,13 @@ function Queue({ loaded, views }: { loaded: LoadedDrone[]; views: DroneView[] })
           <article key={d.slot.flight} className={`q-item tone-${v.tone}`} onClick={() => s.select(d.slot.flight)}>
             <div className="q-head">
               <strong>{d.slot.callsign} · {d.slot.cargo}</strong>
-              <span>{callLabel(v.call.type)}</span>
+              <span>{v.guarded ? "Outside training data" : callLabel(v.call.type)}</span>
             </div>
-            {e && <p>Needs {fmtNum(e.need50)}–{fmtNum(e.need90)} Wh, battery {fmtNum(v.budget)} Wh.</p>}
+            {v.guarded ? (
+              <p>{fmtMass(d.meta.payload)} package; the model was trained on packages up to {fmtMass(d.trainedMaxG[`${s.condition}/on`])}.</p>
+            ) : (
+              e && <p>Needs {fmtNum(e.need50)}–{fmtNum(e.need90)} Wh, battery {fmtNum(v.budget)} Wh.</p>
+            )}
             <div className="q-actions">
               <button className="btn btn-stop" onClick={(ev) => { ev.stopPropagation(); s.act(d.slot.flight, "return"); }}>Return now</button>
               <button className="btn" onClick={(ev) => { ev.stopPropagation(); s.act(d.slot.flight, "continue"); }}>Continue anyway</button>
@@ -239,12 +252,27 @@ function Detail({ d, v }: { d: LoadedDrone; v: DroneView }) {
 
   return (
     <Panel title={`${d.slot.callsign}: ${d.slot.cargo}`} tag={`${fmtNum(v.budget)} Wh pack`}>
-      <p className="fc-sub">To {d.slot.destination}, {fmtNum(d.oneWayM / 1000, 2)} km out from the hub</p>
+      <p className="fc-sub">
+        To {d.slot.destination}, {fmtNum(d.oneWayM / 1000, 2)} km out from the hub · {fmtMass(d.meta.payload)} package
+      </p>
+      {d.synthetic && (
+        <p className="syn-box">
+          <span className="sim-tag">Synthetic</span> Real flight {d.synthetic.basedOn} ({fmtMass(d.synthetic.sourcePayloadG)}) re-run at{" "}
+          {fmtMass(d.meta.payload)}: battery current ×{fmtNum(d.synthetic.currentFactor, 2)} while the motors run. Route, speed, altitude and
+          wind are as recorded.
+        </p>
+      )}
       <div className={`fd-rec tone-${live === "return" ? "stop" : live === "review" ? "warn" : live === "continue" ? "go" : "idle"}`}>
         <span className="fd-rec-label" title={preflight ? "The forecast made as the drone lifts off, 5 s after the rotors start" : undefined}>
           {preflight ? "Launch check" : "System recommends"}
         </span>
-        <strong>{preflight ? v.status : live ? callLabel(live) : "Waiting for takeoff"}</strong>
+        <strong>{v.guarded && !decision ? "Hold: outside training data" : preflight ? v.status : live ? callLabel(live) : "Waiting for takeoff"}</strong>
+        {v.guarded && !decision && (
+          <p>
+            Range guard: this {fmtMass(d.meta.payload)} package is heavier than anything in the training data (up to{" "}
+            {fmtMass(d.trainedMaxG[`${s.condition}/on`])}), so the forecast below can't be trusted. A person decides.
+          </p>
+        )}
         {e && (
           <p>
             Forecast {fmtNum(e.need50)}–{fmtNum(e.need90)} Wh against {fmtNum(v.budget)} Wh
@@ -336,9 +364,14 @@ function DronePanel({ d, v, index, selected, onSelect }: { d: LoadedDrone; v: Dr
         <strong>{index + 1} · {d.slot.cargo}</strong>
         <span className="dp-status">{v.status}</span>
       </div>
-      <p className="dp-dest">to {d.slot.destination}</p>
+      <p className="dp-dest">
+        to {d.slot.destination} · {fmtMass(d.meta.payload)}
+        {d.synthetic && <span className="sim-tag dp-syn" title={`Synthetic: real flight ${d.synthetic.basedOn} re-run at a heavier payload`}>Synthetic</span>}
+      </p>
       <p className="dp-line num">
-        {started
+        {v.crashed
+          ? crashLine(series, pathTime(crashAt(d, decision) ?? 0, decision))
+          : started
           ? `${fmtNum(Math.max(at(series.up), 0), 0)} m · ${fmtNum(at(series.groundSpeed), 1)} m/s · ${fmtNum(at(series.voltage), 1)} V · ${fmtNum(Math.max(at(series.power), 0), 0)} W`
           : `Launch check: needs ${fmtNum(v.launch.est.need50)}–${fmtNum(v.launch.est.need90)} Wh`}
       </p>
@@ -355,6 +388,24 @@ function DronePanel({ d, v, index, selected, onSelect }: { d: LoadedDrone; v: Dr
       {v.verdict && <p className={`fc-verdict ${VERDICT_TEXT[v.verdict].good ? "good" : "bad"}`}>{VERDICT_TEXT[v.verdict].label}</p>}
     </button>
   );
+}
+
+/** A payload in grams, as "250 g" or "1.2 kg". */
+function fmtMass(g: number): string {
+  return g >= 1000 ? `${fmtNum(g / 1000, 1)} kg` : `${fmtNum(g, 0)} g`;
+}
+
+function fmtPct(v: number): string {
+  return `${v >= 0 ? "+" : ""}${fmtNum(v, 0)}%`;
+}
+
+/** Where a drone went down: its distance from the hub and height when the pack ran dry. */
+function crashLine(series: LoadedDrone["series"], emptyAt: number): string {
+  const { i, f } = sampleAt(series.t, emptyAt);
+  const km = Math.hypot(lerpAt(series.east, i, f), lerpAt(series.north, i, f)) / 1000;
+  const up = fmtNum(lerpAt(series.up, i, f), 0);
+  // The recorded flights end with a vertical descent over the pad, which is where a short pack usually gives out.
+  return km < 0.05 ? `Ran dry ${up} m above its pad on the final descent` : `Went down ${fmtNum(km, 2)} km from the hub, ${up} m up`;
 }
 
 const CW = 340;

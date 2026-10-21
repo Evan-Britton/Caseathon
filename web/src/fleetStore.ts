@@ -1,9 +1,10 @@
 import { create } from "zustand";
+import { loadSynthetic } from "./data";
 import { FLEET, droneView, loadFleet } from "./fleet";
 import type { Decision, LoadedDrone, OperatorAction } from "./fleet";
 import type { CallType } from "./mission";
 import { useStore } from "./store";
-import type { ScenarioCondition } from "./types";
+import type { ScenarioCondition, SyntheticIndex } from "./types";
 
 /** One line of the operator's decision log. */
 export interface LogEntry {
@@ -22,6 +23,8 @@ export interface LogEntry {
 interface FleetState {
   open: boolean;
   loaded: LoadedDrone[] | null;
+  /** How the SYNTHETIC heavy-payload flights were made, for the console's labels. */
+  synth: SyntheticIndex | null;
   error: string | null;
   condition: ScenarioCondition;
   fix: boolean;
@@ -67,6 +70,7 @@ export function fleetEnd(loaded: LoadedDrone[]): number {
 export const useFleet = create<FleetState>((set, get) => ({
   open: false,
   loaded: null,
+  synth: null,
   error: null,
   condition: "combined",
   fix: false,
@@ -84,7 +88,8 @@ export const useFleet = create<FleetState>((set, get) => ({
       return;
     }
     try {
-      set({ loaded: await loadFleet(index.flights, scenarioIndex.flightWindow), error: null });
+      const synth = await loadSynthetic();
+      set({ loaded: await loadFleet(index.flights, scenarioIndex.flightWindow, synth), synth, error: null });
     } catch (e) {
       set({ error: (e as Error).message });
     }

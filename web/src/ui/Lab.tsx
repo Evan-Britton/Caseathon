@@ -104,6 +104,7 @@ export function ScenarioControls({
   onCondition,
   onFix,
   rowClass,
+  fixLabel = "audit + trusted calibration",
 }: {
   idx: ScenarioIndex;
   condition: ScenarioCondition;
@@ -111,6 +112,8 @@ export function ScenarioControls({
   onCondition: (c: ScenarioCondition) => void;
   onFix: (fix: boolean) => void;
   rowClass: string;
+  /** What the fix does here, after "On: ". */
+  fixLabel?: string;
 }) {
   return (
     <>
@@ -136,7 +139,7 @@ export function ScenarioControls({
         <span className="lab-label">Countermeasure</span>
         <button className={`switch ${fix ? "on" : ""}`} role="switch" aria-checked={fix} onClick={() => onFix(!fix)}>
           <i aria-hidden />
-          {fix ? "On: audit + trusted calibration" : "Off"}
+          {fix ? `On: ${fixLabel}` : "Off"}
         </button>
       </div>
     </>

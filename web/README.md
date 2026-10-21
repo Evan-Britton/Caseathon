@@ -116,6 +116,18 @@ npm run scenarios
 
 This runs `scripts/export_web_scenarios.py`. It retrains the hybrid model at each simulated window for each condition, exactly as `scripts/run_countermeasure.py` does with seed 0, and reads the chart values from `results/countermeasure/metrics.json` (5-seed means).
 
+### Synthetic heavy-payload flights (operator console)
+
+The CMU packages top out at 500 g (one flight at 750 g). To show what happens when operations move to heavier packages than the model has seen, drones 1, 3 and 5 in the operator console fly **SYNTHETIC** flights: real window-7 flights (97, 184, 126) re-run at 1.0–1.2 kg, which is within the Matrice 100's 3.6 kg take-off limit. While the motors run, the battery current is multiplied by `((2355 + new payload) / (2355 + recorded payload)) ^ b`. The exponent `b` (about 0.95) is fitted on the real 0–500 g flights, comparing flights flown at the same speed, altitude and route, and is checked on the real 750 g flight, which the fit never saw: scaled flights land within +1% to +10% of its energy. Route, speed, altitude, wind and timing stay as recorded. Each flight's battery comes from a stated rule on the launch forecasts, recorded in the output. The console labels these drones as synthetic everywhere they appear.
+
+`public/data/synthetic.json` describes each flight, the scaling fit and its check. The flights' series, forecasts and scenario runs sit next to the real ones under ids 1001–1003. To rebuild them (about 25 s), run:
+
+```bash
+npm run synthetic
+```
+
+The console's countermeasure adds a **range guard**: any payload heavier than the heaviest one in the fixed model's training data is held for a person to decide. The Results tab experiments don't include the guard.
+
 ### Results scorecard
 
 `public/data/results.json` holds the headline numbers for the Results tab, copied (not recomputed) from `results/baseline/metrics.json` and `results/countermeasure/metrics.json`. After rerunning those experiments, refresh it with:
