@@ -3,10 +3,12 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Color, Group, Mesh, MeshBasicMaterial, PerspectiveCamera, RingGeometry, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { lerpAt, sampleAt } from "../data";
+import { followTerrain } from "../fleetRoutes";
 import { pathTime } from "../fleet";
 import type { LoadedDrone } from "../fleet";
 import { fleetStatus, fleetTime, useFleet } from "../fleetStore";
 import { useStore } from "../store";
+import type { FlightSeries } from "../types";
 import { DRONE_SCALE, dronePose } from "./Drone";
 import { FlightPath } from "./FlightPath";
 import { drape } from "./drape";
@@ -53,6 +55,11 @@ export function FleetScene({ loaded }: { loaded: LoadedDrone[] }) {
   const ground = useStore((s) => s.ground);
   const follow = useFleet((s) => s.follow);
   const selected = useFleet((s) => s.selected);
+  // The routes cross hills the recorded heights never saw, so draw each flight terrain-following.
+  const drawn = useMemo(
+    () => loaded.map((d, i) => (ground ? followTerrain(d.series, ground, offsets[i].x, offsets[i].z) : d.series)),
+    [loaded, ground, offsets],
+  );
   return (
     <>
       {loaded.map((d, i) => (
@@ -64,8 +71,8 @@ export function FleetScene({ loaded }: { loaded: LoadedDrone[] }) {
       <RouteLabels loaded={loaded} offsets={offsets} />
       {loaded.map((d, i) => (
         <group key={d.slot.flight} position={[offsets[i].x, 0, offsets[i].z]}>
-          <FlightPath series={d.series} ground={ground} getTime={() => droneTime(d)} fade={follow && selected !== d.slot.flight} />
-          <FleetDrone d={d} index={i} offset={offsets[i]} />
+          <FlightPath series={drawn[i]} ground={ground} getTime={() => droneTime(d)} fade={follow && selected !== d.slot.flight} />
+          <FleetDrone d={d} series={drawn[i]} index={i} offset={offsets[i]} />
         </group>
       ))}
       <FleetCamera loaded={loaded} offsets={offsets} />
@@ -92,8 +99,8 @@ function RouteLabels({ loaded, offsets }: { loaded: LoadedDrone[]; offsets: { x:
   return null;
 }
 
-function FleetDrone({ d, index, offset }: { d: LoadedDrone; index: number; offset: { x: number; z: number } }) {
-  const { series, meta } = d;
+function FleetDrone({ d, series, index, offset }: { d: LoadedDrone; series: FlightSeries; index: number; offset: { x: number; z: number } }) {
+  const { meta } = d;
   const group = useRef<Group>(null);
   const body = useRef<Group>(null);
   const rotors = useRef<(Mesh | null)[]>([]);

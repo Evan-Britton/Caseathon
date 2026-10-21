@@ -71,3 +71,53 @@ export function reroute(series: FlightSeries, bearingDeg: number): Rerouted {
     oneWayM: scale,
   };
 }
+
+/** Safe height above the ground the drones keep once they are well clear of the launch pad, metres. */
+export const CLEARANCE_M = 18;
+
+/**
+ * Terrain-following: the recorded heights are above the launch pad, but the redrawn routes cross
+ * hills. Where the ground would rise to meet a drone, lift it so it keeps CLEARANCE_M above the ground.
+ * The lift looks ahead and behind and is smoothed, so the drone climbs over a ridge instead of
+ * snapping up. This changes the 3D drawing only: recorded altitude, power and energy are untouched.
+ *
+ * `ground(x, z)` is the terrain height above the launch point at three.js x (east) and z (south);
+ * (ox, oz) is this flight's launch point in the same frame.
+ */
+export function followTerrain(
+  series: FlightSeries,
+  ground: (x: number, z: number) => number,
+  ox: number,
+  oz: number,
+): FlightSeries {
+  const n = series.t.length;
+  const smooth = (x: number) => x * x * (3 - 2 * x);
+  const raw = new Array<number>(n).fill(0);
+  for (let i = 0; i < n; i++) {
+    const up = series.up[i];
+    // Clearance fades in as the drone leaves the pad, so it doesn't float up off the ground at takeoff.
+    const want = CLEARANCE_M * smooth(Math.min(Math.max((up - 2) / 10, 0), 1));
+    raw[i] = Math.max(0, ground(series.east[i] + ox, -series.north[i] + oz) + want - up);
+  }
+  const dt = (series.t[n - 1] - series.t[0]) / Math.max(n - 1, 1);
+  const w = Math.max(2, Math.round(6 / dt)); // look 6 s ahead and behind
+  const h = Math.max(1, Math.round(w / 2));
+  // Running maximum, then a moving average over half that window: the average never drops below
+  // the terrain beneath the drone, because every point in it is the maximum of a window covering it.
+  const mx = new Array<number>(n);
+  for (let i = 0; i < n; i++) {
+    let m = 0;
+    for (let j = Math.max(0, i - w); j <= Math.min(n - 1, i + w); j++) m = Math.max(m, raw[j]);
+    mx[i] = m;
+  }
+  const up = series.up.map((u, i) => {
+    let sum = 0;
+    let cnt = 0;
+    for (let j = Math.max(0, i - h); j <= Math.min(n - 1, i + h); j++) {
+      sum += mx[j];
+      cnt++;
+    }
+    return +(u + sum / cnt).toFixed(2);
+  });
+  return { ...series, up };
+}
