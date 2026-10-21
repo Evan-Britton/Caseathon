@@ -10,7 +10,6 @@ import { FleetTags } from "./ui/FleetTags";
 import { Lab } from "./ui/Lab";
 import { Mission } from "./ui/Mission";
 import { Results } from "./ui/Results";
-import { RouteMap } from "./ui/RouteMap";
 import { Telemetry } from "./ui/Telemetry";
 import { TopBar } from "./ui/TopBar";
 import { fmtNum } from "./ui/format";
@@ -52,7 +51,6 @@ export default function App() {
       <Fleet />
       <section className="flight-panel glass" aria-label="Flight">
         <Telemetry />
-        <RouteMap />
       </section>
       <Dock />
       <Attribution />

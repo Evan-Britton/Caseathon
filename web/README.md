@@ -19,7 +19,7 @@ Built with React 19, three.js (via React Three Fiber) and Vite. It deploys to Cl
   - a **battery slider** (the usable energy for this mission, remembered between visits);
   - a hindsight line comparing the call with what the flight really used.
 
-  The timeline shades the decision window and flags the call, the route map marks halfway and where the call was made, and the drone's reticle and ground ring turn amber or red. Hover tests have no route, so they show "Not rated". Simulated flight 900 uses its own depleted pack (11.8 Wh) instead of the slider.
+  The timeline shades the decision window and flags the call, and the drone's reticle and ground ring turn amber or red. Hover tests have no route, so they show "Not rated". Simulated flight 900 uses its own depleted pack (11.8 Wh) instead of the slider.
 - **Poisoning lab (simulated).** Replays the same flight with the model each training-data condition would have produced, from the simulated timeline in `results/countermeasure` (seed 0). Every element is labelled SIMULATED.
   - **Training data:**
     - Clean.
@@ -31,7 +31,7 @@ Built with React 19, three.js (via React Three Fiber) and Vite. It deploys to Cl
   - **Two charts by window:** forecast error and how often the P90 really holds, for clean, poisoned and fixed.
   - **Demo buttons:** jump to flights where poisoning flips the call. In the top case, flight 268 with a 28.5 Wh battery, the poisoned model says continue while the flight really comes up 0.15 Wh short; the clean and fixed models both say it's too close to call.
 
-  While the lab is open, the mission check, timeline, route map and reticle all use the lab's forecast. The forecast chart adds an "actual" line, so you can see the P90 band falling below what the flight really used. Window 0 flights have no scenario (nothing earlier to train on), and the lab says so.
+  While the lab is open, the mission check, timeline and reticle all use the lab's forecast. The forecast chart adds an "actual" line, so you can see the P90 band falling below what the flight really used. Window 0 flights have no scenario (nothing earlier to train on), and the lab says so.
 - **Results tab.** The left column switches between the mission check and a results scorecard. Each block is tagged with the case-prompt requirement it answers (R2–R7, with the requirement's name on hover):
   - clean baseline accuracy;
   - the four data conditions without and with the fix (error, how often the safety margin held, unsafe continue calls);
@@ -40,7 +40,7 @@ Built with React 19, three.js (via React Three Fiber) and Vite. It deploys to Cl
   - unseen-defect tests, the main limit, and the cost.
 
   Opening the poisoning lab switches back to the mission check.
-- **Flight panel (right).** Live telemetry at the top: altitude above launch, ground speed, airflow from the onboard anemometer, battery voltage, current, power, and energy used so far. Below it, the route: the flight's plan in a compact grid (cruise speed, payload, altitude, duration, total energy, date flown), a top-down map (north up) with a scale bar, and an altitude profile.
+- **Flight panel (right).** Live telemetry: altitude above launch, ground speed, airflow from the onboard anemometer, battery voltage, current, power, and energy used so far.
 - **Playback.** Play/pause, a power-draw scrubber, speed (1–16×), a map layer (Grid or Terrain) and three camera modes: Orbit, Chase and Top. It opens in Chase at 8×. In Chase, drag to swing around the drone, scroll to zoom and double-click to go back behind it; the camera stays locked on the drone.
 - **Simulated flight 900.** A labelled battery-failure scenario, built by `scripts/make_sim_failure.py` from flight 142's real path. It is not CMU data: the picker, a banner, the telemetry chip and the 3D reticle all mark it, and the rotors stop when power is lost.
 
@@ -168,6 +168,6 @@ Graphite panels with an ultraviolet accent, after a tactical drone-ops dashboard
 |---|---|
 | `src/store.ts` | App state (Zustand) and the playback clock. Time lives outside React so the 3D scene can advance every frame without re-rendering. |
 | `src/data.ts` | Fetching, caching and time interpolation helpers. |
-| `src/mission.ts` | The mission check: on track / turn back / too close, the halfway deadline, and the hindsight outcome. Pure functions shared by the panel, the timeline, the route map and the 3D reticle. |
+| `src/mission.ts` | The mission check: on track / turn back / too close, the halfway deadline, and the hindsight outcome. Pure functions shared by the panel, the timeline and the 3D reticle. |
 | `src/scene/` | `Scene` (lights, ground, camera modes), `Terrain` (elevation tiles to topo mesh and shader, with narrow pits filled), `Stars`, `FlightPath` (ribbon and curtain), `Drone` (model and reticle), `palette` (colours shared with CSS). |
-| `src/ui/` | `TopBar`, `Mission` (mission check panel), `Lab` (poisoning lab), `useMission` (shared hook), `RouteMap`, `Telemetry`, `Dock` (playback). |
+| `src/ui/` | `TopBar`, `Mission` (mission check panel), `Lab` (poisoning lab), `useMission` (shared hook), `Telemetry`, `Dock` (playback). |

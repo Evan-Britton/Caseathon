@@ -177,7 +177,6 @@ As any flight plays, the app decides in real time whether the drone will make it
 
 **Everywhere else:**
 - The timeline shades the decision window and flags the call.
-- The route map marks halfway (½) and where the call was made.
 - The drone's reticle and ground ring turn amber or red.
 - Hover tests show "Not rated", since they have no route.
 

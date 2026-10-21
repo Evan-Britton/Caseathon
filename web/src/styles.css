@@ -130,25 +130,13 @@ select {
   pointer-events: auto;
 }
 
-/* Live telemetry and the route in one panel on the right; it stops above the dock and scrolls if short. */
+/* Live telemetry in a panel on the right. */
 .flight-panel {
   position: absolute;
   top: var(--gap);
   right: var(--gap);
   width: 300px;
-  max-height: calc(100% - var(--gap) * 3 - 80px);
-  overflow-y: auto;
-  scrollbar-width: none;
   z-index: 20;
-}
-
-.flight-panel::-webkit-scrollbar {
-  display: none;
-}
-
-.flight-route {
-  margin-top: 2px;
-  border-top: 1px solid var(--edge);
 }
 
 /* Mission check above the results scorecard; the column scrolls if the window is too short for both. */
@@ -310,70 +298,10 @@ select {
   font-size: 12px;
 }
 
-.panel-head.sub {
-  padding-top: 6px;
-  padding-bottom: 2px;
-}
-
 .panel-head h3 {
   font-size: 12px;
   font-weight: 500;
   color: var(--muted);
-}
-
-.panel-head.sub .num {
-  font-family: var(--num);
-  font-weight: 600;
-}
-
-/* route map */
-
-.map {
-  display: block;
-  width: calc(100% - 24px);
-  margin: 0 12px;
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.22);
-}
-
-.map-launch {
-  fill: none;
-  stroke: var(--warn);
-  stroke-width: 2;
-}
-
-.map-drone {
-  fill: var(--text);
-}
-
-.map-drone-halo {
-  fill: rgba(var(--accent-rgb), 0.22);
-  stroke: var(--accent);
-  stroke-width: 1;
-}
-
-.map-north path {
-  fill: var(--muted);
-}
-
-.map-north text,
-.map-scale text {
-  fill: var(--muted);
-  font-size: 10px;
-  font-family: var(--body);
-}
-
-.map-scale path {
-  fill: none;
-  stroke: var(--muted);
-  stroke-width: 1.2;
-}
-
-.profile {
-  display: block;
-  width: calc(100% - 24px);
-  height: 54px;
-  margin: 4px 12px 14px;
 }
 
 .playhead {
@@ -741,7 +669,7 @@ select {
   color: var(--muted);
 }
 
-/* mission markers on the scrubber and route map */
+/* mission markers on the scrubber */
 
 .scrub-window {
   fill: rgba(var(--accent-rgb), 0.1);
@@ -753,24 +681,6 @@ select {
 }
 
 .scrub-call {
-  stroke: rgba(14, 13, 19, 0.9);
-  stroke-width: 1.5;
-}
-
-.map-half {
-  fill: rgba(14, 13, 19, 0.85);
-  stroke: var(--accent);
-  stroke-width: 1.5;
-}
-
-.map-half-text {
-  fill: var(--accent);
-  font-size: 8px;
-  font-weight: 700;
-  font-family: var(--body);
-}
-
-.map-call {
   stroke: rgba(14, 13, 19, 0.9);
   stroke-width: 1.5;
 }
@@ -1218,15 +1128,6 @@ select {
   letter-spacing: 0.12em;
 }
 
-/* Section headings inside a combined panel read like small panel titles. */
-.flight-route > .panel-head h3 {
-  font-family: var(--display);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text);
-}
 
 /* ---------- results scorecard ---------- */
 
@@ -1602,8 +1503,6 @@ select {
 }
 
 /* inset surfaces inside panels */
-.map,
-.profile,
 .fchart svg {
   border: 1px solid var(--inset-edge);
 }
@@ -1639,49 +1538,6 @@ select {
 
 .rate select {
   background: var(--inset);
-}
-
-/* flight specs at the top of the route panel */
-.specs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  margin: 0 12px 10px;
-}
-
-.specs > div {
-  min-width: 0;
-  padding: 6px 8px 5px;
-  border-radius: 10px;
-  background: var(--inset);
-  border: 1px solid var(--inset-edge);
-}
-
-.specs dt {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--display);
-  font-size: 8.5px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.specs dt .icon {
-  width: 11px;
-  height: 11px;
-  color: var(--accent);
-}
-
-.specs dd {
-  margin-top: 1px;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* ---------- poisoning lab (simulated scenarios) ---------- */
@@ -2265,7 +2121,6 @@ select {
 
   .flight-panel {
     order: 6;
-    max-height: none;
   }
 
   .attribution {
