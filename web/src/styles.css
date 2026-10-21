@@ -2306,3 +2306,788 @@ select {
     transition: none;
   }
 }
+
+/* ---- Operator console: one operator, five drones (SIMULATED fleet) ---- */
+.ops {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  grid-template-rows: 54px minmax(0, 1fr) 112px;
+  grid-template-areas: "bar bar" "map side" "strip strip";
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  pointer-events: none;
+}
+
+.ops > * {
+  pointer-events: auto;
+}
+
+.ops-bar,
+.ops-side,
+.ops-strip {
+  background: rgba(10, 10, 14, 0.94);
+  backdrop-filter: blur(10px);
+}
+
+.ops-map {
+  grid-area: map;
+  position: relative;
+  pointer-events: none;
+  background: none;
+}
+
+.ops-credit {
+  position: absolute;
+  left: 12px;
+  bottom: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  text-shadow: 0 0 6px #000;
+}
+
+/* Status bar */
+.ops-bar {
+  grid-area: bar;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 0 14px;
+  min-width: 0;
+}
+
+.ops-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ops-brand > div {
+  display: grid;
+  line-height: 1.15;
+}
+
+.ops-brand strong {
+  font-family: var(--display);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ops-brand span:not(.sim-tag) {
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.lamp {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #4a4960;
+  flex: none;
+}
+
+.lamp.on {
+  background: var(--go);
+  box-shadow: 0 0 8px var(--go);
+}
+
+.ops-stats {
+  display: flex;
+  gap: 8px;
+  margin: 0 auto;
+}
+
+.ops-stats > div {
+  min-width: 82px;
+  padding: 4px 11px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--inset-edge);
+}
+
+.ops-stats dt {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ops-stats dd {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.ops-stats .alert {
+  border-color: rgba(255, 79, 94, 0.55);
+}
+
+.ops-stats .alert dd {
+  color: var(--stop);
+}
+
+.ops-clock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ops-time {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+
+.ops-time small {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* Right column */
+.ops-side {
+  grid-area: side;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.ops-panel {
+  padding: 11px 14px 12px;
+  border-bottom: 1px solid var(--edge);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ops-panel > h3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.ops-panel > h3 em {
+  font-style: normal;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.ops-panel.alerting {
+  background: rgba(255, 184, 77, 0.06);
+  box-shadow: inset 3px 0 0 var(--warn);
+}
+
+.ops-panel.alerting > h3 em {
+  background: rgba(255, 184, 77, 0.2);
+  color: var(--warn);
+}
+
+.ops-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.ops-row .lab-label {
+  min-width: 96px;
+}
+
+.ops-empty {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.q-item {
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: 1px solid var(--inset-edge);
+  background: var(--inset);
+  display: grid;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.q-item.tone-warn {
+  border-color: rgba(255, 184, 77, 0.6);
+}
+
+.q-item.tone-stop {
+  border-color: rgba(255, 79, 94, 0.6);
+}
+
+.q-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.q-head span {
+  font-weight: 600;
+}
+
+.q-item.tone-warn .q-head span {
+  color: var(--warn);
+}
+
+.q-item.tone-stop .q-head span {
+  color: var(--stop);
+}
+
+.q-item p {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.q-actions,
+.fd-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Drone panels along the bottom */
+.ops-strip {
+  grid-area: strip;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.ops-strip > .stage-msg,
+.ops-strip > .lab-note {
+  grid-column: 1 / -1;
+  align-self: center;
+  justify-self: center;
+}
+
+.dp {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 11px 13px;
+  border: 0;
+  background: rgba(10, 10, 14, 0.94);
+  cursor: pointer;
+  position: relative;
+  min-width: 0;
+}
+
+.dp:hover {
+  background: rgba(24, 24, 31, 0.96);
+}
+
+.dp.selected {
+  background: rgba(154, 140, 255, 0.1);
+  box-shadow: inset 0 2px 0 var(--accent);
+}
+
+.dp.asking {
+  animation: ask-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes ask-pulse {
+  50% {
+    box-shadow: inset 0 0 0 2px rgba(255, 184, 77, 0.55);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dp.asking {
+    animation: none;
+    box-shadow: inset 0 0 0 2px rgba(255, 184, 77, 0.6);
+  }
+}
+
+.dp-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.dp-head strong {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dp-status {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.dp .lamp {
+  background: var(--muted);
+}
+
+.dp.tone-go .lamp {
+  background: var(--go);
+  box-shadow: 0 0 8px var(--go);
+}
+
+.dp.tone-warn .lamp {
+  background: var(--warn);
+  box-shadow: 0 0 8px var(--warn);
+}
+
+.dp.tone-stop .lamp {
+  background: var(--stop);
+  box-shadow: 0 0 8px var(--stop);
+}
+
+.dp.tone-go .dp-status {
+  color: var(--go);
+  background: rgba(62, 232, 168, 0.12);
+}
+
+.dp.tone-warn .dp-status {
+  color: var(--warn);
+  background: rgba(255, 184, 77, 0.14);
+}
+
+.dp.tone-stop .dp-status {
+  color: var(--stop);
+  background: rgba(255, 79, 94, 0.14);
+}
+
+.dp-tele {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.dp-tele dt {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dp-tele dd {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.dp-tele small {
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 400;
+}
+
+.dp-foot {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.dp-gauge {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: visible;
+}
+
+.dp-used,
+.dp-need {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.dp-used {
+  left: 0;
+  background: var(--accent);
+  border-radius: 4px 0 0 4px;
+}
+
+.dp-need {
+  background: repeating-linear-gradient(135deg, rgba(154, 140, 255, 0.5) 0 3px, rgba(154, 140, 255, 0.15) 3px 6px);
+  border-radius: 0 4px 4px 0;
+}
+
+.dp-budget {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--text);
+}
+
+.fc-route {
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.fc-route i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--go);
+}
+
+.fc-sub {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.fc-verdict,
+.fd-verdict {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fc-verdict.good,
+.fd-verdict.good {
+  color: var(--go);
+}
+
+.fc-verdict.bad,
+.fd-verdict.bad {
+  color: var(--stop);
+}
+
+/* Selected drone */
+.fd-rec {
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--inset-edge);
+  background: var(--inset);
+  display: grid;
+  gap: 2px;
+}
+
+.fd-rec strong {
+  font-family: var(--display);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.fd-rec.tone-go strong {
+  color: var(--go);
+}
+
+.fd-rec.tone-warn strong {
+  color: var(--warn);
+}
+
+.fd-rec.tone-stop strong {
+  color: var(--stop);
+}
+
+.fd-rec p,
+.fd-rec-label {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.fd-chart {
+  margin: 0;
+}
+
+.fd-chart figcaption {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.fd-chart svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+  background: var(--inset);
+}
+
+.ev-band {
+  fill: rgba(154, 140, 255, 0.22);
+  stroke: none;
+}
+
+.ev-p50 {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.4;
+}
+
+.ev-budget {
+  stroke: var(--text);
+  stroke-width: 1.2;
+  stroke-dasharray: 5 3;
+}
+
+.ev-deadline {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.ev-now {
+  stroke: var(--text);
+  stroke-width: 1.2;
+  opacity: 0.8;
+}
+
+.ev-actual {
+  stroke: var(--go);
+  stroke-width: 1.3;
+  stroke-dasharray: 1.5 3;
+}
+
+.fd-chose {
+  font-size: 13px;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.btn-stop {
+  border-color: transparent;
+  background: var(--stop);
+  color: #200509;
+}
+
+.btn-stop:hover:not(:disabled) {
+  background: #ff7480;
+}
+
+.ops .link-btn {
+  align-self: flex-start;
+}
+
+.link-btn:disabled {
+  color: var(--muted);
+  text-decoration: none;
+  cursor: default;
+}
+
+.decision-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 12.5px;
+  max-height: 150px;
+  overflow: auto;
+}
+
+.decision-log li {
+  display: flex;
+  gap: 10px;
+}
+
+.decision-log .num {
+  color: var(--muted);
+  min-width: 34px;
+}
+
+.fine {
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+@media (max-width: 1100px) {
+  .ops {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-rows: 54px minmax(0, 1fr) 118px;
+  }
+
+  .ops-stats > div:nth-child(n + 4) {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .ops {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 54px 200px minmax(0, 1fr) 118px;
+    grid-template-areas: "bar" "map" "side" "strip";
+  }
+
+  .ops-stats {
+    display: none;
+  }
+
+  .ops-strip {
+    overflow-x: auto;
+    grid-template-columns: repeat(5, 220px);
+  }
+}
+
+/* While the operator console is open, the 3D scene shows all five drones; hide the single-flight panels. */
+.fleet-on .topbar,
+.fleet-on .left-stack,
+.fleet-on .lab,
+.fleet-on .flight-panel,
+.fleet-on .caution,
+.fleet-on .caution-edge,
+.fleet-on .dock,
+.fleet-on .power-legend,
+.fleet-on .reticle-anchor,
+.fleet-on .attribution {
+  display: none;
+}
+
+.fleet-tags {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.fleet-tag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 3px 9px;
+  border-radius: 9px;
+  background: rgba(14, 13, 19, 0.78);
+  border: 1px solid var(--inset-edge);
+  font-size: 11.5px;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.fleet-tag span {
+  color: var(--muted);
+  font-size: 10.5px;
+}
+
+.fleet-tag.tone-go { border-color: rgba(62, 232, 168, 0.55); }
+.fleet-tag.tone-go span { color: var(--go); }
+.fleet-tag.tone-warn { border-color: rgba(255, 184, 77, 0.7); }
+.fleet-tag.tone-warn span { color: var(--warn); }
+.fleet-tag.tone-stop { border-color: rgba(255, 79, 94, 0.7); }
+.fleet-tag.tone-stop span { color: var(--stop); }
+
+/* Decluttered: secondary controls tuck away, and the drone strip stays slim. */
+.ops-more {
+  font-size: 12.5px;
+}
+
+.ops-more summary,
+.ops-log summary {
+  cursor: pointer;
+  color: var(--muted);
+  list-style: none;
+  user-select: none;
+}
+
+.ops-more summary::before,
+.ops-log summary::before {
+  content: "+ ";
+}
+
+.ops-more[open] summary::before,
+.ops-log[open] summary::before {
+  content: "– ";
+}
+
+.ops-more[open] {
+  display: grid;
+  gap: 8px;
+}
+
+.ops-log summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.ops-log summary em {
+  font-style: normal;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.ops-log .decision-log {
+  margin-top: 8px;
+}
+
+.dp {
+  gap: 6px;
+}
+
+.dp-line {
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dp-foot {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.fleet-tag.compact {
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.ops-cam {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  pointer-events: auto;
+  background: rgba(10, 10, 14, 0.85);
+}
+
+.ops-more > .fd-chart {
+  margin-top: 8px;
+}
+
+.seg button[aria-checked="true"]:not(.seg-clean):not(.seg-bad) {
+  background: rgba(154, 140, 255, 0.24);
+  color: var(--text);
+}

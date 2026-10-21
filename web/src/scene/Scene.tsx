@@ -3,11 +3,14 @@ import { useEffect, useMemo, useRef } from "react";
 import { CanvasTexture, GridHelper, PMREMGenerator, SRGBColorSpace, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { useFleet } from "../fleetStore";
 import { clock, useStore } from "../store";
 import type { CameraMode, FlightMeta, FlightSeries } from "../types";
 import { BODY_LIFT, Drone, dronePose } from "./Drone";
 import { Effects } from "./Effects";
+import { FleetScene } from "./FleetScene";
 import { FlightPath } from "./FlightPath";
+import { LaunchPad } from "./LaunchPad";
 import { SCENE } from "./palette";
 import { Stars } from "./Stars";
 import { Terrain } from "./Terrain";
@@ -18,7 +21,8 @@ export function Scene() {
   const camera = useStore((s) => s.camera);
   const basemap = useStore((s) => s.basemap);
   const ground = useStore((s) => s.ground);
-  const onMap = basemap !== "grid";
+  const fleet = useFleet((s) => (s.open ? s.loaded : null));
+  const onMap = basemap !== "grid" || !!fleet;
 
   return (
     <Canvas
@@ -36,11 +40,13 @@ export function Scene() {
       <Reflections />
       <Effects />
       <Ticker />
-      {basemap === "grid" && <Ground />}
-      <LaunchPad />
+      {((basemap === "grid" && !fleet) || (fleet && !ground)) && <Ground />}
+      {!fleet && <LaunchPad />}
       <Stars />
-      {meta && basemap === "terrain" && <Terrain meta={meta} />}
-      {series && meta && (
+      {fleet && <Terrain meta={fleet[0].meta} />}
+      {fleet && <FleetScene loaded={fleet} />}
+      {!fleet && meta && basemap === "terrain" && <Terrain meta={meta} />}
+      {!fleet && series && meta && (
         <>
           <FlightPath series={series} ground={ground} failureS={meta.simulated ? meta.failureS : undefined} />
           <Drone series={series} meta={meta} />
@@ -138,21 +144,6 @@ function Ground() {
       <primitive object={grids.cells} position={[0, 0.01, 0]} />
       <primitive object={grids.sections} position={[0, 0.02, 0]} />
     </>
-  );
-}
-
-function LaunchPad() {
-  return (
-    <group position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <mesh>
-        <ringGeometry args={[5, 5.6, 64]} />
-        <meshBasicMaterial color={SCENE.warn} />
-      </mesh>
-      <mesh>
-        <circleGeometry args={[1.2, 32]} />
-        <meshBasicMaterial color={SCENE.warn} />
-      </mesh>
-    </group>
   );
 }
 

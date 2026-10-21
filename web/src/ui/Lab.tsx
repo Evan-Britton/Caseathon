@@ -49,36 +49,14 @@ export function Lab() {
         </button>
       </div>
 
-      <div className="lab-row">
-        <span className="lab-label">Training data</span>
-        <div className="seg" role="radiogroup" aria-label="Training data condition">
-          {ORDER.map((c) => (
-            <button
-              key={c}
-              role="radio"
-              aria-checked={lab.condition === c}
-              className={c === "reference" ? "seg-clean" : "seg-bad"}
-              onClick={() => setLab({ condition: c })}
-              title={idx.conditions[c].desc}
-            >
-              {idx.conditions[c].label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="lab-row">
-        <span className="lab-label">Countermeasure</span>
-        <button
-          className={`switch ${lab.fix ? "on" : ""}`}
-          role="switch"
-          aria-checked={lab.fix}
-          onClick={() => setLab({ fix: !lab.fix })}
-        >
-          <i aria-hidden />
-          {lab.fix ? "On: audit + trusted calibration" : "Off"}
-        </button>
-      </div>
+      <ScenarioControls
+        idx={idx}
+        condition={lab.condition}
+        fix={lab.fix}
+        onCondition={(condition) => setLab({ condition })}
+        onFix={(fix) => setLab({ fix })}
+        rowClass="lab-row"
+      />
 
       <p className="lab-desc">{idx.conditions[lab.condition].desc}</p>
 
@@ -114,7 +92,67 @@ export function Lab() {
   );
 }
 
-function Health({ idx, health, window, fix }: { idx: ScenarioIndex; health: ScenarioHealth; window: number; fix: boolean }) {
+/** Training-data condition and countermeasure switch, shared by the lab and the operator console. */
+export function ScenarioControls({
+  idx,
+  condition,
+  fix,
+  onCondition,
+  onFix,
+  rowClass,
+}: {
+  idx: ScenarioIndex;
+  condition: ScenarioCondition;
+  fix: boolean;
+  onCondition: (c: ScenarioCondition) => void;
+  onFix: (fix: boolean) => void;
+  rowClass: string;
+}) {
+  return (
+    <>
+      <div className={rowClass}>
+        <span className="lab-label">Training data</span>
+        <div className="seg" role="radiogroup" aria-label="Training data condition">
+          {ORDER.map((c) => (
+            <button
+              key={c}
+              role="radio"
+              aria-checked={condition === c}
+              className={c === "reference" ? "seg-clean" : "seg-bad"}
+              onClick={() => onCondition(c)}
+              title={idx.conditions[c].desc}
+            >
+              {idx.conditions[c].label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className={rowClass}>
+        <span className="lab-label">Countermeasure</span>
+        <button className={`switch ${fix ? "on" : ""}`} role="switch" aria-checked={fix} onClick={() => onFix(!fix)}>
+          <i aria-hidden />
+          {fix ? "On: audit + trusted calibration" : "Off"}
+        </button>
+      </div>
+    </>
+  );
+}
+
+/** Data-health readout for one training window, shared by the lab and the operator console. */
+export function Health({
+  idx,
+  health,
+  window,
+  fix,
+  children,
+}: {
+  idx: ScenarioIndex;
+  health: ScenarioHealth;
+  window: number;
+  fix: boolean;
+  children?: React.ReactNode;
+}) {
   const stale = health.uploadAgeWindows > 1;
   const cheap = health.cheapFeedShare > 0;
   const statusText: Record<ScenarioHealth["status"], string> = {
@@ -161,6 +199,7 @@ function Health({ idx, health, window, fix }: { idx: ScenarioIndex; health: Scen
         </div>
       </dl>
       {findings.length > 0 && <p className="lab-findings">Fix: {findings.join(" · ")}.</p>}
+      {children}
     </div>
   );
 }

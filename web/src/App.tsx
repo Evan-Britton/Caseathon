@@ -1,9 +1,12 @@
 import { useEffect } from "react";
+import { useFleet } from "./fleetStore";
 import { powerRange } from "./scene/palette";
 import { reticle } from "./scene/Drone";
 import { Scene } from "./scene/Scene";
 import { useStore } from "./store";
 import { Dock } from "./ui/Dock";
+import { Fleet } from "./ui/Fleet";
+import { FleetTags } from "./ui/FleetTags";
 import { Lab } from "./ui/Lab";
 import { Mission } from "./ui/Mission";
 import { Results } from "./ui/Results";
@@ -27,8 +30,9 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [init]);
 
+  const fleetOpen = useFleet((s) => s.open);
   return (
-    <div className="hud">
+    <div className={`hud ${fleetOpen ? "fleet-on" : ""}`}>
       <main className="scene">
         <Scene />
         <div className="reticle-anchor" ref={(el) => void (reticle.el = el)} aria-hidden>
@@ -37,6 +41,7 @@ export default function App() {
             <span className="reticle-label" ref={(el) => void (reticle.label = el)} />
           </div>
         </div>
+        <FleetTags />
         <PowerLegend />
         <StageMessage />
         <Caution />
@@ -44,6 +49,7 @@ export default function App() {
       <TopBar />
       <LeftColumn />
       <Lab />
+      <Fleet />
       <section className="flight-panel glass" aria-label="Flight">
         <Telemetry />
         <RouteMap />

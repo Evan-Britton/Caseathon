@@ -22,7 +22,21 @@ const tmp = new Color();
  * trail right behind the drone. All grow with playback; the remaining route shows as a
  * faint dashed guide.
  */
-export function FlightPath({ series, ground, failureS }: { series: FlightSeries; ground: GroundSampler | null; failureS?: number }) {
+export function FlightPath({
+  series,
+  ground,
+  failureS,
+  getTime,
+  fade = false,
+}: {
+  series: FlightSeries;
+  ground: GroundSampler | null;
+  failureS?: number;
+  /** Playback time for this path; the single-flight clock if omitted. */
+  getTime?: () => number;
+  /** Draw the path faintly, so another one can stand out. */
+  fade?: boolean;
+}) {
   const { flown, guide, curtain } = useMemo(() => build(series, ground), [series, ground]);
   const trail = useMemo(makeTrail, []);
   const [lo, hi] = useMemo(() => powerRange(series.power, series.up), [series]);
@@ -45,20 +59,30 @@ export function FlightPath({ series, ground, failureS }: { series: FlightSeries;
     [trail],
   );
 
+  useEffect(() => {
+    for (const [line, full] of [[flown, 1], [guide, 0.3]] as const) {
+      line.material.transparent = true;
+      line.material.opacity = fade ? full * 0.15 : full;
+      line.material.needsUpdate = true;
+    }
+    trail.material.opacity = fade ? 0.15 : 1;
+  }, [flown, guide, trail, fade]);
+
   useFrame(() => {
-    const now = sampleAt(series.t, clock.time);
+    const time = getTime ? getTime() : clock.time;
+    const now = sampleAt(series.t, time);
     flown.geometry.instanceCount = now.i;
     curtain.setDrawRange(0, now.i * 6);
 
     // No trail once a simulated failure cuts the power: the smoke takes over.
-    trail.visible = lerpAt(series.up, now.i, now.f) > 0.5 && clock.time < (failureS ?? Infinity);
+    trail.visible = lerpAt(series.up, now.i, now.f) > 0.5 && time < (failureS ?? Infinity);
     if (!trail.visible) return;
     const pos = (trail.geometry.attributes.instanceStart as InterleavedBufferAttribute).data;
     const col = (trail.geometry.attributes.instanceColorStart as InterleavedBufferAttribute).data;
     const prev = [0, 0, 0, 0, 0, 0];
     for (let k = 0; k < TRAIL_N; k++) {
       const u = k / (TRAIL_N - 1); // 0 = tail, 1 = at the drone
-      const { i, f } = sampleAt(series.t, Math.max(clock.time - TRAIL_S * (1 - u), 0));
+      const { i, f } = sampleAt(series.t, Math.max(time - TRAIL_S * (1 - u), 0));
       const [x, y, z] = toWorld(lerpAt(series.east, i, f), lerpAt(series.north, i, f), lerpAt(series.up, i, f));
       // Power colour rising out of black (invisible under additive blending), white-hot at the head.
       powerColor(lerpAt(series.power, i, f), lo, hi, tmp)
@@ -81,7 +105,7 @@ export function FlightPath({ series, ground, failureS }: { series: FlightSeries;
       <primitive object={trail} />
       <mesh geometry={curtain} renderOrder={-1}>
         {/* Additive glow reads well over the dark grid and the topo map */}
-        <meshBasicMaterial vertexColors transparent side={DoubleSide} depthWrite={false} blending={AdditiveBlending} />
+        <meshBasicMaterial vertexColors transparent opacity={fade ? 0.12 : 1} side={DoubleSide} depthWrite={false} blending={AdditiveBlending} />
       </mesh>
     </group>
   );
