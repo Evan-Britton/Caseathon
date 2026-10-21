@@ -26,9 +26,10 @@ export function Scene() {
 
   return (
     <Canvas
-      dpr={[1, 2]}
+      dpr={[1, MAX_DPR]}
       camera={{ fov: 42, near: 0.5, far: 6000, position: [260, 180, 260] }}
-      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+      // Post-processing draws the scene off-screen first, so the canvas's own antialiasing would only cost time.
+      gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
       aria-label="3D replay of the selected flight"
     >
       {/* Push the fog back over real maps so distant terrain stays readable */}
@@ -36,6 +37,7 @@ export function Scene() {
       <hemisphereLight args={["#b8b3d9", "#0e0d14", 1.1]} />
       <directionalLight position={[120, 300, 80]} intensity={1.6} />
       <directionalLight position={[-200, 80, -120]} intensity={0.5} color={SCENE.accent} />
+      <AdaptiveDpr />
       <Backdrop />
       <Reflections />
       <Effects />
@@ -55,6 +57,45 @@ export function Scene() {
       )}
     </Canvas>
   );
+}
+
+const MAX_DPR = 2;
+const DPR_STEP = 0.25;
+
+/**
+ * Keeps the frame rate up on slower GPUs: averages the frame time each second and, after two seconds in a
+ * row below about 45 fps, drops the pixel ratio a step (down to 1). With headroom it climbs back, but never
+ * to a level that was already too slow, so it doesn't flip back and forth. One-off hitches (loading terrain,
+ * a hidden tab) are ignored.
+ */
+function AdaptiveDpr() {
+  const setDpr = useThree((s) => s.setDpr);
+  const st = useRef({ time: 0, frames: 0, dpr: 0, ceiling: 0, slow: 0, calm: 0 });
+  useFrame((_, delta) => {
+    const s = st.current;
+    if (!s.dpr) s.dpr = s.ceiling = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+    if (delta > 0.1) return; // a hitch or a hidden tab, not the steady frame rate
+    s.time += delta;
+    s.frames++;
+    if (s.time < 1) return;
+    const ms = (s.time / s.frames) * 1000;
+    s.time = s.frames = 0;
+    let next = s.dpr;
+    s.slow = ms > 22 ? s.slow + 1 : 0;
+    if (s.slow >= 2 && s.dpr > 1) {
+      s.ceiling = s.dpr - DPR_STEP;
+      next = Math.max(1, s.dpr - DPR_STEP);
+      s.slow = s.calm = 0;
+    } else if (ms < 18 && s.dpr < s.ceiling && ++s.calm >= 3) {
+      next = Math.min(s.ceiling, s.dpr + DPR_STEP);
+      s.calm = 0;
+    }
+    if (next !== s.dpr) {
+      s.dpr = next;
+      setDpr(next);
+    }
+  });
+  return null;
 }
 
 /** Advances playback time and mirrors it into the store ~15 times a second. */
