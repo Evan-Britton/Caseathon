@@ -90,6 +90,8 @@ export function Fleet() {
         <p className="ops-credit" aria-hidden>
           {source && <>Data: {source.authors}, {source.license}</>}
           {mapCredits && <> · {mapCredits}</>}
+          <br />
+          Routes and destinations are illustrative; speed, altitude, power and energy are from the real flights.
         </p>
       </div>
 
@@ -130,7 +132,7 @@ function OpsBar({ views }: { views: DroneView[] }) {
         </div>
         <span
           className="sim-tag"
-          title="Five real CMU flights, flown on different days from the same launch site near Pittsburgh, replayed together. The data has one aircraft, so the fleet is staged. Cargo names are illustrative."
+          title="Five real CMU flights, flown on different days from the same launch site near Pittsburgh, replayed together. The data has one aircraft, so the fleet is staged. Cargo, destinations and the out-and-back routes are illustrative; the recorded flights are all one triangle."
         >
           Simulated fleet
         </span>
@@ -241,6 +243,7 @@ function Detail({ d, v }: { d: LoadedDrone; v: DroneView }) {
 
   return (
     <Panel title={`${d.slot.callsign}: ${d.slot.cargo}`} tag={`${fmtNum(v.budget)} Wh pack`}>
+      <p className="fc-sub">To {d.slot.destination}, {fmtNum(d.oneWayM / 1000, 2)} km out from the hub</p>
       <div className={`fd-rec tone-${live === "return" ? "stop" : live === "review" ? "warn" : live === "continue" ? "go" : "idle"}`}>
         <span className="fd-rec-label">System recommends</span>
         <strong>{live ? callLabel(live) : "Waiting for takeoff"}</strong>
@@ -333,6 +336,7 @@ function DronePanel({ d, v, index, selected, onSelect }: { d: LoadedDrone; v: Dr
         <strong>{index + 1} · {d.slot.cargo}</strong>
         <span className="dp-status">{v.status}</span>
       </div>
+      <p className="dp-dest">to {d.slot.destination}</p>
       <p className="dp-line num">
         {started
           ? `${fmtNum(Math.max(at(series.up), 0), 0)} m · ${fmtNum(at(series.groundSpeed), 1)} m/s · ${fmtNum(at(series.voltage), 1)} V · ${fmtNum(Math.max(at(series.power), 0), 0)} W`

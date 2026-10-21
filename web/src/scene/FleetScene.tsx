@@ -30,6 +30,8 @@ const TONE = {
 
 /** DOM name tags over the canvas, one per drone, moved each frame by FleetDrone. */
 export const fleetTags: (HTMLDivElement | null)[] = [];
+/** DOM labels for the hub (index 0) and each drone's destination (index 1 + drone), moved each frame by RouteLabels. */
+export const routeLabels: (HTMLDivElement | null)[] = [];
 
 /** Each drone's real launch point, in metres east and south of the first drone's (three.js x and z). */
 export function realOffsets(loaded: LoadedDrone[]): { x: number; z: number }[] {
@@ -57,6 +59,10 @@ export function FleetScene({ loaded }: { loaded: LoadedDrone[] }) {
         <LaunchPad key={d.slot.flight} x={offsets[i].x} z={offsets[i].z} disc={false} />
       ))}
       {loaded.map((d, i) => (
+        <LaunchPad key={`dest-${d.slot.flight}`} x={offsets[i].x + d.dest.east} z={offsets[i].z - d.dest.north} color="#3ee8a8" />
+      ))}
+      <RouteLabels loaded={loaded} offsets={offsets} />
+      {loaded.map((d, i) => (
         <group key={d.slot.flight} position={[offsets[i].x, 0, offsets[i].z]}>
           <FlightPath series={d.series} ground={ground} getTime={() => droneTime(d)} fade={follow && selected !== d.slot.flight} />
           <FleetDrone d={d} index={i} offset={offsets[i]} />
@@ -68,6 +74,23 @@ export function FleetScene({ loaded }: { loaded: LoadedDrone[] }) {
 }
 
 const projected = new Vector3();
+
+/** Keeps the hub and destination name labels over their spots on the map. */
+function RouteLabels({ loaded, offsets }: { loaded: LoadedDrone[]; offsets: { x: number; z: number }[] }) {
+  const { camera, size } = useThree();
+  useFrame(() => {
+    const gnd = useStore.getState().ground;
+    const place = (el: HTMLDivElement | null, x: number, z: number) => {
+      if (!el) return;
+      projected.set(x, (gnd ? gnd(x, z) : 0) + 7, z).project(camera);
+      el.style.opacity = projected.z < 1 ? "1" : "0";
+      el.style.transform = `translate(${((projected.x + 1) / 2) * size.width}px, ${((1 - projected.y) / 2) * size.height}px) translate(-50%, -100%)`;
+    };
+    place(routeLabels[0], offsets[0].x, offsets[0].z);
+    loaded.forEach((d, i) => place(routeLabels[i + 1], offsets[i].x + d.dest.east, offsets[i].z - d.dest.north));
+  });
+  return null;
+}
 
 function FleetDrone({ d, index, offset }: { d: LoadedDrone; index: number; offset: { x: number; z: number } }) {
   const { series, meta } = d;

@@ -2314,7 +2314,7 @@ select {
   z-index: 60;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 400px;
-  grid-template-rows: 54px minmax(0, 1fr) 112px;
+  grid-template-rows: 54px minmax(0, 1fr) 128px;
   grid-template-areas: "bar bar" "map side" "strip strip";
   gap: 1px;
   background: rgba(255, 255, 255, 0.07);
@@ -2925,7 +2925,7 @@ select {
 @media (max-width: 1100px) {
   .ops {
     grid-template-columns: minmax(0, 1fr) 340px;
-    grid-template-rows: 54px minmax(0, 1fr) 118px;
+    grid-template-rows: 54px minmax(0, 1fr) 134px;
   }
 
   .ops-stats > div:nth-child(n + 4) {
@@ -2936,7 +2936,7 @@ select {
 @media (max-width: 760px) {
   .ops {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 54px 200px minmax(0, 1fr) 118px;
+    grid-template-rows: 54px 200px minmax(0, 1fr) 134px;
     grid-template-areas: "bar" "map" "side" "strip";
   }
 
@@ -3090,4 +3090,33 @@ select {
 .seg button[aria-checked="true"]:not(.seg-clean):not(.seg-bad) {
   background: rgba(154, 140, 255, 0.24);
   color: var(--text);
+}
+
+/* Named places on the map: the hub and each drone's destination. */
+.fleet-place {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(14, 13, 19, 0.7);
+  border: 1px solid rgba(62, 232, 168, 0.4);
+  color: #bff5dd;
+  font-size: 11px;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.fleet-place.hub {
+  border-color: rgba(255, 184, 77, 0.5);
+  color: var(--warn);
+}
+
+.dp-dest {
+  color: var(--muted);
+  font-size: 11.5px;
+  margin-top: -3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

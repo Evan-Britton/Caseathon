@@ -1,4 +1,5 @@
 import { loadFlight, loadForecast, loadScenarios } from "./data";
+import { reroute } from "./fleetRoutes";
 import { deadlineTime, missionCall, missionState } from "./mission";
 import type { CallType, MissionCall, MissionState } from "./mission";
 import type { FlightForecast, FlightMeta, FlightScenarios, FlightSeries, ScenarioCondition } from "./types";
@@ -15,20 +16,29 @@ import type { FlightForecast, FlightMeta, FlightScenarios, FlightSeries, Scenari
  *    99  comfortable margin: every model agrees
  *    93  pack too small: every model says RETURN
  *   276  a tight pack the flight just fits: even the clean model is cautious
+ *
+ * Destinations are made up. Each route is redrawn as an out-and-back (see fleetRoutes.ts); the
+ * recorded flights are all the same triangle.
  */
 export interface FleetSlot {
   flight: number;
   callsign: string;
   cargo: string;
   budgetWh: number;
+  /** Made-up delivery destination, for the story. */
+  destination: string;
+  /** Direction out from the hub, degrees clockwise from north. */
+  bearing: number;
 }
 
+export const HUB_NAME = "Central supply hub";
+
 export const FLEET: FleetSlot[] = [
-  { flight: 268, callsign: "Drone 1", cargo: "Blood unit", budgetWh: 28.5 },
-  { flight: 99, callsign: "Drone 2", cargo: "Insulin", budgetWh: 30.5 },
-  { flight: 166, callsign: "Drone 3", cargo: "Antivenom", budgetWh: 22.0 },
-  { flight: 93, callsign: "Drone 4", cargo: "Lab specimens", budgetWh: 18.0 },
-  { flight: 276, callsign: "Drone 5", cargo: "Vaccines", budgetWh: 15.5 },
+  { flight: 268, callsign: "Drone 1", cargo: "Blood unit", budgetWh: 28.5, destination: "Ridgeline Clinic", bearing: 25 },
+  { flight: 99, callsign: "Drone 2", cargo: "Insulin", budgetWh: 30.5, destination: "Harlan Creek Health Post", bearing: 320 },
+  { flight: 166, callsign: "Drone 3", cargo: "Antivenom", budgetWh: 22.0, destination: "Millbrook Rural Clinic", bearing: 75 },
+  { flight: 93, callsign: "Drone 4", cargo: "Lab specimens", budgetWh: 18.0, destination: "Valley Diagnostic Lab", bearing: 250 },
+  { flight: 276, callsign: "Drone 5", cargo: "Vaccines", budgetWh: 15.5, destination: "Cedar Hollow Outreach Site", bearing: 150 },
 ];
 
 export interface LoadedDrone {
@@ -36,8 +46,12 @@ export interface LoadedDrone {
   meta: FlightMeta;
   forecast: FlightForecast;
   scenarios: FlightScenarios;
-  /** The recorded flight path, for the fleet map. */
+  /** The flight with its horizontal path redrawn as an out-and-back route; everything else is as recorded. */
   series: FlightSeries;
+  /** The turnaround point, metres east and north of this drone's launch point. */
+  dest: { east: number; north: number };
+  /** One-way distance to the destination, metres. */
+  oneWayM: number;
   window: number;
 }
 
@@ -54,7 +68,17 @@ export async function loadFleet(
         loadScenarios(slot.flight),
         loadFlight(slot.flight),
       ]);
-      return { slot, meta, forecast, scenarios, series, window: flightWindow[String(slot.flight)] };
+      const routed = reroute(series, slot.bearing);
+      return {
+        slot,
+        meta,
+        forecast,
+        scenarios,
+        series: routed.series,
+        dest: routed.dest,
+        oneWayM: routed.oneWayM,
+        window: flightWindow[String(slot.flight)],
+      };
     }),
   );
 }
