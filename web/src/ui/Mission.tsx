@@ -3,6 +3,7 @@ import { outcome, type MissionCall, type MissionState, type OutcomeKind } from "
 import { useStore } from "../store";
 import type { FlightForecast, FlightMeta } from "../types";
 import { fmtClock, fmtNum } from "./format";
+import { HeavyDemos, LabControls, storyLabel, storyOf } from "./Lab";
 import { useMission } from "./useMission";
 
 type Tone = "go" | "warn" | "stop" | "idle" | "fail";
@@ -32,13 +33,17 @@ export function Mission() {
         <h2>Mission check</h2>
         {m.labActive && m.scenarioIndex ? (
           <span className={`ai-tag lab-tag ${m.lab.condition !== "reference" && !m.lab.fix ? "bad" : ""}`} title={m.scenarioIndex.note}>
-            Lab · {m.scenarioIndex.conditions[m.lab.condition].label}
-            {m.lab.fix ? " + fix" : ""}
+            {(() => {
+              const story = storyOf(m.lab.condition, m.lab.fix);
+              return story ? storyLabel(story) : `Lab · ${m.scenarioIndex.conditions[m.lab.condition].label}${m.lab.fix ? " + fix" : ""}`;
+            })()}
           </span>
         ) : (
           <span className="ai-tag" title={m.model?.model}>AI forecast</span>
         )}
       </div>
+
+      <LabControls />
 
       <div className={`verdict tone-${head.tone}`} role="status" aria-live="polite">
         <VerdictIcon kind={head.icon} />
@@ -79,6 +84,8 @@ export function Mission() {
           )}
         </div>
       )}
+
+      <HeavyDemos />
 
       {m.model && m.forecast && (
         <p className="mission-foot" title={m.model.validation}>

@@ -360,7 +360,17 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
           <meshBasicMaterial ref={ring} color={SCENE.accent} transparent opacity={0.6} polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-2} />
         </mesh>
       </group>
-      {meta.simulated && meta.failureS !== undefined && <Smoke series={series} failureS={meta.failureS} />}
+      {meta.simulated && meta.failureS !== undefined && (
+        <Smoke
+          startS={meta.failureS}
+          endS={series.t[series.t.length - 1]}
+          posAt={(t) => {
+            const { i, f } = sampleAt(series.t, t);
+            const [x, y, z] = toWorld(lerpAt(series.east, i, f), lerpAt(series.north, i, f), lerpAt(series.up, i, f));
+            return [x, y + BODY_LIFT, z];
+          }}
+        />
+      )}
     </>
   );
 }

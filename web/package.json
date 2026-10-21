@@ -11,7 +11,8 @@
     "data": "python3 ../scripts/build_web_data.py ../data/raw/cmu_drone public/data && cd .. && python3 scripts/make_sim_failure.py",
     "model": "cd .. && python3 scripts/export_web_model.py",
     "scenarios": "cd .. && python3 scripts/export_web_scenarios.py",
-    "results": "cd .. && python3 scripts/export_web_results.py"
+    "results": "cd .. && python3 scripts/export_web_results.py",
+    "synthetic": "cd .. && python3 scripts/export_web_synthetic.py"
   },
   "dependencies": {
     "@react-three/fiber": "9.8.2",

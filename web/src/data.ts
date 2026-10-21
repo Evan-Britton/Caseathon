@@ -1,4 +1,4 @@
-import type { DataIndex, FlightForecast, FlightScenarios, FlightSeries, ModelIndex, ResultsSummary, ScenarioIndex } from "./types";
+import type { DataIndex, FlightForecast, FlightScenarios, FlightSeries, ModelIndex, ResultsSummary, ScenarioIndex, SyntheticIndex } from "./types";
 
 const base = import.meta.env.BASE_URL;
 const flightCache = new Map<number, Promise<FlightSeries>>();
@@ -37,6 +37,10 @@ export function loadForecast(id: number): Promise<FlightForecast> {
     forecastCache.set(id, p);
   }
   return p;
+}
+
+export function loadSynthetic(): Promise<SyntheticIndex> {
+  return getJson<SyntheticIndex>("data/synthetic.json", "npm run synthetic");
 }
 
 export function loadResults(): Promise<ResultsSummary> {

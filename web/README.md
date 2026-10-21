@@ -19,19 +19,19 @@ Built with React 19, three.js (via React Three Fiber) and Vite. It deploys to Cl
   - a **battery slider** (the usable energy for this mission, remembered between visits);
   - a hindsight line comparing the call with what the flight really used.
 
-  The timeline shades the decision window and flags the call, the route map marks halfway and where the call was made, and the drone's reticle and ground ring turn amber or red. Hover tests have no route, so they show "Not rated". Simulated flight 900 uses its own depleted pack (11.8 Wh) instead of the slider.
+  The timeline shades the decision window and flags the call, and the drone's reticle and ground ring turn amber or red. Hover tests have no route, so they show "Not rated". Simulated flight 900 uses its own depleted pack (11.8 Wh) instead of the slider.
 - **Poisoning lab (simulated).** Replays the same flight with the model each training-data condition would have produced, from the simulated timeline in `results/countermeasure` (seed 0). Every element is labelled SIMULATED.
   - **Training data:**
     - Clean.
-    - Stale: the accurate logger's uploads stopped after window 1.
-    - Low quality: a cheap feed whose current reads 12% low, at twice the record rate.
+    - Stale: the healthy drones' log uploads broke after window 1.
+    - Low quality: accidentally damaged current sensors (hard landing, moisture, a loose connector) on a growing share of drones, reading 12% low and logging twice as often.
     - Both.
   - **Countermeasure switch:** the reference-flight audit, recalibration and trusted P90 calibration.
-  - **Health rows:** what the training data really contains (age of the newest upload, the cheap feed's share), and what the fix's health check reports. Without the fix it reads "Not monitored · nothing flags it".
+  - **Health rows:** what the training data really contains (age of the newest healthy-drone upload, the damaged sensors' share), and what the fix's health check reports. Without the fix it reads "Not monitored · nothing flags it".
   - **Two charts by window:** forecast error and how often the P90 really holds, for clean, poisoned and fixed.
   - **Demo buttons:** jump to flights where poisoning flips the call. In the top case, flight 268 with a 28.5 Wh battery, the poisoned model says continue while the flight really comes up 0.15 Wh short; the clean and fixed models both say it's too close to call.
 
-  While the lab is open, the mission check, timeline, route map and reticle all use the lab's forecast. The forecast chart adds an "actual" line, so you can see the P90 band falling below what the flight really used. Window 0 flights have no scenario (nothing earlier to train on), and the lab says so.
+  While the lab is open, the mission check, timeline and reticle all use the lab's forecast. The forecast chart adds an "actual" line, so you can see the P90 band falling below what the flight really used. Window 0 flights have no scenario (nothing earlier to train on), and the lab says so.
 - **Results tab.** The left column switches between the mission check and a results scorecard. Each block is tagged with the case-prompt requirement it answers (R2–R7, with the requirement's name on hover):
   - clean baseline accuracy;
   - the four data conditions without and with the fix (error, how often the safety margin held, unsafe continue calls);
@@ -40,7 +40,7 @@ Built with React 19, three.js (via React Three Fiber) and Vite. It deploys to Cl
   - unseen-defect tests, the main limit, and the cost.
 
   Opening the poisoning lab switches back to the mission check.
-- **Flight panel (right).** Live telemetry at the top: altitude above launch, ground speed, airflow from the onboard anemometer, battery voltage, current, power, and energy used so far. Below it, the route: the flight's plan in a compact grid (cruise speed, payload, altitude, duration, total energy, date flown), a top-down map (north up) with a scale bar, and an altitude profile.
+- **Flight panel (right).** Live telemetry: altitude above launch, ground speed, airflow from the onboard anemometer, battery voltage, current, power, and energy used so far.
 - **Playback.** Play/pause, a power-draw scrubber, speed (1–16×), a map layer (Grid or Terrain) and three camera modes: Orbit, Chase and Top. It opens in Chase at 8×. In Chase, drag to swing around the drone, scroll to zoom and double-click to go back behind it; the camera stays locked on the drone.
 - **Simulated flight 900.** A labelled battery-failure scenario, built by `scripts/make_sim_failure.py` from flight 142's real path. It is not CMU data: the picker, a banner, the telemetry chip and the 3D reticle all mark it, and the rotors stop when power is lost.
 
@@ -116,6 +116,18 @@ npm run scenarios
 
 This runs `scripts/export_web_scenarios.py`. It retrains the hybrid model at each simulated window for each condition, exactly as `scripts/run_countermeasure.py` does with seed 0, and reads the chart values from `results/countermeasure/metrics.json` (5-seed means).
 
+### Synthetic heavy-payload flights (operator console)
+
+The CMU packages top out at 500 g (one flight at 750 g). To show what happens when operations move to heavier packages than the model has seen, drones 1, 3 and 5 in the operator console fly **SYNTHETIC** flights: real window-7 flights (97, 184, 126) re-run at 1.0–1.2 kg, which is within the Matrice 100's 3.6 kg take-off limit. While the motors run, the battery current is multiplied by `((2355 + new payload) / (2355 + recorded payload)) ^ b`. The exponent `b` (about 0.95) is fitted on the real 0–500 g flights, comparing flights flown at the same speed, altitude and route, and is checked on the real 750 g flight, which the fit never saw: scaled flights land within +1% to +10% of its energy. Route, speed, altitude, wind and timing stay as recorded. Each flight's battery comes from a stated rule on the launch forecasts, recorded in the output. The console labels these drones as synthetic everywhere they appear.
+
+`public/data/synthetic.json` describes each flight, the scaling fit and its check. The flights' series, forecasts and scenario runs sit next to the real ones under ids 1001–1003. To rebuild them (about 25 s), run:
+
+```bash
+npm run synthetic
+```
+
+The console's countermeasure adds a **range guard** for any payload heavier than the heaviest one in the fixed model's training data (750 g). A tree model can't forecast past what it has seen, so the guard scales its forecast up from 750 g to the real payload with the same fitted weight-to-power rule. It also sends close calls to a person. Before takeoff, this turns the heavy drones' launch check into "Not enough battery". Because the synthetic flights were built with that same rule, the correction isn't independent evidence on them; it still comes out 2–4 Wh low. The Results tab experiments don't include the guard.
+
 ### Results scorecard
 
 `public/data/results.json` holds the headline numbers for the Results tab, copied (not recomputed) from `results/baseline/metrics.json` and `results/countermeasure/metrics.json`. After rerunning those experiments, refresh it with:
@@ -168,6 +180,6 @@ Graphite panels with an ultraviolet accent, after a tactical drone-ops dashboard
 |---|---|
 | `src/store.ts` | App state (Zustand) and the playback clock. Time lives outside React so the 3D scene can advance every frame without re-rendering. |
 | `src/data.ts` | Fetching, caching and time interpolation helpers. |
-| `src/mission.ts` | The mission check: on track / turn back / too close, the halfway deadline, and the hindsight outcome. Pure functions shared by the panel, the timeline, the route map and the 3D reticle. |
+| `src/mission.ts` | The mission check: on track / turn back / too close, the halfway deadline, and the hindsight outcome. Pure functions shared by the panel, the timeline and the 3D reticle. |
 | `src/scene/` | `Scene` (lights, ground, camera modes), `Terrain` (elevation tiles to topo mesh and shader, with narrow pits filled), `Stars`, `FlightPath` (ribbon and curtain), `Drone` (model and reticle), `palette` (colours shared with CSS). |
-| `src/ui/` | `TopBar`, `Mission` (mission check panel), `Lab` (poisoning lab), `useMission` (shared hook), `RouteMap`, `Telemetry`, `Dock` (playback). |
+| `src/ui/` | `TopBar`, `Mission` (mission check panel), `Lab` (poisoning lab), `useMission` (shared hook), `Telemetry`, `Dock` (playback). |

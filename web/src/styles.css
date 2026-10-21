@@ -130,25 +130,13 @@ select {
   pointer-events: auto;
 }
 
-/* Live telemetry and the route in one panel on the right; it stops above the dock and scrolls if short. */
+/* Live telemetry in a panel on the right. */
 .flight-panel {
   position: absolute;
   top: var(--gap);
   right: var(--gap);
   width: 300px;
-  max-height: calc(100% - var(--gap) * 3 - 80px);
-  overflow-y: auto;
-  scrollbar-width: none;
   z-index: 20;
-}
-
-.flight-panel::-webkit-scrollbar {
-  display: none;
-}
-
-.flight-route {
-  margin-top: 2px;
-  border-top: 1px solid var(--edge);
 }
 
 /* Mission check above the results scorecard; the column scrolls if the window is too short for both. */
@@ -310,70 +298,10 @@ select {
   font-size: 12px;
 }
 
-.panel-head.sub {
-  padding-top: 6px;
-  padding-bottom: 2px;
-}
-
 .panel-head h3 {
   font-size: 12px;
   font-weight: 500;
   color: var(--muted);
-}
-
-.panel-head.sub .num {
-  font-family: var(--num);
-  font-weight: 600;
-}
-
-/* route map */
-
-.map {
-  display: block;
-  width: calc(100% - 24px);
-  margin: 0 12px;
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.22);
-}
-
-.map-launch {
-  fill: none;
-  stroke: var(--warn);
-  stroke-width: 2;
-}
-
-.map-drone {
-  fill: var(--text);
-}
-
-.map-drone-halo {
-  fill: rgba(var(--accent-rgb), 0.22);
-  stroke: var(--accent);
-  stroke-width: 1;
-}
-
-.map-north path {
-  fill: var(--muted);
-}
-
-.map-north text,
-.map-scale text {
-  fill: var(--muted);
-  font-size: 10px;
-  font-family: var(--body);
-}
-
-.map-scale path {
-  fill: none;
-  stroke: var(--muted);
-  stroke-width: 1.2;
-}
-
-.profile {
-  display: block;
-  width: calc(100% - 24px);
-  height: 54px;
-  margin: 4px 12px 14px;
 }
 
 .playhead {
@@ -741,7 +669,7 @@ select {
   color: var(--muted);
 }
 
-/* mission markers on the scrubber and route map */
+/* mission markers on the scrubber */
 
 .scrub-window {
   fill: rgba(var(--accent-rgb), 0.1);
@@ -753,24 +681,6 @@ select {
 }
 
 .scrub-call {
-  stroke: rgba(14, 13, 19, 0.9);
-  stroke-width: 1.5;
-}
-
-.map-half {
-  fill: rgba(14, 13, 19, 0.85);
-  stroke: var(--accent);
-  stroke-width: 1.5;
-}
-
-.map-half-text {
-  fill: var(--accent);
-  font-size: 8px;
-  font-weight: 700;
-  font-family: var(--body);
-}
-
-.map-call {
   stroke: rgba(14, 13, 19, 0.9);
   stroke-width: 1.5;
 }
@@ -1218,15 +1128,6 @@ select {
   letter-spacing: 0.12em;
 }
 
-/* Section headings inside a combined panel read like small panel titles. */
-.flight-route > .panel-head h3 {
-  font-family: var(--display);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text);
-}
 
 /* ---------- results scorecard ---------- */
 
@@ -1602,8 +1503,6 @@ select {
 }
 
 /* inset surfaces inside panels */
-.map,
-.profile,
 .fchart svg {
   border: 1px solid var(--inset-edge);
 }
@@ -1641,89 +1540,46 @@ select {
   background: var(--inset);
 }
 
-/* flight specs at the top of the route panel */
-.specs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  margin: 0 12px 10px;
-}
-
-.specs > div {
-  min-width: 0;
-  padding: 6px 8px 5px;
-  border-radius: 10px;
-  background: var(--inset);
-  border: 1px solid var(--inset-edge);
-}
-
-.specs dt {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--display);
-  font-size: 8.5px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.specs dt .icon {
-  width: 11px;
-  height: 11px;
-  color: var(--accent);
-}
-
-.specs dd {
-  margin-top: 1px;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* ---------- poisoning lab (simulated scenarios) ---------- */
 
-.lab {
-  position: absolute;
-  top: 80px;
-  left: calc(var(--left-w) + var(--gap) * 2);
-  width: min(440px, calc(100vw - var(--left-w) - 300px - var(--gap) * 4));
-  z-index: 20;
-  padding-bottom: 2px;
+/* Lives inside the mission check, between its header and the verdict. */
+.mlab {
+  padding-bottom: 8px;
 }
 
-.lab-closed {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 10px 10px 16px;
+.mlab .sim-tag {
+  margin-right: 4px;
+  font-size: 9.5px;
 }
 
-.lab-closed-text {
-  flex: 1;
-  min-width: 0;
-}
-
-.lab-closed h2 {
-  font-family: var(--display);
+.mlab-more {
+  margin: 6px 16px 0;
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
-.lab-closed p {
-  margin-top: 2px;
-  font-size: 11.5px;
+.mlab-more summary {
+  cursor: pointer;
   color: var(--muted);
+  list-style: none;
+  user-select: none;
 }
 
-.lab-closed-actions {
-  display: flex;
-  gap: 6px;
+.mlab-more summary::before {
+  content: "+ ";
+}
+
+.mlab-more[open] summary::before {
+  content: "– ";
+}
+
+.mlab-more .lab-health {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.mlab-more .lab-charts {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .btn {
@@ -1749,11 +1605,6 @@ select {
 
 .btn-accent:hover {
   background: #b0a5ff;
-}
-
-.lab .panel-head {
-  justify-content: flex-start;
-  align-items: center;
 }
 
 .sim-tag {
@@ -1845,6 +1696,104 @@ select {
 .seg .seg-bad[aria-checked="true"] {
   background: rgba(255, 79, 94, 0.16);
   color: var(--stop);
+}
+
+.seg .seg-fix[aria-checked="true"] {
+  background: rgba(154, 140, 255, 0.24);
+  color: var(--accent);
+}
+
+/* Plain words under the sensor switch: how bad data gets in, and what it does. */
+.story-note {
+  display: grid;
+  gap: 6px;
+  padding: 6px 16px 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.story-note b {
+  color: var(--text);
+}
+
+.story-note .sim-tag {
+  margin-right: 4px;
+  font-size: 9px;
+}
+
+.ops .story-note {
+  padding: 0;
+}
+
+.fix-real {
+  margin-top: 6px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* "Damaged + fix": the fix's steps, with this window's numbers. */
+.fix-steps {
+  margin: 8px 16px 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(154, 140, 255, 0.08);
+  border: 1px solid rgba(154, 140, 255, 0.25);
+}
+
+.ops .fix-steps {
+  margin: 8px 0 0;
+}
+
+.fix-steps-head {
+  margin-bottom: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.fix-steps ol {
+  display: grid;
+  gap: 5px;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.fix-steps li::marker {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.fix-result {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(154, 140, 255, 0.2);
+  font-size: 12px;
+}
+
+.fix-result b {
+  color: var(--go);
+}
+
+/* The three-way sensor switch takes the full width under its label. */
+.lab-row.story-row {
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding-top: 6px;
+}
+
+.story-row .seg button {
+  white-space: nowrap;
+}
+
+.lab-note-sm {
+  padding: 4px 0 2px;
+  font-size: 11px;
+  color: var(--muted);
 }
 
 .switch {
@@ -2174,10 +2123,6 @@ select {
   .topbar {
     right: calc(250px + var(--gap) * 2);
   }
-
-  .lab {
-    width: min(440px, calc(100vw - var(--left-w) - 250px - var(--gap) * 4));
-  }
 }
 
 @media (max-width: 820px) {
@@ -2253,10 +2198,6 @@ select {
     margin: 0 12px;
   }
 
-  .lab {
-    order: 4;
-  }
-
   .lab-row {
     grid-template-columns: 1fr;
     gap: 4px;
@@ -2265,7 +2206,6 @@ select {
 
   .flight-panel {
     order: 6;
-    max-height: none;
   }
 
   .attribution {
@@ -2314,7 +2254,8 @@ select {
   z-index: 60;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 400px;
-  grid-template-rows: 54px minmax(0, 1fr) 112px;
+  /* The drone strip is as tall as its cards need, so no line is cut off; the map takes the rest. */
+  grid-template-rows: 54px minmax(0, 1fr) auto;
   grid-template-areas: "bar bar" "map side" "strip strip";
   gap: 1px;
   background: rgba(255, 255, 255, 0.07);
@@ -2583,8 +2524,8 @@ select {
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 11px 13px;
+  gap: 6px;
+  padding: 10px 13px;
   border: 0;
   background: rgba(10, 10, 14, 0.94);
   cursor: pointer;
@@ -2925,7 +2866,7 @@ select {
 @media (max-width: 1100px) {
   .ops {
     grid-template-columns: minmax(0, 1fr) 340px;
-    grid-template-rows: 54px minmax(0, 1fr) 118px;
+    grid-template-rows: 54px minmax(0, 1fr) auto;
   }
 
   .ops-stats > div:nth-child(n + 4) {
@@ -2936,7 +2877,7 @@ select {
 @media (max-width: 760px) {
   .ops {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 54px 200px minmax(0, 1fr) 118px;
+    grid-template-rows: 54px 200px minmax(0, 1fr) auto;
     grid-template-areas: "bar" "map" "side" "strip";
   }
 
@@ -2953,7 +2894,6 @@ select {
 /* While the operator console is open, the 3D scene shows all five drones; hide the single-flight panels. */
 .fleet-on .topbar,
 .fleet-on .left-stack,
-.fleet-on .lab,
 .fleet-on .flight-panel,
 .fleet-on .caution,
 .fleet-on .caution-edge,
@@ -3070,17 +3010,39 @@ select {
   color: var(--muted);
 }
 
+/* SYNTHETIC heavy-payload flights are labelled wherever they appear. */
+.dp-syn {
+  margin-left: 6px;
+  padding: 0 6px;
+  font-size: 9px;
+  vertical-align: 1px;
+}
+
+.syn-box {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.syn-box .sim-tag {
+  margin-right: 4px;
+  font-size: 9px;
+}
+
+.syn-note {
+  color: var(--warn);
+  font-weight: 600;
+}
+
+/* 5% of the pack or less: the battery readout turns red. */
+.dp-foot.low {
+  color: var(--stop);
+  font-weight: 600;
+}
+
 .fleet-tag.compact {
   padding: 2px 8px;
   border-radius: 999px;
-}
-
-.ops-cam {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  pointer-events: auto;
-  background: rgba(10, 10, 14, 0.85);
 }
 
 .ops-more > .fd-chart {
@@ -3090,4 +3052,220 @@ select {
 .seg button[aria-checked="true"]:not(.seg-clean):not(.seg-bad) {
   background: rgba(154, 140, 255, 0.24);
   color: var(--text);
+}
+
+/* Named places on the map: the hub and each drone's destination. */
+.fleet-place {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(14, 13, 19, 0.7);
+  border: 1px solid rgba(62, 232, 168, 0.4);
+  color: #bff5dd;
+  font-size: 11px;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.fleet-place.hub {
+  border-color: rgba(255, 184, 77, 0.5);
+  color: var(--warn);
+}
+
+.dp-dest {
+  color: var(--muted);
+  font-size: 11.5px;
+  margin-top: -3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- guided demo: Run 1 / Run 2 ---------- */
+
+.run-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.run-btn {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--inset-edge);
+  background: var(--inset);
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+}
+
+.run-btn b {
+  font-family: var(--display);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.run-btn span {
+  font-size: 12px;
+}
+
+.run-btn.run-bad[aria-checked="true"] {
+  border-color: rgba(255, 79, 94, 0.6);
+  background: rgba(255, 79, 94, 0.12);
+}
+
+.run-btn.run-good[aria-checked="true"] {
+  border-color: rgba(62, 232, 168, 0.6);
+  background: rgba(62, 232, 168, 0.1);
+}
+
+.run-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.charge-plan {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 184, 77, 0.45);
+  background: rgba(255, 184, 77, 0.08);
+}
+
+.charge-plan.approved {
+  border-color: rgba(62, 232, 168, 0.45);
+  background: rgba(62, 232, 168, 0.07);
+}
+
+.charge-head {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--warn);
+}
+
+.charge-plan.approved .charge-head {
+  color: var(--go);
+}
+
+.charge-plan ul {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+}
+
+.charge-plan li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0 8px;
+  font-size: 12.5px;
+}
+
+.charge-plan li b {
+  color: var(--text);
+}
+
+.charge-plan li small {
+  grid-column: 1 / -1;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.charge-ok {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--go);
+}
+
+.charge-btn {
+  justify-self: start;
+}
+
+/* One plain sentence over the map for each moment, and the scoreboard at the end. */
+.story-wrap {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(620px, calc(100% - 32px));
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  z-index: 2;
+}
+
+.story-banner {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--inset-edge);
+  background: rgba(10, 10, 14, 0.88);
+  backdrop-filter: blur(8px);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.story-banner.tone-warn {
+  border-color: rgba(255, 184, 77, 0.6);
+  color: var(--warn);
+}
+
+.story-banner.tone-bad {
+  border-color: rgba(255, 79, 94, 0.6);
+  color: var(--stop);
+}
+
+.story-banner.tone-good {
+  border-color: rgba(62, 232, 168, 0.6);
+  color: var(--go);
+}
+
+.scoreboard {
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(10, 10, 14, 0.9);
+  font-size: 13px;
+}
+
+.scoreboard th,
+.scoreboard td {
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.scoreboard thead th {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.scoreboard tbody th {
+  text-align: left;
+  font-weight: 500;
+}
+
+.scoreboard td {
+  font-family: var(--display);
+  font-size: 18px;
+}
+
+.scoreboard td.bad {
+  color: var(--stop);
+}
+
+.scoreboard td.good {
+  color: var(--go);
 }
