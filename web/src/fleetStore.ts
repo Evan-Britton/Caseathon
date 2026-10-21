@@ -48,6 +48,8 @@ interface FleetState {
   openConsole: () => Promise<void>;
   closeConsole: () => void;
   setCondition: (c: ScenarioCondition) => void;
+  /** Set the data condition and the fix together (one restart). */
+  setScenario: (c: ScenarioCondition, fix: boolean) => void;
   setFix: (fix: boolean) => void;
   setPlaying: (playing: boolean) => void;
   setRate: (rate: number) => void;
@@ -96,6 +98,7 @@ export const useFleet = create<FleetState>((set, get) => ({
   },
   closeConsole: () => set({ open: false, playing: false }),
   setCondition: (condition) => set({ condition, ...fresh }),
+  setScenario: (condition, fix) => set({ condition, fix, ...fresh }),
   setFix: (fix) => set({ fix, ...fresh }),
   setPlaying: (playing) => {
     const { loaded, t } = get();

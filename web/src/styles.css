@@ -1698,6 +1698,74 @@ select {
   color: var(--stop);
 }
 
+.seg .seg-fix[aria-checked="true"] {
+  background: rgba(154, 140, 255, 0.24);
+  color: var(--accent);
+}
+
+/* "Damaged + fix": the fix's steps, with this window's numbers. */
+.fix-steps {
+  margin: 8px 16px 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(154, 140, 255, 0.08);
+  border: 1px solid rgba(154, 140, 255, 0.25);
+}
+
+.ops .fix-steps {
+  margin: 8px 0 0;
+}
+
+.fix-steps-head {
+  margin-bottom: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.fix-steps ol {
+  display: grid;
+  gap: 5px;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.fix-steps li::marker {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.fix-result {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(154, 140, 255, 0.2);
+  font-size: 12px;
+}
+
+.fix-result b {
+  color: var(--go);
+}
+
+/* The three-way sensor switch takes the full width under its label. */
+.lab-row.story-row {
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding-top: 6px;
+}
+
+.story-row .seg button {
+  white-space: nowrap;
+}
+
+.lab-note-sm {
+  padding: 4px 0 2px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
 .switch {
   display: inline-flex;
   align-items: center;

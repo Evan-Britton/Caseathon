@@ -5,7 +5,7 @@ import type { DroneView, LoadedDrone } from "../fleet";
 import { fleetEnd, fleetStatus, useFleet } from "../fleetStore";
 import { useStore } from "../store";
 import { fmtClock, fmtNum } from "./format";
-import { Health, ScenarioControls } from "./Lab";
+import { FixSteps, Health, ScenarioControls, StoryControls, storyOf, storySetting } from "./Lab";
 
 const RATES = [2, 4, 8];
 
@@ -179,9 +179,18 @@ function Scenario() {
   if (!idx) return null;
   return (
     <Panel title="Scenario" tag="simulated">
-      <ScenarioControls idx={idx} condition={s.condition} fix={s.fix} onCondition={s.setCondition} onFix={s.setFix} rowClass="ops-row" />
+      <StoryControls
+        story={storyOf(s.condition, s.fix)}
+        onStory={(st) => {
+          const { condition, fix } = storySetting(st);
+          s.setScenario(condition, fix);
+        }}
+        rowClass="ops-row"
+        fixTitle="The same damaged data with the fix: check flights correct the sensors' bias, and a range guard holds any payload heavier than the training data"
+      />
       <details className="ops-more">
         <summary>Presenter controls</summary>
+        <ScenarioControls idx={idx} condition={s.condition} fix={s.fix} onCondition={s.setCondition} onFix={s.setFix} rowClass="ops-row" fixLabel="audit, calibration + range guard" />
         <div className="ops-row">
           <span className="lab-label">Speed</span>
           <div className="seg" role="radiogroup" aria-label="Playback speed">
@@ -281,6 +290,12 @@ function Detail({ d, v }: { d: LoadedDrone; v: DroneView }) {
         )}
       </div>
 
+      {s.fix && idx && (
+        <details className="ops-more" open>
+          <summary>How the fix cleans the data</summary>
+          <FixSteps idx={idx} condition={s.condition} window={d.window} guardMaxG={d.trainedMaxG[`${s.condition}/on`]} />
+        </details>
+      )}
       <details className="ops-more">
         <summary>Forecast chart</summary>
         <Evidence d={d} v={v} t={s.t} />
@@ -451,7 +466,7 @@ function FlagLink() {
   const flagged = useFleet((s) => s.flagged);
   const flag = useFleet((s) => s.flag);
   return (
-    <button className="link-btn" disabled={flagged} onClick={flag} title="Tell the data-quality owner that this feed needs checking">
+    <button className="link-btn" disabled={flagged} onClick={flag} title="Tell the data-quality owner that the damaged sensors' records need checking">
       {flagged ? "Data source flagged to the data-quality owner" : "Flag data source"}
     </button>
   );

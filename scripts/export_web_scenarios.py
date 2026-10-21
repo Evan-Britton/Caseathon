@@ -5,11 +5,11 @@ the 196 cruise flights are re-sequenced into 8 simulated operating windows with 
 mix drifting heavier; at the start of each window the system retrains on what it has
 received from earlier windows. Four training-data conditions, each with and without the fix:
 
-  reference    every earlier flight arrives from the accurate logger
-  stale        the accurate logger's uploads stop after window 1
-  low_quality  a cheap feed (current reads 12% low, twice the record rate) carries a
-               growing share of flights
-  combined     both: uploads stop and the cheap feed keeps flowing
+  reference    every earlier flight's log comes from a drone with a healthy current sensor
+  stale        the healthy drones' log uploads break after window 1
+  low_quality  a growing share of drones have accidentally damaged current sensors that read
+               12% low; their glitchy firmware logs twice as often (source B in degrade.py)
+  combined     both: the healthy drones' uploads break and the damaged sensors keep logging
 
 For each flight in windows 1-7 the app gets the P50/P90 "energy still needed" forecast,
 once per second, from the model each condition would have flown it with. The time base,
@@ -17,7 +17,7 @@ energy used and route share are the same as in data/model/flights/<id>.json, so 
 forecasts differ. Window 0 flights have no scenario: nothing earlier exists to train on.
 
 Also exported, per window and condition: what the training data really contains (age of
-the newest accurate upload, the cheap feed's share), what the fix's health check reports,
+the newest healthy-drone upload, the damaged sensors' share), what the fix's health check reports,
 the by-window error and P90 coverage from results/countermeasure (5-seed means), and the
 flights and battery levels where poisoning visibly flips the call (for the demo).
 
@@ -52,13 +52,14 @@ SERVE_STEP_S = 1.0
 SIM_ID, SIM_SOURCE = 900, 142
 CONDITIONS = {
     "reference": {"label": "Clean", "low_quality": False, "stale_after": None,
-                  "desc": "Every earlier flight arrives from the accurate logger."},
+                  "desc": "Every earlier flight's log comes from a drone with a healthy current sensor."},
     "stale": {"label": "Stale", "low_quality": False, "stale_after": STALE_AFTER,
-              "desc": "The accurate logger's uploads stopped after window 1. Retraining keeps reusing old, lighter flights."},
+              "desc": "Log uploads from the healthy drones broke after window 1. Retraining keeps reusing old, lighter flights."},
     "low_quality": {"label": "Low quality", "low_quality": True, "stale_after": None,
-                    "desc": "A cheap feed whose current sensor reads 12% low, sending twice as many records, carries a growing share of flights."},
+                    "desc": "A growing share of drones have accidentally damaged current sensors (hard landing, moisture, a loose connector) "
+                            "that read 12% low. Their glitchy firmware logs twice as often, so bad records outnumber good ones."},
     "combined": {"label": "Both", "low_quality": True, "stale_after": STALE_AFTER,
-                 "desc": "Accurate uploads stopped after window 1 while the cheap feed kept flowing: every recent record is from the biased sensor."},
+                 "desc": "Damaged current sensors (reading 12% low) keep logging while the healthy drones' uploads are broken, so every recent record the model learns from is a bad reading."},
 }
 DEMO_BUDGETS = np.arange(14.0, 30.01, 0.5)
 
@@ -211,7 +212,7 @@ def main() -> None:
                   for w, g in mix.groupby("window")}
     index = {
         "simulated": True,
-        "note": "SIMULATED: the timeline, the cheap feed, the upload outage and the reference flights are "
+        "note": "SIMULATED: the timeline, the damaged sensors, the broken uploads and the check flights are "
         "experiment settings, not CMU data. Seed 0 of results/countermeasure.",
         "conditions": {k: {"label": v["label"], "desc": v["desc"]} for k, v in CONDITIONS.items()},
         "windows": dg.N_WINDOWS,

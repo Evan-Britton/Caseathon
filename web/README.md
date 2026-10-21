@@ -23,11 +23,11 @@ Built with React 19, three.js (via React Three Fiber) and Vite. It deploys to Cl
 - **Poisoning lab (simulated).** Replays the same flight with the model each training-data condition would have produced, from the simulated timeline in `results/countermeasure` (seed 0). Every element is labelled SIMULATED.
   - **Training data:**
     - Clean.
-    - Stale: the accurate logger's uploads stopped after window 1.
-    - Low quality: a cheap feed whose current reads 12% low, at twice the record rate.
+    - Stale: the healthy drones' log uploads broke after window 1.
+    - Low quality: accidentally damaged current sensors (hard landing, moisture, a loose connector) on a growing share of drones, reading 12% low and logging twice as often.
     - Both.
   - **Countermeasure switch:** the reference-flight audit, recalibration and trusted P90 calibration.
-  - **Health rows:** what the training data really contains (age of the newest upload, the cheap feed's share), and what the fix's health check reports. Without the fix it reads "Not monitored · nothing flags it".
+  - **Health rows:** what the training data really contains (age of the newest healthy-drone upload, the damaged sensors' share), and what the fix's health check reports. Without the fix it reads "Not monitored · nothing flags it".
   - **Two charts by window:** forecast error and how often the P90 really holds, for clean, poisoned and fixed.
   - **Demo buttons:** jump to flights where poisoning flips the call. In the top case, flight 268 with a 28.5 Wh battery, the poisoned model says continue while the flight really comes up 0.15 Wh short; the clean and fixed models both say it's too close to call.
 

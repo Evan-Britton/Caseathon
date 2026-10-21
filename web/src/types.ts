@@ -138,6 +138,8 @@ export interface ScenarioHealth {
   unverifiedRecords?: number;
   auditedWindows?: number;
   estimatedFeedRatio?: number | null;
+  /** How the fixed model's P90 was calibrated: "trusted_recent_flights", or a fallback when too few were available. */
+  calibration?: string;
 }
 
 export interface ScenarioDemo {

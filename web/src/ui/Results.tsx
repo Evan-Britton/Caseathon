@@ -86,7 +86,7 @@ export function Results() {
 
       <Block reqs={[5]} title="Why it breaks">
         <p className="res-chain">
-          {feed ? `Cheap feed reads current ${Math.round((1 - feed.currentFactor) * 100)}% low` : "Cheap feed under-reads current"} <i>→</i> model learns
+          {feed ? `Damaged sensors read current ${Math.round((1 - feed.currentFactor) * 100)}% low` : "Damaged sensors under-read current"} <i>→</i> model learns
           missions need less energy (bias {fmtNum(both.off.biasWh, 2)} Wh) <i>→</i> margin held drops to{" "}
           {pct(both.off.p90)} <i>→</i> {fmtNum(both.off.unsafe, 1)} unsafe continue calls.
         </p>
@@ -101,7 +101,7 @@ export function Results() {
             unseen defects held with the fix: {span(held.map((u) => u.on.maeWh), (v) => fmtNum(v, 2))} Wh, {span(held.map((u) => u.on.p90), pct)} margin.
           </li>
           <li className="bad">
-            <b>Limit:</b> with no reference flights the margin only reaches {pct(r.failure.on.p90)}, and {Math.round(r.failure.on.deferred)} calls go to the operator.
+            <b>Limit:</b> with no check flights the margin only reaches {pct(r.failure.on.p90)}, and {Math.round(r.failure.on.deferred)} calls go to the operator.
           </li>
           <li>
             <b>Cost:</b> {r.cost}. {Math.round(both.on.deferred)} of {r.decisions.total} calls are sent for human review when both defects hit.
