@@ -95,6 +95,7 @@ export function FleetScene({ loaded }: { loaded: LoadedDrone[] }) {
   const ground = useStore((s) => s.ground);
   const selected = useFleet((s) => s.selected);
   const decisions = useFleet((s) => s.decisions);
+  const charge = useFleet((s) => s.charge);
   // The routes cross hills the recorded heights never saw, so draw each flight terrain-following.
   const drawn = useMemo(
     () => loaded.map((d, i) => (ground ? followTerrain(d.series, ground, offsets[i].x, offsets[i].z) : d.series)),
@@ -110,10 +111,10 @@ export function FleetScene({ loaded }: { loaded: LoadedDrone[] }) {
     () =>
       loaded.map((d, i) => {
         const decision = decisions[d.slot.flight];
-        const t0 = crashAt(d, decision);
+        const t0 = crashAt(d, decision, charge?.[d.slot.flight] ?? d.budgetWh);
         return t0 === null ? null : crashPath(drawn[i], decision, t0, padGround[i]);
       }),
-    [loaded, drawn, padGround, decisions],
+    [loaded, drawn, padGround, decisions, charge],
   );
   return (
     <>

@@ -109,24 +109,39 @@ Status: ✅ done · 🟡 partly done · ⬜ not started
 
 ---
 
-## 4. The countermeasure (built ✅)
+## 4. The countermeasure: the "sensor check" (built ✅)
 
-Code: `scripts/countermeasure.py`, `scripts/run_countermeasure.py`. Results and the full write-up are in `results/countermeasure/README.md`. Two layers, each aimed at one link in the chain:
+Code: `scripts/countermeasure.py`, `scripts/run_countermeasure.py`. Results and the full write-up are in `results/countermeasure/README.md`.
+
+### In plain words (say it like this)
+
+**How bad data gets in (real world).** Drones get bumped on landing, rained on, or a connector works loose. The current sensor keeps working but reads about 12% low, and nobody notices because the drone still flies. A glitch makes damaged units log twice as often, and the healthy drones' uploads have broken, so most new logs are bad.
+
+**What it does to the model.** The logs say each flight used less energy than it really did. The model learns that missions need less energy, stays just as confident, and starts clearing drones that can't make it home.
+
+**How the sensor check fixes it**, the way you check a scale against a known weight:
+1. **Fly check flights.** A few flights each period (about 12%) carry a trusted spare sensor next to the drone's own. Their logs are uploaded by hand, so they still arrive when uploads break.
+2. **Find the error.** Compare the damaged sensors with the spare on those flights. It finds them reading ×0.879, against a true ×0.88.
+3. **Fix the data, don't delete it.** Scale the bad readings back up (about +14%). Nothing is thrown away, so the model keeps learning from the newest flights.
+4. **Retrain, and check the safety margin on trusted flights only.** Never test the margin against the data that might be wrong.
+5. **Warn people.** A health badge shows when data was corrected or looks suspect, and close calls go to the operator.
+
+In the operator console, the fix also has a **range guard** for a package heavier than anything the model was trained on (over 750 g). A tree model can't forecast past the heaviest payload it has seen, so the guard scales the forecast up for the extra weight, using the weight-to-power rule fitted on real flights and checked on the real 750 g flight. Before takeoff, the heavy drones then show **"Not enough battery"**. Be honest if asked: the synthetic flights were built with that same rule, so this isn't independent proof on them, and it still comes out 2–4 Wh low.
+
+**What it costs:** about 12% of flights carry the spare sensor. **Where it fails:** with no check flights it can't measure the error, and the margin only recovers to 63% (or 174 calls go to the operator).
+
+### Technical detail (for judge questions)
 
 ```
-data age/quality ──▶ model learns wrong power ──▶ overconfident P90 ──▶ wrong continue call
-      ▲ Layer 1: data health gate                    ▲ Layer 2: trusted calibration + operator review
+damaged/stale data ──▶ model learns too-low power ──▶ overconfident P90 ──▶ wrong "continue"
+     ▲ Layer 1: data health gate                         ▲ Layer 2: trusted calibration + operator review
 ```
 
-**Layer 1: data health gate (before retraining).**
-- **Check flights.** 3 per window (about 12%) carry a known-good backup sensor alongside the drone's own, and are uploaded manually, so they keep arriving when uploads break. The backup sensor's record is trusted training data.
-- **Sensor audit.** For each window, compare the damaged sensors' energy with the backup sensor's on that window's check flights (95% t-interval). If the ratio is clearly off 1, **correct** those records. If it's consistent with 1, **keep** them. Otherwise, **weight them 0.2** (unverified). Nothing is discarded.
-- **Freshness check.** Track how old the newest healthy-drone upload is, and flag broken uploads.
-
-**Layer 2: decision safeguards.**
-- **Trusted calibration.** The P90 is calibrated on held-out recent trusted flights (check flights and healthy-sensor flights), never on damaged-sensor records.
-- **Health badge.** Red when unverified records carry more than 10% of the training weight. Amber when damaged-sensor records were corrected, the upload is stale, or there's nothing trusted to calibrate on. Green otherwise.
-- **CONTINUE / RETURN / DEFER.** Defer when the P50–P90 band straddles the budget. When health is red, also defer a continue with less than 1 Wh to spare. Deferred flights are scored as returned (the safe choice) and counted as operator workload.
+- **Sensor audit:** per window, the ratio of damaged-sensor to backup-sensor energy on that window's check flights, with a 95% t-interval. Clearly off 1: **correct** the records (divide by the ratio). Consistent with 1: **keep** them. Inconclusive: keep them at **weight 0.2**.
+- **Freshness check:** age of the newest healthy-drone upload; broken uploads are flagged.
+- **Trusted calibration:** the P90 is calibrated on held-out recent check flights and healthy-sensor flights, never on damaged-sensor records.
+- **Health badge:** red when unverified records carry over 10% of the training weight; amber when records were corrected, uploads are stale, or there's too little trusted data to calibrate; green otherwise.
+- **CONTINUE / RETURN / DEFER:** defer when the P50–P90 band straddles the battery. When health is red, also defer a continue with under 1 Wh to spare. Deferred flights are scored as returned (the safe choice) and counted as operator workload.
 
 **Against the targets:**
 
@@ -263,17 +278,21 @@ flowchart LR
 
 ---
 
-## 7. The 10-minute demo script (draft)
+## 7. The 10-minute demo script: two runs
 
-| Time | Beat | On screen |
-|---|---|---|
-| 0:00–1:00 | **The decision.** A drone, a package, a battery. "Continue or come home?" Who uses it, and what an error costs | Flight 142 playing; drag the battery from 24 Wh (On track) to 20 Wh (Turn back). Then flight 900: turn back called 72 s before the pack dies |
-| 1:00–2:00 | **How the AI works.** Physics + ML, P90 safety margin, why 0.36 Wh is good enough | Architecture diagram, baseline numbers |
-| 2:00–4:00 | **Poison it.** Open the lab and press Demo (flight 268, 28.5 Wh, "Both"). The answer still looks confident ("On track", then "Committed: tight"), the health check says "Not monitored", and the hindsight says "Missed". The window charts show the P90 holding only 34–43% of the time | Poisoning lab, mission check |
-| 4:00–5:30 | **Why: the mechanism.** Dose-response vs placebo. "It's the bias, not the volume." The ML half broke, not physics. Heavy flights hit hardest | Mechanism chart |
-| 5:30–7:30 | **The fix.** Flip the countermeasure switch on the same flight: "Too close to call" at 0:20, sent to the operator, health amber, "damaged sensors read ×0.88: 1022 records corrected". The charts switch to the green line (about 90% coverage). Then show the unseen-defect results | Poisoning lab, fix on |
-| 7:30–8:45 | **Human in the loop.** A DEFER case: the operator sees the evidence, the badges and the explanation, takes an action, and it's logged. Review time: N seconds | Operator walkthrough |
-| 8:45–10:00 | **Limits and next step.** Where the fix fails, what we'd pilot, who owns what, when not to use it | Limits slide |
+The live demo is the **operator console** (top bar → Operator console). Its **Demo** panel has two buttons, **Run 1 · Today's model** and **Run 2 · Fixed model**. A caption over the map says what's happening at each moment, and a scoreboard compares the two runs at the end. Set the speed to 8× under Presenter controls before you start.
+
+| Time | Beat | On screen | Rubric |
+|---|---|---|---|
+| 0:00–1:00 | **The job.** Five drones carry medical supplies from a hub to five clinics. The AI forecasts each drone's energy, before launch and all the way round, and says whether it can make it. Who uses it: the operator. What an error costs: a lost drone and a missed delivery | Console, before launch: every card shows its launch check | R1 |
+| 1:00–1:45 | **The AI works on healthy data.** Off by 0.36 Wh on flights it never saw; safety margin holds about 90% | Results tab → "Healthy data: the model works" | R2 |
+| 1:45–4:30 | **Run 1 · Today's model.** Two things changed: some drones' current sensors got damaged (they read 12% low), and today's medical kits are heavier than anything the model has seen. Press **Run 1 → Start shift**. All five are cleared. At ~0:35 the AI says "too close to call", but its best guess says they'll make it, so the operator keeps flying. Past halfway: "the AI realizes it was wrong… too late to turn back". Three drones crash | Run 1 captions; crashes with smoke; "3 of 5 drones crashed" | R3, consequence |
+| 4:30–5:45 | **Why it broke.** Damaged sensors make the logs say flights used less energy, so the model learns missions need less. Bias, not volume: the same amount of unbiased noise does no harm. And a tree model can't forecast heavier than it has seen | Results tab → "Why it breaks", "As more sensors get damaged" | R4, R5 |
+| 5:45–8:00 | **Run 2 · Fixed model.** The sensor check: check flights with a trusted spare sensor measure the error (×0.879), the bad readings are corrected and none are deleted, and the model retrains. Heavy kits get their forecast scaled up for the weight. Before launch the model says drones 1, 3 and 5 need more charge, and the operator **approves the charge plan** (logged with review time). **Start shift**: all five deliver | Run 2: charge plan, approval, captions; scoreboard 2 → 5 deliveries, 3 → 0 crashes | R6, human oversight |
+| 8:00–9:00 | **Proof it's not one lucky demo.** Every condition, with and without the fix: miss 0.84 → 0.41 Wh, margin 51% → 92%, unsafe calls 4.0 → 0.4; holds on sensor faults it wasn't built for | Results tab → grid, "How the fix corrects it", stress tests | R3, R6 |
+| 9:00–10:00 | **Limits and next step.** Needs check flights (~12% of flights); without them the margin only reaches 63%. Synthetic heavy flights and simulated sensors, clearly labelled. Next: a 2-week shadow-mode pilot on one route | Limits slide | R7, governance |
+
+**Say what's simulated, once and plainly:** the damaged sensors, the timeline, the fleet staging, and drones 1, 3 and 5's heavier kits (real flights re-run at 1.0–1.2 kg) are simulated. The flights, the energy and the model are real.
 
 Rehearse with a timer. Record the fallback video from the final rehearsal.
 

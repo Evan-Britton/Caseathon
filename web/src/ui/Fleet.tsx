@@ -1,11 +1,12 @@
 import { useEffect, useMemo } from "react";
 import { lerpAt, sampleAt } from "../data";
-import { FLEET, VERDICT_TEXT, callLabel, crashAt, droneView, pathTime } from "../fleet";
+import { CHARGE_RESERVE, FLEET, VERDICT_TEXT, callLabel, chargePlan, crashAt, droneView, pathTime } from "../fleet";
 import type { DroneView, LoadedDrone } from "../fleet";
+import type { StoryRun } from "../fleetStore";
 import { fleetEnd, fleetStatus, useFleet } from "../fleetStore";
 import { useStore } from "../store";
 import { fmtClock, fmtNum } from "./format";
-import { FixSteps, Health, ScenarioControls, StoryControls, storyOf, storySetting } from "./Lab";
+import { FixSteps, Health, ScenarioControls, StoryControls, StoryNote, storyOf, storySetting } from "./Lab";
 
 const RATES = [2, 4, 8];
 
@@ -53,8 +54,11 @@ export function Fleet() {
   }, [s.open]);
 
   const views = useMemo(
-    () => (s.loaded ? s.loaded.map((d) => droneView(d, s.condition, s.fix, deadline, s.t, s.decisions[d.slot.flight])) : []),
-    [s.loaded, s.condition, s.fix, deadline, s.t, s.decisions],
+    () =>
+      s.loaded
+        ? s.loaded.map((d) => droneView(d, s.condition, s.fix, deadline, s.t, s.decisions[d.slot.flight], s.charge?.[d.slot.flight]))
+        : [],
+    [s.loaded, s.condition, s.fix, deadline, s.t, s.decisions, s.charge],
   );
 
   // Let the 3D scene colour each drone's ring and tag from what the console says it's doing.
@@ -81,6 +85,7 @@ export function Fleet() {
 
       {/* The 3D map shows through this empty cell; the scene's camera is centred on it. */}
       <div className="ops-map">
+        {s.loaded && <StoryBanner loaded={s.loaded} views={views} />}
         <p className="ops-credit" aria-hidden>
           {source && <>Data: {source.authors}, {source.license}</>}
           {mapCredits && <> · {mapCredits}</>}
@@ -148,7 +153,12 @@ function OpsBar({ views }: { views: DroneView[] }) {
 
       <div className="ops-clock">
         <span className="ops-time num" title="Simulated mission time">T+ {fmtClock(s.t)} <small>/ {fmtClock(end)}</small></span>
-        <button className="btn btn-accent" onClick={() => s.setPlaying(!s.playing)} disabled={!s.loaded}>
+        <button
+          className="btn btn-accent"
+          onClick={() => s.setPlaying(!s.playing)}
+          disabled={!s.loaded || (s.story === "run2" && !s.charge)}
+          title={s.story === "run2" && !s.charge ? "Approve the charge plan first" : undefined}
+        >
           {s.playing ? "Pause" : s.t >= end && s.t > 0 ? "Replay" : s.t > 0 ? "Resume" : "Start shift"}
         </button>
         <button className="btn" onClick={s.restart} disabled={!s.loaded || s.t === 0}>Restart</button>
@@ -178,19 +188,31 @@ function Scenario() {
   const sel = s.loaded?.find((d) => d.slot.flight === s.selected);
   if (!idx) return null;
   return (
-    <Panel title="Scenario" tag="simulated">
-      <StoryControls
-        story={storyOf(s.condition, s.fix)}
-        onStory={(st) => {
-          const { condition, fix } = storySetting(st);
-          s.setScenario(condition, fix);
-        }}
-        rowClass="ops-row"
-        fixTitle="The same damaged data with the fix: check flights correct the sensors' bias, and a range guard holds any payload heavier than the training data"
-      />
+    <Panel title="Demo" tag="simulated">
+      <div className="run-btns" role="radiogroup" aria-label="Demo run">
+        <button role="radio" aria-checked={s.story === "run1"} className="run-btn run-bad" onClick={() => s.startStory("run1")}>
+          <b>Run 1</b>
+          <span>Today's model</span>
+        </button>
+        <button role="radio" aria-checked={s.story === "run2"} className="run-btn run-good" onClick={() => s.startStory("run2")}>
+          <b>Run 2</b>
+          <span>Fixed model</span>
+        </button>
+      </div>
+      {s.story ? <p className="run-desc">{RUN_TEXT[s.story]}</p> : <StoryNote story={storyOf(s.condition, s.fix)} note={idx.note} compact />}
+      {s.story === "run2" && s.loaded && <ChargePlanBox loaded={s.loaded} />}
       <details className="ops-more">
         <summary>Presenter controls</summary>
-        <ScenarioControls idx={idx} condition={s.condition} fix={s.fix} onCondition={s.setCondition} onFix={s.setFix} rowClass="ops-row" fixLabel="audit, calibration + range guard" />
+        <StoryControls
+          story={s.story ? null : storyOf(s.condition, s.fix)}
+          onStory={(st) => {
+            const { condition, fix } = storySetting(st);
+            s.setScenario(condition, fix);
+          }}
+          rowClass="ops-row"
+          fixTitle="The same damaged data run through the sensor check, plus a range guard that scales up the forecast for any package heavier than the model has seen"
+        />
+        <ScenarioControls idx={idx} condition={s.condition} fix={s.fix} onCondition={s.setCondition} onFix={s.setFix} rowClass="ops-row" fixLabel="sensor check + range guard" />
         <div className="ops-row">
           <span className="lab-label">Speed</span>
           <div className="seg" role="radiogroup" aria-label="Playback speed">
@@ -218,6 +240,143 @@ function Scenario() {
   );
 }
 
+const RUN_TEXT: Record<StoryRun, string> = {
+  run1: "The model learned from damaged-sensor data, and today's medical kits (1.0–1.2 kg) are heavier than anything it has seen. The operator follows the AI's call.",
+  run2: "Same drones, same kits. The sensor check corrected the bad readings, and the forecast is corrected for the heavier kits. Before launch, it plans each drone's charge.",
+};
+
+/** "Drone 1", "Drones 1 and 3", "Drones 1, 3 and 5". */
+function droneList(nums: number[]): string {
+  if (nums.length === 1) return `Drone ${nums[0]}`;
+  return `Drones ${nums.slice(0, -1).join(", ")} and ${nums[nums.length - 1]}`;
+}
+
+/** Run 2, before launch: what the fixed model says each drone needs, for a person to approve. */
+function ChargePlanBox({ loaded }: { loaded: LoadedDrone[] }) {
+  const s = useFleet();
+  const deadline = useStore((st) => st.model?.deadlineFrac ?? 0.5);
+  const plan = useMemo(() => chargePlan(loaded, s.condition, s.fix, deadline), [loaded, s.condition, s.fix, deadline]);
+  const approval = s.log.find((l) => l.kind === "plan");
+  return (
+    <div className={`charge-plan ${s.charge ? "approved" : ""}`}>
+      <p className="charge-head">Charge plan before launch</p>
+      {plan.length === 0 ? (
+        <p className="ops-empty">Every drone already has enough charge.</p>
+      ) : (
+        <ul>
+          {plan.map((p) => {
+            const i = loaded.findIndex((d) => d.slot.flight === p.flight);
+            return (
+              <li key={p.flight}>
+                <strong>
+                  {i + 1} · {loaded[i].slot.cargo}
+                </strong>
+                <span className="num">
+                  {fmtNum(p.standard)} → <b>{fmtNum(p.charge)} Wh</b>
+                </span>
+                <small>
+                  needs up to {fmtNum(p.need90)} Wh + {Math.round(CHARGE_RESERVE * 100)}% reserve
+                </small>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {s.charge ? (
+        <p className="charge-ok">
+          ✓ Approved{approval?.seconds != null && ` after ${fmtNum(approval.seconds)} s of review`}. Batteries topped up.
+        </p>
+      ) : (
+        <button className="btn btn-accent charge-btn" onClick={s.approvePlan}>
+          Approve charge plan
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** One plain sentence over the map for each moment of the guided runs, and the scoreboard at the end. */
+function StoryBanner({ loaded, views }: { loaded: LoadedDrone[]; views: DroneView[] }) {
+  const s = useFleet();
+  if (!s.story) return null;
+  const done = s.t >= fleetEnd(loaded);
+  const nums = (pick: (v: DroneView, i: number) => boolean) => views.flatMap((v, i) => (pick(v, i) ? [i + 1] : []));
+  let tone: "info" | "warn" | "bad" | "good" = "info";
+  let text: string;
+  if (s.story === "run1") {
+    const down = nums((v) => v.crashed);
+    const late = nums((v) => /too late to turn back/i.test(v.status));
+    const unsure = s.log.filter((l) => l.auto).map((l) => loaded.findIndex((d) => d.slot.flight === l.flight) + 1);
+    if (done) {
+      tone = "bad";
+      text = `Run 1: ${down.length} of ${loaded.length} drones crashed. Only ${loaded.length - down.length} deliveries made.`;
+    } else if (down.length) {
+      tone = "bad";
+      text = `${droneList(down)} crashed: the battery ran dry on the way home.`;
+    } else if (late.length) {
+      tone = "warn";
+      text = `Past the halfway point the AI realizes it was wrong: ${droneList(late).toLowerCase()} ${late.length === 1 ? "doesn't" : "don't"} have the energy to get home. Too late to turn back.`;
+    } else if (unsure.length) {
+      const one = unsure.length === 1;
+      text = `The AI calls ${droneList(unsure).toLowerCase()} "too close to call", but its best guess says ${one ? "it'll" : "they'll"} make it. The operator keeps ${one ? "it" : "them"} flying.`;
+    } else if (s.t > 0) {
+      text = "Five medical drones head out. The AI says every one has enough battery.";
+    } else {
+      text = "Run 1 · Today's model. All five drones are cleared for launch. Press Start shift.";
+    }
+  } else {
+    const need = Object.keys(s.charge ?? {}).length;
+    const planned = chargePlan(loaded, s.condition, s.fix, useStore.getState().model?.deadlineFrac ?? 0.5).map(
+      (p) => loaded.findIndex((d) => d.slot.flight === p.flight) + 1,
+    );
+    const down = nums((v) => v.crashed);
+    if (done) {
+      tone = down.length ? "bad" : "good";
+      text = down.length ? `Run 2: ${down.length} crashed.` : `Run 2: all ${loaded.length} deliveries made, no crashes.`;
+    } else if (!s.charge) {
+      tone = "warn";
+      text = `Before launch, the fixed model says ${droneList(planned).toLowerCase()} need more charge than usual. Review and approve the charge plan.`;
+    } else if (s.t === 0) {
+      tone = "good";
+      text = `Charge plan approved: ${need} batteries topped up. Press Start shift.`;
+    } else {
+      text = `Every drone has the energy for the round trip, plus a ${Math.round(CHARGE_RESERVE * 100)}% reserve.`;
+    }
+  }
+  const r1 = s.results.run1;
+  const r2 = s.results.run2;
+  return (
+    <div className="story-wrap">
+      <p className={`story-banner tone-${tone}`} role="status">
+        {text}
+      </p>
+      {done && r1 && r2 && (
+        <table className="scoreboard">
+          <thead>
+            <tr>
+              <th />
+              <th scope="col">Run 1 · today</th>
+              <th scope="col">Run 2 · fixed</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Deliveries made</th>
+              <td className="bad">{r1.delivered}</td>
+              <td className="good">{r2.delivered}</td>
+            </tr>
+            <tr>
+              <th scope="row">Drones crashed</th>
+              <td className="bad">{r1.crashed}</td>
+              <td className="good">{r2.crashed}</td>
+            </tr>
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
 function Queue({ loaded, views }: { loaded: LoadedDrone[]; views: DroneView[] }) {
   const s = useFleet();
   const asking = loaded.map((d, i) => ({ d, v: views[i] })).filter((x) => x.v.needsDecision);
@@ -230,12 +389,13 @@ function Queue({ loaded, views }: { loaded: LoadedDrone[]; views: DroneView[] })
           <article key={d.slot.flight} className={`q-item tone-${v.tone}`} onClick={() => s.select(d.slot.flight)}>
             <div className="q-head">
               <strong>{d.slot.callsign} · {d.slot.cargo}</strong>
-              <span>{v.guarded ? "Outside training data" : callLabel(v.call.type)}</span>
+              <span>{v.guarded && v.call.type === "review" ? "Outside training data" : callLabel(v.call.type)}</span>
             </div>
-            {v.guarded ? (
-              <p>{fmtMass(d.meta.payload)} package; the model was trained on packages up to {fmtMass(d.trainedMaxG[`${s.condition}/on`])}.</p>
-            ) : (
-              e && <p>Needs {fmtNum(e.need50)}–{fmtNum(e.need90)} Wh, battery {fmtNum(v.budget)} Wh.</p>
+            {e && (
+              <p>
+                {v.guarded && `Corrected for the ${fmtMass(d.meta.payload)} package: `}
+                Needs {fmtNum(e.need50)}–{fmtNum(e.need90)} Wh, battery {fmtNum(v.budget)} Wh.
+              </p>
             )}
             <div className="q-actions">
               <button className="btn btn-stop" onClick={(ev) => { ev.stopPropagation(); s.act(d.slot.flight, "return"); }}>Return now</button>
@@ -275,11 +435,12 @@ function Detail({ d, v }: { d: LoadedDrone; v: DroneView }) {
         <span className="fd-rec-label" title={preflight ? "The forecast made as the drone lifts off, 5 s after the rotors start" : undefined}>
           {preflight ? "Launch check" : "System recommends"}
         </span>
-        <strong>{v.guarded && !decision ? "Hold: outside training data" : preflight ? v.status : live ? callLabel(live) : "Waiting for takeoff"}</strong>
-        {v.guarded && !decision && (
+        <strong>{preflight ? v.status : live ? callLabel(live) : "Waiting for takeoff"}</strong>
+        {v.guarded && (
           <p>
             Range guard: this {fmtMass(d.meta.payload)} package is heavier than anything in the training data (up to{" "}
-            {fmtMass(d.trainedMaxG[`${s.condition}/on`])}), so the forecast below can't be trusted. A person decides.
+            {fmtMass(d.trainedMaxG[`${s.condition}/on`])}), so the forecast is scaled up ×{fmtNum(v.payloadFactor, 2)} for the extra weight,
+            using the weight-to-power rule fitted on real flights.
           </p>
         )}
         {e && (
@@ -344,7 +505,16 @@ function Log() {
             <span className="num">{fmtClock(l.at)}</span>
             {l.kind === "flag" && <span>Flagged the data source to the data-quality owner</span>}
             {l.kind === "missed" && <span>{name(l.flight)}: no decision before the window closed (system said {callLabel(l.ai ?? "review")})</span>}
-            {l.kind === "decision" && (
+            {l.kind === "plan" && (
+              <span>
+                Approved the charge plan: {(l.charges ?? []).map((c) => `${name(c.flight)} → ${fmtNum(c.charge)} Wh`).join(", ")}
+                {l.seconds !== null && ` (reviewed in ${fmtNum(l.seconds)} s)`}
+              </span>
+            )}
+            {l.kind === "decision" && l.auto && (
+              <span>{name(l.flight)}: system said Too close to call; the operator followed its best guess and kept flying</span>
+            )}
+            {l.kind === "decision" && !l.auto && (
               <span>
                 {name(l.flight)}: system said {l.ai ? callLabel(l.ai) : "continue"}; you chose {l.action === "return" ? "Return" : "Continue"}
                 {l.seconds !== null ? ` in ${fmtNum(l.seconds)} s` : " (unprompted)"}
@@ -385,7 +555,7 @@ function DronePanel({ d, v, index, selected, onSelect }: { d: LoadedDrone; v: Dr
       </p>
       <p className="dp-line num">
         {v.crashed
-          ? crashLine(series, pathTime(crashAt(d, decision) ?? 0, decision))
+          ? crashLine(series, pathTime(crashAt(d, decision, v.budget) ?? 0, decision))
           : started
           ? `${fmtNum(Math.max(at(series.up), 0), 0)} m · ${fmtNum(at(series.groundSpeed), 1)} m/s · ${fmtNum(at(series.voltage), 1)} V · ${fmtNum(Math.max(at(series.power), 0), 0)} W`
           : `Launch check: needs ${fmtNum(v.launch.est.need50)}–${fmtNum(v.launch.est.need90)} Wh`}

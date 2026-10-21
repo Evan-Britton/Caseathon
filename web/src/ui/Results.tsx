@@ -43,9 +43,9 @@ export function Results() {
 
   return (
     <section className="results glass" aria-label="Experiment results">
-      <Block reqs={[2]} title="Clean baseline">
+      <Block reqs={[2]} title="Healthy data: the model works">
         <div className="res-hero">
-          <Stat value={fmtNum(hybrid.maeWh, 2)} unit="Wh" label="typical error" />
+          <Stat value={fmtNum(hybrid.maeWh, 2)} unit="Wh" label="typical miss" />
           <Stat value={pct(hybrid.p90)} label="safety margin held" />
           <Stat value={`${Math.round(physics.maeWh / hybrid.maeWh)}×`} label={`less error than physics alone (${fmtNum(physics.maeWh, 2)} Wh)`} />
         </div>
@@ -54,13 +54,13 @@ export function Results() {
         </p>
       </Block>
 
-      <Block reqs={[3, 6]} title="Poisoned data: no fix → fix" tag={<span className="sim-tag" title={r.simulated}>Simulated</span>}>
+      <Block reqs={[3, 6]} title="Bad data, without → with the fix" tag={<span className="sim-tag" title={r.simulated}>Simulated</span>}>
         <table className="res-grid">
           <thead>
             <tr>
               <th scope="col" />
-              <th scope="col" title="Mean absolute error of the energy-still-needed forecast">Error (Wh)</th>
-              <th scope="col" title="Share of checkpoints where the P90 safety margin really covered the energy needed">Margin held</th>
+              <th scope="col" title="How far off the energy forecast is, on average">Miss (Wh)</th>
+              <th scope="col" title="How often the safety margin really covered the energy needed (target 90%)">Margin held</th>
               <th scope="col" title={`Continue calls on flights that would have run out, out of ${r.decisions.total} flight-battery calls`}>Unsafe calls</th>
             </tr>
           </thead>
@@ -75,20 +75,30 @@ export function Results() {
             ))}
           </tbody>
         </table>
+        <p className="res-note">Stale: the healthy drones' uploads broke · Low quality: damaged sensors · Both: the two at once</p>
         <p className="res-note">
           Windows {r.windows[0]}–{r.windows[r.windows.length - 1]} · {r.seeds} seeds · {r.decisions.total} calls, {r.decisions.shouldReturn} should turn back
         </p>
       </Block>
 
-      <Block reqs={[4]} title="Over time, both defects">
+      <Block reqs={[4]} title="As more sensors get damaged">
         <OverTime r={r} clean={cleanMae} />
       </Block>
 
       <Block reqs={[5]} title="Why it breaks">
         <p className="res-chain">
-          {feed ? `Damaged sensors read current ${Math.round((1 - feed.currentFactor) * 100)}% low` : "Damaged sensors under-read current"} <i>→</i> model learns
-          missions need less energy (bias {fmtNum(both.off.biasWh, 2)} Wh) <i>→</i> margin held drops to{" "}
-          {pct(both.off.p90)} <i>→</i> {fmtNum(both.off.unsafe, 1)} unsafe continue calls.
+          {feed ? `Damaged sensors read ${Math.round((1 - feed.currentFactor) * 100)}% low` : "Damaged sensors read low"} <i>→</i> logs say flights used less
+          energy than they did <i>→</i> the model learns missions need less (it under-forecasts by {fmtNum(-both.off.biasWh, 2)} Wh) <i>→</i> its safety
+          margin holds only {pct(both.off.p90)} of the time <i>→</i> {fmtNum(both.off.unsafe, 1)} unsafe "keep flying" calls.
+        </p>
+      </Block>
+
+      <Block reqs={[6]} title="How the fix corrects it">
+        <p className="res-chain">
+          Check flights carry a trusted spare sensor <i>→</i> they measure how far off the damaged sensors are <i>→</i> the bad readings are corrected,
+          none deleted <i>→</i> the model retrains, and its margin is checked on trusted flights only <i>→</i> miss {fmtNum(both.off.maeWh, 2)} →{" "}
+          {fmtNum(both.on.maeWh, 2)} Wh, margin {pct(both.off.p90)} → {pct(both.on.p90)}, unsafe calls {fmtNum(both.off.unsafe, 1)} →{" "}
+          {fmtNum(both.on.unsafe, 1)}.
         </p>
       </Block>
 
@@ -98,7 +108,7 @@ export function Results() {
             <b>
               {held.length} of {r.unseen.length}
             </b>{" "}
-            unseen defects held with the fix: {span(held.map((u) => u.on.maeWh), (v) => fmtNum(v, 2))} Wh, {span(held.map((u) => u.on.p90), pct)} margin.
+            other sensor faults it wasn't built for still handled: {span(held.map((u) => u.on.maeWh), (v) => fmtNum(v, 2))} Wh, {span(held.map((u) => u.on.p90), pct)} margin.
           </li>
           <li className="bad">
             <b>Limit:</b> with no check flights the margin only reaches {pct(r.failure.on.p90)}, and {Math.round(r.failure.on.deferred)} calls go to the operator.

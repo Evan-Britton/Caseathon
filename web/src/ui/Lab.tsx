@@ -33,12 +33,17 @@ export function LabControls() {
   return (
     <div className="mlab">
       <StoryControls story={story} onStory={pick} rowClass="lab-row" />
+      {!lab.on && <StoryNote story="healthy" note={idx.note} />}
 
       {lab.on && (
         <>
-          <p className="lab-desc">
-            <span className="sim-tag" title={idx.note}>Simulated</span> {idx.conditions[lab.condition].desc}
-          </p>
+          {story ? (
+            <StoryNote story={story} note={idx.note} />
+          ) : (
+            <p className="lab-desc">
+              <span className="sim-tag" title={idx.note}>Simulated</span> {idx.conditions[lab.condition].desc}
+            </p>
+          )}
           {lab.fix && window !== undefined && window > 0 && <FixSteps idx={idx} condition={lab.condition} window={window} />}
           {m.scenarios && window !== undefined && health ? (
             <details className="mlab-more">
@@ -119,7 +124,7 @@ const STORIES: { id: SensorStory; label: string; cls: string; title: string; con
     cls: "seg-fix",
     condition: "combined",
     fix: true,
-    title: "The same damaged data with the fix: check flights measure the sensors' bias and their logs are corrected",
+    title: "The same damaged data run through the sensor check: check flights measure the error and the bad readings are corrected",
   },
 ];
 
@@ -135,6 +140,51 @@ export function storySetting(story: SensorStory): { condition: ScenarioCondition
 
 export function storyLabel(story: SensorStory): string {
   return STORIES.find((s) => s.id === story)!.label;
+}
+
+/**
+ * Plain words for each state of the sensor switch: how bad data gets in, and what it does to the model.
+ * "Damaged + fix" explains itself step by step (FixSteps). `compact` is one line, for the console.
+ */
+export function StoryNote({ story, note, compact = false }: { story: SensorStory | null; note: string; compact?: boolean }) {
+  const sim = (
+    <span className="sim-tag" title={note}>
+      Simulated
+    </span>
+  );
+  if (compact) {
+    const line =
+      story === "healthy"
+        ? "Every log comes from a working current sensor."
+        : story === "damaged"
+          ? "Some drones' damaged current sensors read 12% low and flood the logs, so the model thinks missions need less energy than they do."
+          : story === "fixed"
+            ? "Check flights with a trusted spare sensor correct the bad readings, and a too-heavy package gets its forecast scaled up for the weight before takeoff."
+            : null;
+    return line ? <p className="story-note compact">{story !== "healthy" && sim} {line}</p> : null;
+  }
+  if (story === "healthy")
+    return (
+      <p className="story-note">
+        <b>Healthy sensors.</b> Every flight log comes from a working current sensor, so the model learns how much energy missions really
+        take.
+      </p>
+    );
+  if (story === "damaged")
+    return (
+      <div className="story-note bad">
+        <p>
+          {sim} <b>How bad data gets in.</b> Drones get bumped on landing, rained on, or a connector works loose. The current sensor keeps
+          working but reads about 12% low, and nobody notices because the drone still flies. A glitch makes these units log twice as often,
+          and the healthy drones' uploads have broken, so most new logs are bad.
+        </p>
+        <p>
+          <b>What it does to the model.</b> The logs say each flight used less energy than it really did, so the model learns that
+          missions need less. It sounds just as confident, and starts clearing drones that can't make it home.
+        </p>
+      </div>
+    );
+  return null;
 }
 
 /** The demo's one control: healthy sensor data, damaged-sensor data, or the damaged data with the fix. */
@@ -217,7 +267,10 @@ export function FixSteps({
     ["Warn people", `Data health: ${status[on.status]}. Close calls go to the operator.`],
   ];
   if (guardMaxG !== undefined) {
-    steps.push(["Too heavy?", `Packages over ${fmtNum(guardMaxG, 0)} g, more than it was trained on, wait for a person.`]);
+    steps.push([
+      "Too heavy?",
+      `A package over ${fmtNum(guardMaxG, 0)} g is heavier than anything it trained on, so its forecast is scaled up for the extra weight before takeoff, and a person checks close calls.`,
+    ]);
   }
   const w = window - 1;
   return (
@@ -234,6 +287,10 @@ export function FixSteps({
         Before → after: forecast off by {fmtNum(before.maeWh[w], 2)} → <b>{fmtNum(after.maeWh[w], 2)} Wh</b> · safety margin worked{" "}
         {pct(before.p90Coverage[w])} → <b>{pct(after.p90Coverage[w])}</b> of the time
       </p>
+      <p className="fix-real">
+        In a real fleet: put a trusted spare sensor on a few flights each week, the way you check a scale against a known weight. It also
+        caught sensor faults it wasn't built for: reading 20% low, drifting, a fixed offset, reading high.
+      </p>
     </div>
   );
 }
@@ -246,7 +303,7 @@ export function ScenarioControls({
   onCondition,
   onFix,
   rowClass,
-  fixLabel = "audit + trusted calibration",
+  fixLabel = "sensor check",
 }: {
   idx: ScenarioIndex;
   condition: ScenarioCondition;

@@ -1703,6 +1703,36 @@ select {
   color: var(--accent);
 }
 
+/* Plain words under the sensor switch: how bad data gets in, and what it does. */
+.story-note {
+  display: grid;
+  gap: 6px;
+  padding: 6px 16px 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.story-note b {
+  color: var(--text);
+}
+
+.story-note .sim-tag {
+  margin-right: 4px;
+  font-size: 9px;
+}
+
+.ops .story-note {
+  padding: 0;
+}
+
+.fix-real {
+  margin-top: 6px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
 /* "Damaged + fix": the fix's steps, with this window's numbers. */
 .fix-steps {
   margin: 8px 16px 0;
@@ -3051,4 +3081,191 @@ select {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ---------- guided demo: Run 1 / Run 2 ---------- */
+
+.run-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.run-btn {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--inset-edge);
+  background: var(--inset);
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+}
+
+.run-btn b {
+  font-family: var(--display);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.run-btn span {
+  font-size: 12px;
+}
+
+.run-btn.run-bad[aria-checked="true"] {
+  border-color: rgba(255, 79, 94, 0.6);
+  background: rgba(255, 79, 94, 0.12);
+}
+
+.run-btn.run-good[aria-checked="true"] {
+  border-color: rgba(62, 232, 168, 0.6);
+  background: rgba(62, 232, 168, 0.1);
+}
+
+.run-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.charge-plan {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 184, 77, 0.45);
+  background: rgba(255, 184, 77, 0.08);
+}
+
+.charge-plan.approved {
+  border-color: rgba(62, 232, 168, 0.45);
+  background: rgba(62, 232, 168, 0.07);
+}
+
+.charge-head {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--warn);
+}
+
+.charge-plan.approved .charge-head {
+  color: var(--go);
+}
+
+.charge-plan ul {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+}
+
+.charge-plan li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0 8px;
+  font-size: 12.5px;
+}
+
+.charge-plan li b {
+  color: var(--text);
+}
+
+.charge-plan li small {
+  grid-column: 1 / -1;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.charge-ok {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--go);
+}
+
+.charge-btn {
+  justify-self: start;
+}
+
+/* One plain sentence over the map for each moment, and the scoreboard at the end. */
+.story-wrap {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(620px, calc(100% - 32px));
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  z-index: 2;
+}
+
+.story-banner {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--inset-edge);
+  background: rgba(10, 10, 14, 0.88);
+  backdrop-filter: blur(8px);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.story-banner.tone-warn {
+  border-color: rgba(255, 184, 77, 0.6);
+  color: var(--warn);
+}
+
+.story-banner.tone-bad {
+  border-color: rgba(255, 79, 94, 0.6);
+  color: var(--stop);
+}
+
+.story-banner.tone-good {
+  border-color: rgba(62, 232, 168, 0.6);
+  color: var(--go);
+}
+
+.scoreboard {
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(10, 10, 14, 0.9);
+  font-size: 13px;
+}
+
+.scoreboard th,
+.scoreboard td {
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.scoreboard thead th {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.scoreboard tbody th {
+  text-align: left;
+  font-weight: 500;
+}
+
+.scoreboard td {
+  font-family: var(--display);
+  font-size: 18px;
+}
+
+.scoreboard td.bad {
+  color: var(--stop);
+}
+
+.scoreboard td.good {
+  color: var(--go);
 }

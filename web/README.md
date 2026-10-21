@@ -126,7 +126,7 @@ The CMU packages top out at 500 g (one flight at 750 g). To show what happens wh
 npm run synthetic
 ```
 
-The console's countermeasure adds a **range guard**: any payload heavier than the heaviest one in the fixed model's training data is held for a person to decide. The Results tab experiments don't include the guard.
+The console's countermeasure adds a **range guard** for any payload heavier than the heaviest one in the fixed model's training data (750 g). A tree model can't forecast past what it has seen, so the guard scales its forecast up from 750 g to the real payload with the same fitted weight-to-power rule. It also sends close calls to a person. Before takeoff, this turns the heavy drones' launch check into "Not enough battery". Because the synthetic flights were built with that same rule, the correction isn't independent evidence on them; it still comes out 2–4 Wh low. The Results tab experiments don't include the guard.
 
 ### Results scorecard
 
