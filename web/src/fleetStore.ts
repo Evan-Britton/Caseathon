@@ -40,10 +40,8 @@ interface FleetState {
   askedAt: Record<number, number>;
   log: LogEntry[];
   flagged: boolean;
+  /** The drone the camera follows; the other drones' paths fade. */
   selected: number;
-  /** Camera locks onto the selected drone and the other drones' paths fade. */
-  follow: boolean;
-  setFollow: (follow: boolean) => void;
   openConsole: () => Promise<void>;
   closeConsole: () => void;
   setCondition: (c: ScenarioCondition) => void;
@@ -74,7 +72,6 @@ export const useFleet = create<FleetState>((set, get) => ({
   rate: 4,
   hold: false,
   selected: FLEET[0].flight,
-  follow: false,
   ...fresh,
 
   openConsole: async () => {
@@ -102,7 +99,6 @@ export const useFleet = create<FleetState>((set, get) => ({
   setRate: (rate) => set({ rate }),
   setHold: (hold) => set({ hold }),
   select: (selected) => set({ selected }),
-  setFollow: (follow) => set({ follow }),
   restart: () => set({ ...fresh }),
 
   tick: (dt) => {

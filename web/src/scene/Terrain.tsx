@@ -24,8 +24,8 @@ const STEP = 2; // sample every 2nd pixel: ~385 x 385 vertices
 // about (2 * PIT_RADIUS + 1) px (~33 m); hills, ridges and wide valleys are unchanged.
 const PIT_RADIUS = 4;
 const TILE_PX = 256;
-export const M_PER_DEG_LAT = 110_540; // same conversion as scripts/build_web_data.py
-export const M_PER_DEG_LON_EQ = 111_320;
+const M_PER_DEG_LAT = 110_540; // same conversion as scripts/build_web_data.py
+const M_PER_DEG_LON_EQ = 111_320;
 const tileUrl = (x: number, y: number) => `https://elevation-tiles-prod.s3.amazonaws.com/terrarium/${ZOOM}/${x}/${y}.png`;
 
 const worldX = (lon: number) => ((lon + 180) / 360) * 2 ** ZOOM * TILE_PX;
@@ -101,6 +101,32 @@ interface TerrainData {
   maxH: number;
   launchElevation: number; // m above sea level per the elevation model
   radius: number; // m, fade-out radius around the launch point
+}
+
+// How far a levelled plaza takes to blend back into the real terrain, m.
+const PLAZA_BLEND = 20;
+
+/**
+ * Levels the ground within `radius` m of the launch point to the launch point's height, blending back
+ * to the real terrain over PLAZA_BLEND m. The mesh and the ground sampler are both levelled, so anything
+ * placed with the sampler sits flat on the drawn ground.
+ */
+function levelPlaza(d: TerrainData, radius: number): TerrainData {
+  const h0 = d.ground(0, 0);
+  // 0 inside the plaza, easing to 1 out on the real terrain.
+  const weight = (x: number, z: number) => {
+    const t = Math.min(Math.max((Math.hypot(x, z) - radius) / PLAZA_BLEND, 0), 1);
+    return t * t * (3 - 2 * t);
+  };
+  const pos = d.geometry.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const w = weight(pos.getX(i), pos.getZ(i));
+    if (w < 1) pos.setY(i, h0 + (pos.getY(i) - h0) * w);
+  }
+  pos.needsUpdate = true;
+  d.geometry.computeVertexNormals();
+  const ground: GroundSampler = (x, z) => h0 + (d.ground(x, z) - h0) * weight(x, z);
+  return { ...d, ground };
 }
 
 async function buildTerrain(lat: number, lon: number): Promise<TerrainData> {
@@ -258,7 +284,8 @@ const fragmentShader = /* glsl */ `
   }
 `;
 
-export function Terrain({ meta }: { meta: FlightMeta }) {
+/** `plaza`: level the ground within this many metres of the launch point (the operator console's hub). */
+export function Terrain({ meta, plaza }: { meta: FlightMeta; plaza?: number }) {
   const setGround = useStore((s) => s.setGround);
   const setMapCredits = useStore((s) => s.setMapCredits);
   const [data, setData] = useState<TerrainData | null>(null);
@@ -268,7 +295,8 @@ export function Terrain({ meta }: { meta: FlightMeta }) {
     let cancelled = false;
     let built: TerrainData | null = null;
     buildTerrain(lat, lon)
-      .then((d) => {
+      .then((raw) => {
+        const d = plaza ? levelPlaza(raw, plaza) : raw;
         if (cancelled) return d.geometry.dispose();
         built = d;
         setData(d);
@@ -282,7 +310,7 @@ export function Terrain({ meta }: { meta: FlightMeta }) {
       setData(null);
       setGround(null);
     };
-  }, [lat, lon, setGround, setMapCredits]);
+  }, [lat, lon, plaza, setGround, setMapCredits]);
 
   const material = useMemo(
     () =>

@@ -81,8 +81,9 @@ export const CLEARANCE_M = 18;
  * The lift looks ahead and behind and is smoothed, so the drone climbs over a ridge instead of
  * snapping up. This changes the 3D drawing only: recorded altitude, power and energy are untouched.
  *
- * `ground(x, z)` is the terrain height above the launch point at three.js x (east) and z (south);
- * (ox, oz) is this flight's launch point in the same frame.
+ * `ground(x, z)` is the terrain height above the hub at three.js x (east) and z (south); (ox, oz) is
+ * this flight's launch pad in the same frame. The recorded heights are above that pad, so the whole
+ * flight is first set on the pad's ground height, so it takes off from and lands on the pad.
  */
 export function followTerrain(
   series: FlightSeries,
@@ -91,13 +92,14 @@ export function followTerrain(
   oz: number,
 ): FlightSeries {
   const n = series.t.length;
+  const pad = ground(ox, oz);
   const smooth = (x: number) => x * x * (3 - 2 * x);
   const raw = new Array<number>(n).fill(0);
   for (let i = 0; i < n; i++) {
     const up = series.up[i];
     // Clearance fades in as the drone leaves the pad, so it doesn't float up off the ground at takeoff.
     const want = CLEARANCE_M * smooth(Math.min(Math.max((up - 2) / 10, 0), 1));
-    raw[i] = Math.max(0, ground(series.east[i] + ox, -series.north[i] + oz) + want - up);
+    raw[i] = Math.max(0, ground(series.east[i] + ox, -series.north[i] + oz) - pad + want - up);
   }
   const dt = (series.t[n - 1] - series.t[0]) / Math.max(n - 1, 1);
   const w = Math.max(2, Math.round(6 / dt)); // look 6 s ahead and behind
@@ -117,7 +119,7 @@ export function followTerrain(
       sum += mx[j];
       cnt++;
     }
-    return +(u + sum / cnt).toFixed(2);
+    return +(pad + u + sum / cnt).toFixed(2);
   });
   return { ...series, up };
 }

@@ -8,7 +8,7 @@ import { clock, useStore } from "../store";
 import type { CameraMode, FlightMeta, FlightSeries } from "../types";
 import { BODY_LIFT, Drone, dronePose } from "./Drone";
 import { Effects } from "./Effects";
-import { FleetScene } from "./FleetScene";
+import { FleetScene, HUB_PLAZA_M } from "./FleetScene";
 import { FlightPath } from "./FlightPath";
 import { LaunchPad } from "./LaunchPad";
 import { SCENE } from "./palette";
@@ -43,7 +43,7 @@ export function Scene() {
       {((basemap === "grid" && !fleet) || (fleet && !ground)) && <Ground />}
       {!fleet && <LaunchPad />}
       <Stars />
-      {fleet && <Terrain meta={fleet[0].meta} />}
+      {fleet && <Terrain meta={fleet[0].meta} plaza={HUB_PLAZA_M} />}
       {fleet && <FleetScene loaded={fleet} />}
       {!fleet && meta && basemap === "terrain" && <Terrain meta={meta} />}
       {!fleet && series && meta && (

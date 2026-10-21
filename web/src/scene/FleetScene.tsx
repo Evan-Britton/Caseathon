@@ -1,5 +1,5 @@
 import { useFrame, useThree } from "@react-three/fiber";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Color, Group, Mesh, MeshBasicMaterial, PerspectiveCamera, RingGeometry, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { lerpAt, sampleAt } from "../data";
@@ -14,7 +14,6 @@ import { FlightPath } from "./FlightPath";
 import { drape } from "./drape";
 import { LaunchPad } from "./LaunchPad";
 import { SCENE, toWorld } from "./palette";
-import { M_PER_DEG_LAT, M_PER_DEG_LON_EQ } from "./Terrain";
 
 const ARM_ANGLES = [45, 135, 225, 315].map((d) => (d * Math.PI) / 180);
 const ARM_REACH = 0.33;
@@ -35,14 +34,21 @@ export const fleetTags: (HTMLDivElement | null)[] = [];
 /** DOM labels for the hub (index 0) and each drone's destination (index 1 + drone), moved each frame by RouteLabels. */
 export const routeLabels: (HTMLDivElement | null)[] = [];
 
-/** Each drone's real launch point, in metres east and south of the first drone's (three.js x and z). */
-export function realOffsets(loaded: LoadedDrone[]): { x: number; z: number }[] {
-  const ref = loaded[0].meta.origin;
-  const cos = Math.cos((ref.lat * Math.PI) / 180);
-  return loaded.map((d) => ({
-    x: (d.meta.origin.lon - ref.lon) * M_PER_DEG_LON_EQ * cos,
-    z: -(d.meta.origin.lat - ref.lat) * M_PER_DEG_LAT,
-  }));
+/** Distance from the hub centre to each drone's pad, metres: enough that neighbouring drones and their rings never touch. */
+const PAD_RADIUS = 22;
+/** Radius of the level ground around the hub, metres: every pad and its drone sit flat, never cut into a slope. */
+export const HUB_PLAZA_M = PAD_RADIUS + 10;
+
+/**
+ * Where each drone takes off and lands, in metres east and south of the hub (three.js x and z). The five
+ * real flights launched within a few metres of each other, so in the console each drone gets its own pad
+ * around the hub, set out along its route's bearing so the routes fan out instead of crossing.
+ */
+function padOffsets(loaded: LoadedDrone[]): { x: number; z: number }[] {
+  return loaded.map(({ slot }) => {
+    const th = (slot.bearing * Math.PI) / 180;
+    return { x: Math.sin(th) * PAD_RADIUS, z: -Math.cos(th) * PAD_RADIUS };
+  });
 }
 
 /** Time to draw drone d at: the fleet clock, or running its path backwards once it has been recalled. */
@@ -51,14 +57,18 @@ function droneTime(d: LoadedDrone): number {
 }
 
 export function FleetScene({ loaded }: { loaded: LoadedDrone[] }) {
-  const offsets = useMemo(() => realOffsets(loaded), [loaded]);
+  const offsets = useMemo(() => padOffsets(loaded), [loaded]);
   const ground = useStore((s) => s.ground);
-  const follow = useFleet((s) => s.follow);
   const selected = useFleet((s) => s.selected);
   // The routes cross hills the recorded heights never saw, so draw each flight terrain-following.
   const drawn = useMemo(
     () => loaded.map((d, i) => (ground ? followTerrain(d.series, ground, offsets[i].x, offsets[i].z) : d.series)),
     [loaded, ground, offsets],
+  );
+  // Each path is drawn relative to its own pad, so its curtain samples the terrain shifted by the pad's offset.
+  const padGround = useMemo(
+    () => offsets.map((o) => (ground ? (x: number, z: number) => ground(x + o.x, z + o.z) : null)),
+    [ground, offsets],
   );
   return (
     <>
@@ -71,7 +81,7 @@ export function FleetScene({ loaded }: { loaded: LoadedDrone[] }) {
       <RouteLabels loaded={loaded} offsets={offsets} />
       {loaded.map((d, i) => (
         <group key={d.slot.flight} position={[offsets[i].x, 0, offsets[i].z]}>
-          <FlightPath series={drawn[i]} ground={ground} getTime={() => droneTime(d)} fade={follow && selected !== d.slot.flight} />
+          <FlightPath series={drawn[i]} ground={padGround[i]} getTime={() => droneTime(d)} fade={selected !== d.slot.flight} />
           <FleetDrone d={d} series={drawn[i]} index={i} offset={offsets[i]} />
         </group>
       ))}
@@ -93,7 +103,7 @@ function RouteLabels({ loaded, offsets }: { loaded: LoadedDrone[]; offsets: { x:
       el.style.opacity = projected.z < 1 ? "1" : "0";
       el.style.transform = `translate(${((projected.x + 1) / 2) * size.width}px, ${((1 - projected.y) / 2) * size.height}px) translate(-50%, -100%)`;
     };
-    place(routeLabels[0], offsets[0].x, offsets[0].z);
+    place(routeLabels[0], 0, 0);
     loaded.forEach((d, i) => place(routeLabels[i + 1], offsets[i].x + d.dest.east, offsets[i].z - d.dest.north));
   });
   return null;
@@ -127,11 +137,11 @@ function FleetDrone({ d, series, index, offset }: { d: LoadedDrone; series: Flig
       const lean = Math.min(lerpAt(series.groundSpeed, i, f) * 1.3, 16) * (Math.PI / 180);
       body.current.rotation.set(-lean, -headingRad, 0, "YXZ");
     }
-    const airborne = y > 0.5;
+    const airborne = lerpAt(d.series.up, i, f) > 0.5; // recorded height above the pad
     if (!reducedMotion) {
       for (const [k, r] of rotors.current.entries()) if (r) r.rotation.y += (k % 2 ? 1 : -1) * delta * (airborne ? 60 : 8);
     }
-    // Terrain under the drone, in the same launch-relative coordinates as the map.
+    // Terrain under the drone, in the hub-relative coordinates of the map.
     const gnd = useStore.getState().ground;
     const g = gnd ? gnd(x + offset.x, z + offset.z) : 0;
     marker.current?.position.set(x, 0, z);
@@ -142,7 +152,7 @@ function FleetDrone({ d, series, index, offset }: { d: LoadedDrone; series: Flig
       drop.current.position.y = -h / 2;
       drop.current.visible = airborne && h > 0.5;
     }
-    // The map's scan pulse follows the drone you have selected.
+    // The camera and the map's scan pulse follow the drone you have selected.
     if (useFleet.getState().selected === d.slot.flight) Object.assign(dronePose, { x: x + offset.x, y, z: z + offset.z });
 
     const st = fleetStatus[d.slot.flight];
@@ -154,7 +164,7 @@ function FleetDrone({ d, series, index, offset }: { d: LoadedDrone; series: Flig
       projected.set(x + offset.x, y + 10, z + offset.z).project(camera);
       const visible = projected.z < 1;
       tag.style.opacity = visible ? "1" : "0";
-      // The five flew from the same launch site, so stagger the tags to keep them from stacking.
+      // The pads are only tens of metres apart, so stagger the tags to keep them from stacking in a wide view.
       const lift = index * 26;
       tag.style.transform = `translate(${((projected.x + 1) / 2) * size.width}px, ${((1 - projected.y) / 2) * size.height - lift}px) translate(-50%, -100%)`;
       // A compact numbered badge. Name and status only show when the drone needs attention or is selected.
@@ -236,7 +246,7 @@ function FleetDrone({ d, series, index, offset }: { d: LoadedDrone; series: Flig
   );
 }
 
-/** Frames all five routes over the map, and lets the viewer orbit and zoom. */
+/** Always follows the selected drone, at a three-quarter angle; the viewer can still orbit and zoom around it. */
 function FleetCamera({ loaded, offsets }: { loaded: LoadedDrone[]; offsets: { x: number; z: number }[] }) {
   const { camera, gl, size } = useThree();
   const controls = useMemo(() => {
@@ -249,39 +259,13 @@ function FleetCamera({ loaded, offsets }: { loaded: LoadedDrone[]; offsets: { x:
     return () => controls.disconnect();
   }, [controls, gl]);
 
-  const aspect = size.width / size.height;
-  // Frame all five routes together (the overview).
-  const frame = useCallback(() => {
-    let minX = Infinity;
-    let maxX = -Infinity;
-    let minZ = Infinity;
-    let maxZ = -Infinity;
-    let top = 0;
-    loaded.forEach((d, i) => {
-      for (let k = 0; k < d.series.east.length; k++) {
-        minX = Math.min(minX, d.series.east[k] + offsets[i].x);
-        maxX = Math.max(maxX, d.series.east[k] + offsets[i].x);
-        minZ = Math.min(minZ, -d.series.north[k] + offsets[i].z);
-        maxZ = Math.max(maxZ, -d.series.north[k] + offsets[i].z);
-      }
-      top = Math.max(top, ...d.series.up);
-    });
-    const cx = (minX + maxX) / 2;
-    const cz = (minZ + maxZ) / 2;
-    const span = Math.max(maxX - minX, maxZ - minZ, 80);
-    const dist = (span * 1.25 + top * 0.8) * Math.max(1, 1.2 / aspect);
-    camera.position.set(cx + dist * 0.45, top + dist * 0.55, cz + dist * 0.85);
-    controls.target.set(cx, top / 3, cz);
-    controls.update();
-  }, [loaded, offsets, camera, controls, aspect]);
-
-  // Frame once when the fleet appears or the window is resized to a different shape.
+  // Start at a three-quarter view of the selected drone's pad when the fleet appears.
   useEffect(() => {
-    frame();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loaded, offsets, Math.round(aspect * 4)]);
-
-  const wasFollowing = useRef(false);
+    const i = Math.max(0, loaded.findIndex((d) => d.slot.flight === useFleet.getState().selected));
+    controls.target.set(offsets[i].x, 0, offsets[i].z);
+    camera.position.copy(controls.target).add(START_VIEW);
+    controls.update();
+  }, [loaded, offsets, camera, controls]);
 
   // The console's panels frame the 3D view; shift the camera so the fleet is centred in the open map area.
   useEffect(() => {
@@ -307,30 +291,19 @@ function FleetCamera({ loaded, offsets }: { loaded: LoadedDrone[]; offsets: { x:
 
   useFrame((_, delta) => {
     camera.up.set(0, 1, 0);
-    const following = useFleet.getState().follow;
-    if (following) {
-      if (!wasFollowing.current) {
-        // Zoom in on the drone the first time, keeping the viewer's current angle.
-        wasFollowing.current = true;
-        tmpOff.copy(camera.position).sub(controls.target).setLength(150);
-        camera.position.copy(controls.target).add(tmpOff);
-      }
-      // Glide the orbit target onto the selected drone, carrying the camera with it.
-      const k = 1 - Math.exp(-delta * 9);
-      tmpGoal.set(dronePose.x, dronePose.y * 0.6, dronePose.z);
-      tmpStep.copy(tmpGoal).sub(controls.target).multiplyScalar(k);
-      controls.target.add(tmpStep);
-      camera.position.add(tmpStep);
-    } else if (wasFollowing.current) {
-      wasFollowing.current = false;
-      frame();
-    }
+    // Glide the orbit target onto the selected drone, carrying the camera with it.
+    const k = 1 - Math.exp(-delta * 9);
+    tmpGoal.set(dronePose.x, dronePose.y * 0.6, dronePose.z);
+    tmpStep.copy(tmpGoal).sub(controls.target).multiplyScalar(k);
+    controls.target.add(tmpStep);
+    camera.position.add(tmpStep);
     controls.update();
   });
   return null;
 }
 
-const tmpOff = new Vector3();
+// Camera offset from the followed drone: 150 m out, above and behind at a three-quarter angle.
+const START_VIEW = new Vector3(0.45, 0.55, 0.85).setLength(150);
 const tmpGoal = new Vector3();
 const tmpStep = new Vector3();
 

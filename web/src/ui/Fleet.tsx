@@ -81,17 +81,11 @@ export function Fleet() {
 
       {/* The 3D map shows through this empty cell; the scene's camera is centred on it. */}
       <div className="ops-map">
-        <div className="seg ops-cam" role="radiogroup" aria-label="Camera">
-          <button role="radio" aria-checked={!s.follow} onClick={() => s.setFollow(false)}>Overview</button>
-          <button role="radio" aria-checked={s.follow} onClick={() => s.setFollow(true)} title="Lock onto the selected drone and fade the other paths">
-            Follow drone {sel >= 0 ? sel + 1 : ""}
-          </button>
-        </div>
         <p className="ops-credit" aria-hidden>
           {source && <>Data: {source.authors}, {source.license}</>}
           {mapCredits && <> · {mapCredits}</>}
           <br />
-          Routes and destinations are illustrative; speed, altitude, power and energy are from the real flights.
+          Routes, destinations and the levelled hub are illustrative; speed, altitude, power and energy are from the real flights.
         </p>
       </div>
 

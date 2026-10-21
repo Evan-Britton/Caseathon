@@ -3075,14 +3075,6 @@ select {
   border-radius: 999px;
 }
 
-.ops-cam {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  pointer-events: auto;
-  background: rgba(10, 10, 14, 0.85);
-}
-
 .ops-more > .fd-chart {
   margin-top: 8px;
 }
