@@ -114,7 +114,7 @@ function OpsBar({ views }: { views: DroneView[] }) {
   const end = s.loaded ? fleetEnd(s.loaded) : 0;
   const decisions = s.log.filter((l) => l.kind === "decision");
   const alerts = views.filter((v) => v.needsDecision).length;
-  const short = views.filter((v) => v.verdict === "ran-short" || v.verdict === "no-decision-short").length;
+  const short = views.filter((v) => v.verdict === "landed-empty" || v.verdict === "ran-short" || v.verdict === "no-decision-short").length;
 
   return (
     <header className="ops-bar">
@@ -135,7 +135,7 @@ function OpsBar({ views }: { views: DroneView[] }) {
       <dl className="ops-stats">
         <div className={alerts ? "alert" : ""}><dt>Alerts</dt><dd className="num">{alerts}</dd></div>
         <div><dt>Your decisions</dt><dd className="num">{decisions.length}</dd></div>
-        <div className={short ? "alert" : ""}><dt>Would have run out</dt><dd className="num">{short}</dd></div>
+        <div className={short ? "alert" : ""}><dt>Out of battery</dt><dd className="num">{short}</dd></div>
       </dl>
 
       <div className="ops-clock">
@@ -230,17 +230,21 @@ function Detail({ d, v }: { d: LoadedDrone; v: DroneView }) {
   const s = useFleet();
   const idx = useStore((st) => st.scenarioIndex);
   const decision = s.decisions[d.slot.flight];
-  const e = v.state.est;
+  // Before takeoff, show the launch check: the forecast the drone gets as it lifts off.
+  const preflight = v.state.phase === "standby";
+  const e = preflight ? v.launch.est : v.state.est;
   const canAct = !decision && !v.settled && v.state.phase !== "standby" && v.state.phase !== "na";
   const health = idx?.health[`${s.condition}/${s.fix ? "on" : "off"}/${d.window}`];
-  const live = v.state.live;
+  const live = preflight ? v.launch.call : v.state.live;
 
   return (
     <Panel title={`${d.slot.callsign}: ${d.slot.cargo}`} tag={`${fmtNum(v.budget)} Wh pack`}>
       <p className="fc-sub">To {d.slot.destination}, {fmtNum(d.oneWayM / 1000, 2)} km out from the hub</p>
       <div className={`fd-rec tone-${live === "return" ? "stop" : live === "review" ? "warn" : live === "continue" ? "go" : "idle"}`}>
-        <span className="fd-rec-label">System recommends</span>
-        <strong>{live ? callLabel(live) : "Waiting for takeoff"}</strong>
+        <span className="fd-rec-label" title={preflight ? "The forecast made as the drone lifts off, 5 s after the rotors start" : undefined}>
+          {preflight ? "Launch check" : "System recommends"}
+        </span>
+        <strong>{preflight ? v.status : live ? callLabel(live) : "Waiting for takeoff"}</strong>
         {e && (
           <p>
             Forecast {fmtNum(e.need50)}–{fmtNum(e.need90)} Wh against {fmtNum(v.budget)} Wh
@@ -319,8 +323,10 @@ function DronePanel({ d, v, index, selected, onSelect }: { d: LoadedDrone; v: Dr
   const started = v.state.phase !== "standby" && v.state.phase !== "na";
   const { i, f } = sampleAt(series.t, Math.min(pathTime(t, decision), series.t[series.t.length - 1]));
   const at = (a: number[]) => lerpAt(a, i, f);
-  const e = v.state.est;
-  const top = Math.max(v.budget, e?.need90 ?? 0) * 1.12;
+  // Before takeoff the gauge shows the launch check; after that, the live forecast.
+  const e = started ? v.state.est : v.launch.est;
+  const top = Math.max(v.budget, e?.need90 ?? 0, v.usedWh) * 1.12;
+  const leftPct = Math.max(0, Math.round(((v.budget - v.usedWh) / v.budget) * 100));
   const pct = (x: number) => `${Math.min(100, Math.max(0, (x / top) * 100))}%`;
 
   return (
@@ -334,14 +340,18 @@ function DronePanel({ d, v, index, selected, onSelect }: { d: LoadedDrone; v: Dr
       <p className="dp-line num">
         {started
           ? `${fmtNum(Math.max(at(series.up), 0), 0)} m · ${fmtNum(at(series.groundSpeed), 1)} m/s · ${fmtNum(at(series.voltage), 1)} V · ${fmtNum(Math.max(at(series.power), 0), 0)} W`
-          : "Preparing for launch"}
+          : `Launch check: needs ${fmtNum(v.launch.est.need50)}–${fmtNum(v.launch.est.need90)} Wh`}
       </p>
       <div className="dp-gauge" aria-hidden>
-        <div className="dp-used" style={{ width: pct(e?.used ?? 0) }} />
-        {e && <div className="dp-need" style={{ left: pct(e.used), width: `calc(${pct(e.need90)} - ${pct(e.used)})` }} />}
+        <div className="dp-used" style={{ width: pct(v.usedWh) }} />
+        {e && v.state.phase !== "landed" && (
+          <div className="dp-need" style={{ left: pct(v.usedWh), width: `calc(${pct(e.need90)} - ${pct(v.usedWh)})` }} />
+        )}
         <div className="dp-budget" style={{ left: pct(v.budget) }} />
       </div>
-      <span className="dp-foot num">{e ? `${fmtNum(e.used, 1)} of ${fmtNum(v.budget)} Wh used` : `${fmtNum(v.budget)} Wh pack`}</span>
+      <span className={`dp-foot num ${started && leftPct <= 5 ? "low" : ""}`}>
+        {started ? `${fmtNum(v.usedWh, 1)} of ${fmtNum(v.budget)} Wh used · ${leftPct}% left` : `${fmtNum(v.budget)} Wh pack`}
+      </span>
       {v.verdict && <p className={`fc-verdict ${VERDICT_TEXT[v.verdict].good ? "good" : "bad"}`}>{VERDICT_TEXT[v.verdict].label}</p>}
     </button>
   );

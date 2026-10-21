@@ -1,7 +1,7 @@
 import { loadFlight, loadForecast, loadScenarios } from "./data";
 import { reroute } from "./fleetRoutes";
-import { deadlineTime, missionCall, missionState } from "./mission";
-import type { CallType, MissionCall, MissionState } from "./mission";
+import { classify, deadlineTime, estimateAt, missionCall, missionState } from "./mission";
+import type { CallType, Estimate, MissionCall, MissionState } from "./mission";
 import type { FlightForecast, FlightMeta, FlightScenarios, FlightSeries, ScenarioCondition } from "./types";
 
 /**
@@ -53,6 +53,15 @@ export interface LoadedDrone {
   /** One-way distance to the destination, metres. */
   oneWayM: number;
   window: number;
+  /** When the drone touches down (s, flight time) and the energy used by then, Wh: if the pack holds less, it runs dry in the air. */
+  touchdown: { t: number; wh: number };
+}
+
+/** The last moment the drone is airborne, and the energy used by then. */
+function touchdownOf(series: FlightSeries): { t: number; wh: number } {
+  let i = series.up.length - 1;
+  while (i > 0 && series.up[i] <= 0.5) i--;
+  return { t: series.t[i], wh: series.energyWh[i] };
 }
 
 export async function loadFleet(
@@ -78,6 +87,7 @@ export async function loadFleet(
         dest: routed.dest,
         oneWayM: routed.oneWayM,
         window: flightWindow[String(slot.flight)],
+        touchdown: touchdownOf(series),
       };
     }),
   );
@@ -109,7 +119,8 @@ export interface Decision {
 
 export type Verdict =
   | "delivered" // continued, and it made it
-  | "ran-short" // continued, and the pack would have run out
+  | "landed-empty" // continued, and the pack ran dry as it touched down: no margin left
+  | "ran-short" // continued, and the pack would have run out in the air
   | "returned-right" // turned back, and it needed to
   | "returned-needless" // turned back, but it would have made it
   | "no-decision-ok" // a call went unanswered, the drone continued and made it
@@ -121,6 +132,10 @@ export interface DroneView {
   state: MissionState;
   call: MissionCall;
   deadlineT: number;
+  /** The check at liftoff (the first forecast, 5 s after the rotors start): the call before the drone leaves the pad. */
+  launch: { call: CallType; est: Estimate };
+  /** Energy used so far, Wh (the whole mission once landed). */
+  usedWh: number;
   /** The system wants the operator to look: a RETURN or REVIEW call, still inside the decision window. */
   needsDecision: boolean;
   /** The decision window has closed (halfway round the route), so the outcome is fixed. */
@@ -151,19 +166,27 @@ export function droneView(
   const asked = call.type !== "continue";
   const callMade = t >= call.t;
   const needsDecision = asked && callMade && !settled && !decision;
+  const launchEst = estimateAt(fc, 0, budget);
+  const launch = { call: classify(launchEst.used, fc.e50[0], fc.e90[0], budget), est: launchEst };
+  const landed = state.phase === "landed";
+  const usedWh = landed ? fc.totalWh : state.est?.used ?? 0;
 
-  // Hindsight: compare what happened with what the recorded flight really used.
+  // Hindsight: compare what happened with what the recorded flight really used. A missed decision is
+  // known once the window closes; whether a continued drone made it is only revealed when it lands.
   let verdict: Verdict | null = null;
   if (decision?.action === "return") verdict = needsReturn ? "returned-right" : "returned-needless";
-  else if (settled) {
-    if (asked && !decision) verdict = needsReturn ? "no-decision-short" : "no-decision-ok";
-    else verdict = needsReturn ? "ran-short" : "delivered";
-  }
+  else if (settled && asked && !decision) verdict = needsReturn ? "no-decision-short" : "no-decision-ok";
+  else if (landed) verdict = !needsReturn ? "delivered" : d.touchdown.wh <= budget ? "landed-empty" : "ran-short";
 
   let status = "Flying";
   let tone: DroneView["tone"] = "idle";
-  if (state.phase === "standby" || state.phase === "na") status = "Preparing";
-  else if (verdict === "returned-right" || verdict === "returned-needless") {
+  if (state.phase === "standby" || state.phase === "na") {
+    status = launch.call === "continue" ? "Cleared for launch" : launch.call === "return" ? "Not enough battery" : "Too close to call";
+    tone = launch.call === "continue" ? "go" : launch.call === "return" ? "stop" : "warn";
+  } else if (landed && needsReturn && decision?.action !== "return") {
+    status = d.touchdown.wh <= budget ? "Landed on empty" : "Would have run dry in the air";
+    tone = "stop";
+  } else if (verdict === "returned-right" || verdict === "returned-needless") {
     status = "Recalled to base";
     tone = "done";
   } else if (needsDecision) {
@@ -175,16 +198,24 @@ export function droneView(
   } else if (state.phase === "deciding") {
     status = "On track";
     tone = "go";
-  } else if (state.phase === "committed" || state.phase === "landed") {
-    status = state.phase === "landed" ? "Landed" : "Committed";
+  } else if (!landed && decision?.action !== "return" && usedWh > budget) {
+    status = "Battery empty";
+    tone = "stop";
+  } else if (state.phase === "committed" && state.live && state.live !== "continue") {
+    // Past the turnaround the forecast has caught up with the real draw, but flying on is now the way home.
+    status = "No margin left: too late to turn back";
+    tone = "stop";
+  } else if (state.phase === "committed" || landed) {
+    status = landed ? "Landed" : "Committed";
     tone = "done";
   }
-  return { fc, budget, state, call, deadlineT, needsDecision, settled, verdict, status, tone };
+  return { fc, budget, state, call, deadlineT, launch, usedWh, needsDecision, settled, verdict, status, tone };
 }
 
 export const VERDICT_TEXT: Record<Verdict, { label: string; good: boolean }> = {
   delivered: { label: "Delivered", good: true },
-  "ran-short": { label: "Would have run out of battery", good: false },
+  "landed-empty": { label: "Landed on empty: the pack ran dry at touchdown", good: false },
+  "ran-short": { label: "Would have run out of battery in the air", good: false },
   "returned-right": { label: "Right call: it would have run out", good: true },
   "returned-needless": { label: "Cautious: it would have made it", good: true },
   "no-decision-ok": { label: "No decision in time; it made it", good: true },

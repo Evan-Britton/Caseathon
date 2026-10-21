@@ -59,8 +59,9 @@ interface FleetState {
 const fresh = { t: 0, tickedAt: 0, playing: false, held: false, decisions: {}, askedAt: {}, log: [], flagged: false };
 let nextId = 1;
 
+/** The shift ends once every drone has finished its forecast and touched down. */
 export function fleetEnd(loaded: LoadedDrone[]): number {
-  return Math.max(...loaded.map((d) => d.forecast.t[d.forecast.t.length - 1]));
+  return Math.max(...loaded.map((d) => Math.max(d.forecast.t[d.forecast.t.length - 1], d.touchdown.t + 3)));
 }
 
 export const useFleet = create<FleetState>((set, get) => ({

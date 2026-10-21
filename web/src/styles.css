@@ -2911,6 +2911,12 @@ select {
   color: var(--muted);
 }
 
+/* 5% of the pack or less: the battery readout turns red. */
+.dp-foot.low {
+  color: var(--stop);
+  font-weight: 600;
+}
+
 .fleet-tag.compact {
   padding: 2px 8px;
   border-radius: 999px;
