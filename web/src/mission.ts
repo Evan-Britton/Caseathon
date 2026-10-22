@@ -1,4 +1,4 @@
-import type { FlightForecast, FlightMeta } from "./types";
+import type { FlightForecast, FlightMeta, FlightSeries } from "./types";
 
 /**
  * The in-flight mission check, computed live from the model's forecast and the battery budget.
@@ -77,6 +77,16 @@ export function missionCall(fc: FlightForecast, budget: number, deadlineFrac: nu
     if (c !== "continue") return { type: c, t: fc.t[i], idx: i };
   }
   return { type: "continue", t: deadlineTime(fc, deadlineFrac), idx: last };
+}
+
+/**
+ * When a mission the check cleared runs its pack dry: the first recorded moment the flight has used more
+ * than the battery holds. Null if the check called for a return or review, or the battery lasts the flight.
+ */
+export function dryAt(series: FlightSeries, call: MissionCall, budget: number): number | null {
+  if (call.type !== "continue") return null;
+  const k = series.energyWh.findIndex((e) => e > budget);
+  return k < 0 ? null : series.t[k];
 }
 
 export function estimateAt(fc: FlightForecast, i: number, budget: number): Estimate {
