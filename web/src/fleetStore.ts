@@ -51,7 +51,10 @@ interface FleetState {
   tickedAt: number;
   playing: boolean;
   rate: number;
-  /** Pause the clock when the system asks for a decision, so the operator isn't racing it. */
+  /**
+   * Pause the clock when the system asks for a decision, so the operator isn't racing it. In guided Run 1 it
+   * also stops the console from following the AI's best guess for them: the call is left to the operator.
+   */
   hold: boolean;
   /** The clock was paused by a request, and resumes once every request is answered. */
   held: boolean;
@@ -167,7 +170,8 @@ export const useFleet = create<FleetState>((set, get) => ({
       const f = d.slot.flight;
       const v = droneView(d, s.condition, s.fix, deadline, t, decisions[f], s.charge?.[f]);
       // Run 1: when the AI says "too close to call", the operator follows its best guess and keeps flying.
-      if (s.story === "run1" && v.needsDecision && v.call.type === "review") {
+      // With "Hold for decisions" on, nothing is answered for them: the clock stops and the call is theirs.
+      if (s.story === "run1" && !s.hold && v.needsDecision && v.call.type === "review") {
         decisions[f] = { action: "continue", at: t, seconds: 0 };
         log.push({ id: nextId++, kind: "decision", flight: f, at: t, ai: "review", action: "continue", seconds: null, auto: true });
         continue;

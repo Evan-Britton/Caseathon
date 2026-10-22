@@ -199,7 +199,7 @@ function Scenario() {
           <span>Fixed model</span>
         </button>
       </div>
-      {s.story ? <p className="run-desc">{RUN_TEXT[s.story]}</p> : <StoryNote story={storyOf(s.condition, s.fix)} note={idx.note} compact />}
+      {s.story ? <p className="run-desc">{s.hold && s.story === "run1" ? RUN1_HELD_TEXT : RUN_TEXT[s.story]}</p> : <StoryNote story={storyOf(s.condition, s.fix)} note={idx.note} compact />}
       {s.story === "run2" && s.loaded && <ChargePlanBox loaded={s.loaded} />}
       <details className="ops-more">
         <summary>Presenter controls</summary>
@@ -227,7 +227,7 @@ function Scenario() {
             role="switch"
             aria-checked={s.hold}
             onClick={() => s.setHold(!s.hold)}
-            title="Pause the clock when the system asks for a decision"
+            title="Pause the clock when the AI asks for a decision, and leave the call to you instead of following its best guess"
           >
             <i aria-hidden />
             Hold for decisions
@@ -239,6 +239,10 @@ function Scenario() {
     </Panel>
   );
 }
+
+/** Run 1's description while "Hold for decisions" is on: the operator is not following the AI, they decide. */
+const RUN1_HELD_TEXT =
+  "The model learned from damaged-sensor data, and today's medical kits (1.0–1.2 kg) are heavier than anything it has seen. Hold is on: when the AI is unsure, the clock stops and you make the call.";
 
 const RUN_TEXT: Record<StoryRun, string> = {
   run1: "The model learned from damaged-sensor data, and today's medical kits (1.0–1.2 kg) are heavier than anything it has seen. The operator follows the AI's call.",
@@ -305,6 +309,7 @@ function StoryBanner({ loaded, views }: { loaded: LoadedDrone[]; views: DroneVie
   let text: string;
   if (s.story === "run1") {
     const down = nums((v) => v.crashed);
+    const asking = nums((v) => v.needsDecision);
     const late = nums((v) => /too late to turn back/i.test(v.status));
     const unsure = s.log.filter((l) => l.auto).map((l) => loaded.findIndex((d) => d.slot.flight === l.flight) + 1);
     if (done) {
@@ -313,6 +318,9 @@ function StoryBanner({ loaded, views }: { loaded: LoadedDrone[]; views: DroneVie
     } else if (down.length) {
       tone = "bad";
       text = `${droneList(down)} crashed: the battery ran dry on the way home.`;
+    } else if (asking.length) {
+      tone = "warn";
+      text = `The AI isn't sure about ${droneList(asking).toLowerCase()}. ${s.held ? "The clock is held. " : ""}Your call.`;
     } else if (late.length) {
       tone = "warn";
       text = `Past the halfway point the AI realizes it was wrong: ${droneList(late).toLowerCase()} ${late.length === 1 ? "doesn't" : "don't"} have the energy to get home. Too late to turn back.`;
@@ -336,6 +344,9 @@ function StoryBanner({ loaded, views }: { loaded: LoadedDrone[]; views: DroneVie
     } else if (!s.charge) {
       tone = "warn";
       text = `Before launch, the fixed model says ${droneList(planned).toLowerCase()} need more charge than usual. Review and approve the charge plan.`;
+    } else if (nums((v) => v.needsDecision).length) {
+      tone = "warn";
+      text = `The AI isn't sure about ${droneList(nums((v) => v.needsDecision)).toLowerCase()}. ${s.held ? "The clock is held. " : ""}Your call.`;
     } else if (s.t === 0) {
       tone = "good";
       text = `Charge plan approved: ${need} batteries topped up. Press Start shift.`;
