@@ -27,6 +27,8 @@ Outputs in results/degradation/:
 Usage: python3 scripts/run_degradation.py [raw_dir] [out_dir]
 """
 
+from __future__ import annotations
+
 import json
 import os
 import sys

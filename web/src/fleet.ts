@@ -231,7 +231,8 @@ export interface Decision {
 export type Verdict =
   | "delivered" // continued, and it made it
   | "landed-empty" // continued, and the pack ran dry as it touched down: no margin left
-  | "crashed" // continued, and the pack ran dry in the air
+  | "delivered-lost" // reached the destination and delivered, then the pack ran dry on the way home
+  | "crashed" // went down without delivering: the pack ran dry on the way out, or on the way back after a recall
   | "returned-right" // turned back, and it needed to
   | "returned-needless" // turned back, but it would have made it
   | "no-decision-ok" // a call went unanswered, the drone continued and made it
@@ -249,6 +250,11 @@ export interface DroneView {
   usedWh: number;
   /** The pack ran dry in the air and the drone has gone down. */
   crashed: boolean;
+  /**
+   * The package has been delivered: the drone reached its destination (the turnaround, halfway round the
+   * route) before its pack ran dry, and was not recalled first. It can still be lost on the way home.
+   */
+  delivered: boolean;
   /** The fix's range guard is on this drone: its payload is outside the training data, so its forecast is scaled up. */
   guarded: boolean;
   /** How much the range guard scaled the forecast up for the extra weight (1 when it didn't). */
@@ -298,11 +304,13 @@ export function droneView(
   const emptyAt = crashAt(d, decision, budget);
   const crashed = emptyAt !== null && t >= emptyAt;
   const usedWh = crashed ? budget : landed ? fc.totalWh : state.est?.used ?? 0;
+  // The turnaround is the halfway point. A drone that gets there with energy left has delivered, whatever happens next.
+  const delivered = decision?.action !== "return" && t >= deadlineT && (emptyAt === null || emptyAt >= deadlineT);
 
   // Hindsight: compare what happened with what the recorded flight really used. A missed decision is
   // known once the window closes; whether a continued drone made it shows when it crashes or lands.
   let verdict: Verdict | null = null;
-  if (crashed) verdict = "crashed";
+  if (crashed) verdict = delivered ? "delivered-lost" : "crashed";
   else if (decision?.action === "return") verdict = needsReturn ? "returned-right" : "returned-needless";
   else if (settled && asked && !decision) verdict = needsReturn ? "no-decision-short" : "no-decision-ok";
   else if (landed) verdict = needsReturn ? "landed-empty" : "delivered";
@@ -316,10 +324,10 @@ export function droneView(
     status = launch.call === "continue" ? "Cleared for launch" : launch.call === "return" ? "Not enough battery" : "Too close to call";
     tone = launch.call === "continue" ? "go" : launch.call === "return" ? "stop" : "warn";
   } else if (crashed) {
-    status = decision?.action === "return" ? "Crashed on the way back" : "Crashed: battery empty";
+    status = delivered ? "Delivered, then lost on the way home" : decision?.action === "return" ? "Crashed on the way back" : "Crashed before delivery";
     tone = "stop";
   } else if (landed && needsReturn && decision?.action !== "return") {
-    status = "Landed on empty";
+    status = "Delivered, but landed on empty";
     tone = "stop";
   } else if (verdict === "returned-right" || verdict === "returned-needless") {
     status = "Recalled to base";
@@ -334,12 +342,12 @@ export function droneView(
     status = "On track";
     tone = "go";
   } else if (state.phase === "committed" && state.live && state.live !== "continue") {
-    // Past the turnaround the forecast has caught up with the real draw, but flying on is now the way home.
-    status = state.live === "return" ? "Won't make it: too late to turn back" : "No margin left: too late to turn back";
+    // Past the turnaround the package is delivered, but the forecast has caught up with the real draw.
+    status = state.live === "return" ? "Delivered, but won't make it home" : "Delivered, but no margin to get home";
     tone = "stop";
   } else if (state.phase === "committed" || landed) {
-    status = landed ? "Landed" : "Committed";
-    tone = "done";
+    status = landed ? (delivered ? "Delivered and home" : "Landed") : delivered ? "Delivered: heading home" : "Committed";
+    tone = delivered ? "go" : "done";
   }
   return {
     fc,
@@ -350,6 +358,7 @@ export function droneView(
     launch,
     usedWh,
     crashed,
+    delivered,
     guarded,
     payloadFactor: guarded ? payloadFactor(d, condition) : 1,
     needsDecision,
@@ -362,8 +371,9 @@ export function droneView(
 
 export const VERDICT_TEXT: Record<Verdict, { label: string; good: boolean }> = {
   delivered: { label: "Delivered", good: true },
-  "landed-empty": { label: "Landed on empty: the pack ran dry at touchdown", good: false },
-  crashed: { label: "Crashed: the battery ran dry in the air", good: false },
+  "landed-empty": { label: "Delivered, but landed on empty: the pack ran dry at touchdown", good: false },
+  "delivered-lost": { label: "Delivered, then lost: the battery ran dry on the way home", good: false },
+  crashed: { label: "Crashed without delivering: the battery ran dry in the air", good: false },
   "returned-right": { label: "Right call: it would have run out", good: true },
   "returned-needless": { label: "Cautious: it would have made it", good: true },
   "no-decision-ok": { label: "No decision in time; it made it", good: true },

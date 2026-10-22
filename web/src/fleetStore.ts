@@ -32,7 +32,9 @@ export type StoryRun = "run1" | "run2";
 
 /** How a run ended, for the side-by-side scoreboard. */
 export interface RunScore {
+  /** Drones lost: the pack ran dry in the air, before or after delivering. */
   crashed: number;
+  /** Packages delivered: the drone reached its destination, even if it was lost on the way home. */
   delivered: number;
   recalled: number;
 }
@@ -191,9 +193,9 @@ export const useFleet = create<FleetState>((set, get) => ({
       for (const d of s.loaded) {
         const f = d.slot.flight;
         const v = droneView(d, s.condition, s.fix, deadline, t, decisions[f], s.charge?.[f]);
+        if (v.delivered) score.delivered++;
         if (v.crashed) score.crashed++;
         else if (decisions[f]?.action === "return") score.recalled++;
-        else score.delivered++;
       }
       results = { ...s.results, [s.story]: score };
     }
