@@ -18,7 +18,7 @@ import {
   Vector3,
 } from "three";
 import { lerpAt, sampleAt } from "../data";
-import { missionState } from "../mission";
+import { dryAt, missionCall, missionState } from "../mission";
 import { activeForecast, budgetFor, clock, useStore } from "../store";
 import type { FlightMeta, FlightSeries } from "../types";
 import { drape } from "./drape";
@@ -83,6 +83,26 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
     const k = series.t.findIndex((t, i) => t > meta.failureS! && series.up[i] <= 0.05);
     return k < 0 ? series.t[series.t.length - 1] : series.t[k];
   }, [series, meta]);
+
+  // A mission the check cleared whose pack runs dry before the recording ends. The flight is recorded, so it
+  // keeps its real path; it only smokes from that moment on.
+  const fc = useStore(activeForecast);
+  const model = useStore((s) => s.model);
+  const budgetWh = useStore((s) => s.budgetWh);
+  const emptyS = useMemo(() => {
+    if (meta.simulated || !fc) return null;
+    const budget = budgetFor(model, meta, budgetWh);
+    return dryAt(series, missionCall(fc, budget, model?.deadlineFrac ?? 0.5), budget);
+  }, [fc, model, meta, budgetWh, series]);
+  const bodyAt = useMemo(
+    () =>
+      (t: number): [number, number, number] => {
+        const { i, f } = sampleAt(series.t, t);
+        const [x, y, z] = toWorld(lerpAt(series.east, i, f), lerpAt(series.north, i, f), lerpAt(series.up, i, f));
+        return [x, y + BODY_LIFT, z];
+      },
+    [series],
+  );
 
   useEffect(() => () => shadowTex.dispose(), [shadowTex]);
   useEffect(() => () => void [deck.map?.dispose(), deck.dispose()], [deck]);
@@ -192,11 +212,13 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
       const visible = projected.z < 1;
       reticle.el.style.opacity = visible ? "1" : "0";
       reticle.el.style.transform = `translate(${((projected.x + 1) / 2) * size.width}px, ${((1 - projected.y) / 2) * size.height}px)`;
-      reticle.el.classList.toggle("reticle-fail", powerLost);
-      reticle.el.classList.toggle("reticle-return", !powerLost && callType === "return");
-      reticle.el.classList.toggle("reticle-review", !powerLost && callType === "review");
+      const dry = emptyS !== null && clock.time >= emptyS;
+      reticle.el.classList.toggle("reticle-fail", powerLost || dry);
+      reticle.el.classList.toggle("reticle-return", !powerLost && !dry && callType === "return");
+      reticle.el.classList.toggle("reticle-review", !powerLost && !dry && callType === "review");
       const tag = callType === "return" ? " · turn back" : callType === "review" ? " · operator review" : "";
-      if (reticle.label) reticle.label.textContent = powerLost ? `Power lost, ${y.toFixed(0)} m` : `${y.toFixed(0)} m above launch${tag}`;
+      if (reticle.label)
+        reticle.label.textContent = powerLost ? `Power lost, ${y.toFixed(0)} m` : dry ? `Battery empty, ${y.toFixed(0)} m above launch` : `${y.toFixed(0)} m above launch${tag}`;
     }
   });
 
@@ -360,17 +382,8 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
           <meshBasicMaterial ref={ring} color={SCENE.accent} transparent opacity={0.6} polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-2} />
         </mesh>
       </group>
-      {meta.simulated && meta.failureS !== undefined && (
-        <Smoke
-          startS={meta.failureS}
-          endS={series.t[series.t.length - 1]}
-          posAt={(t) => {
-            const { i, f } = sampleAt(series.t, t);
-            const [x, y, z] = toWorld(lerpAt(series.east, i, f), lerpAt(series.north, i, f), lerpAt(series.up, i, f));
-            return [x, y + BODY_LIFT, z];
-          }}
-        />
-      )}
+      {meta.simulated && meta.failureS !== undefined && <Smoke startS={meta.failureS} endS={series.t[series.t.length - 1]} posAt={bodyAt} />}
+      {emptyS !== null && <Smoke startS={emptyS} endS={series.t[series.t.length - 1]} posAt={bodyAt} />}
     </>
   );
 }

@@ -23,8 +23,16 @@ export function Mission() {
   useEffect(() => setShowHindsight(false), [m.meta?.id]);
 
   if (!m.meta) return null;
-  const head = headline(m.state, m.call, m.budget, m.deadlineT, m.uiTime, m.meta, !!m.forecast, modelError);
-  const done = m.state.phase === "landed" || m.state.phase === "lost";
+  const dry = m.emptyS !== null && m.uiTime >= m.emptyS;
+  const head = dry
+    ? {
+        tone: "fail" as const,
+        icon: "bolt" as const,
+        title: "Battery empty",
+        detail: `The check cleared this mission, but the pack ran dry at ${fmtClock(m.emptyS!)}. This is a recorded flight, so it keeps its real path; the smoke marks where the battery gave out.`,
+      }
+    : headline(m.state, m.call, m.budget, m.deadlineT, m.uiTime, m.meta, !!m.forecast, modelError);
+  const done = m.state.phase === "landed" || m.state.phase === "lost" || dry;
   const result = m.forecast && m.call ? outcome(m.forecast, m.call, m.budget) : null;
 
   return (
