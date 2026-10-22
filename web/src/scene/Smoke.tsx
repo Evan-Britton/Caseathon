@@ -1,11 +1,7 @@
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo } from "react";
 import { BufferAttribute, BufferGeometry, ShaderMaterial, Vector2 } from "three";
-import { lerpAt, sampleAt } from "../data";
 import { clock } from "../store";
-import type { FlightSeries } from "../types";
-import { BODY_LIFT } from "./Drone";
-import { toWorld } from "./palette";
 
 // One puff every EMIT seconds of flight time, each living LIFE seconds. Puffs are a pure function of
 // playback time (emitted at the drone's position at their birth time), so scrubbing back and forth just works.
@@ -45,8 +41,21 @@ const fragmentShader = /* glsl */ `
 
 const buffer = new Vector2();
 
-/** Smoke and sparks trailing from the motors after a simulated power loss, and rising from the wreck. */
-export function Smoke({ series, failureS }: { series: FlightSeries; failureS: number }) {
+/**
+ * Smoke and sparks trailing from the motors after a power loss, and rising from the wreck. `posAt(t)` is
+ * where the drone's body was at time t; puffs are emitted from `startS` (the power loss) to `endS`.
+ */
+export function Smoke({
+  startS,
+  endS,
+  posAt,
+  getTime = () => clock.time,
+}: {
+  startS: number;
+  endS: number;
+  posAt: (t: number) => [number, number, number];
+  getTime?: () => number;
+}) {
   const { geometry, material } = useMemo(() => {
     const g = new BufferGeometry();
     g.setAttribute("position", new BufferAttribute(new Float32Array(N * 3), 3));
@@ -63,8 +72,7 @@ export function Smoke({ series, failureS }: { series: FlightSeries; failureS: nu
   );
 
   useFrame(({ gl }) => {
-    const t = clock.time;
-    const end = series.t[series.t.length - 1];
+    const t = getTime();
     const pos = geometry.attributes.position.array as Float32Array;
     const age = geometry.attributes.aAge.array as Float32Array;
     const k0 = Math.floor(t / EMIT);
@@ -72,15 +80,14 @@ export function Smoke({ series, failureS }: { series: FlightSeries; failureS: nu
       const k = k0 - j;
       const born = k * EMIT;
       const a = (t - born) / LIFE;
-      if (born < failureS || born > end || a < 0 || a >= 1) {
+      if (born < startS || born > endS || a < 0 || a >= 1) {
         age[j] = -1;
         continue;
       }
-      const { i, f } = sampleAt(series.t, born);
-      const [x, y, z] = toWorld(lerpAt(series.east, i, f), lerpAt(series.north, i, f), lerpAt(series.up, i, f));
+      const [x, y, z] = posAt(born);
       const dt = t - born;
       pos[j * 3] = x + (hash(k) - 0.5) * 3 + dt * 1.3;
-      pos[j * 3 + 1] = y + BODY_LIFT + (hash(k + 0.37) - 0.5) + dt * 2.6 - dt * dt * 0.12;
+      pos[j * 3 + 1] = y + (hash(k + 0.37) - 0.5) + dt * 2.6 - dt * dt * 0.12;
       pos[j * 3 + 2] = z + (hash(k + 0.71) - 0.5) * 3 - dt * 0.6;
       age[j] = a;
     }

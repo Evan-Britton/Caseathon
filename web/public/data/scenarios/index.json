@@ -1,22 +1,22 @@
 {
  "simulated": true,
- "note": "SIMULATED: the timeline, the cheap feed, the upload outage and the reference flights are experiment settings, not CMU data. Seed 0 of results/countermeasure.",
+ "note": "SIMULATED: the timeline, the damaged sensors, the broken uploads and the check flights are experiment settings, not CMU data. Seed 0 of results/countermeasure.",
  "conditions": {
   "reference": {
    "label": "Clean",
-   "desc": "Every earlier flight arrives from the accurate logger."
+   "desc": "Every earlier flight's log comes from a drone with a healthy current sensor."
   },
   "stale": {
    "label": "Stale",
-   "desc": "The accurate logger's uploads stopped after window 1. Retraining keeps reusing old, lighter flights."
+   "desc": "Log uploads from the healthy drones broke after window 1. Retraining keeps reusing old, lighter flights."
   },
   "low_quality": {
    "label": "Low quality",
-   "desc": "A cheap feed whose current sensor reads 12% low, sending twice as many records, carries a growing share of flights."
+   "desc": "A growing share of drones have accidentally damaged current sensors (hard landing, moisture, a loose connector) that read 12% low. Their glitchy firmware logs twice as often, so bad records outnumber good ones."
   },
   "combined": {
    "label": "Both",
-   "desc": "Accurate uploads stopped after window 1 while the cheap feed kept flowing: every recent record is from the biased sensor."
+   "desc": "Damaged current sensors (reading 12% low) keep logging while the healthy drones' uploads are broken, so every recent record the model learns from is a bad reading."
   }
  },
  "windows": 8,

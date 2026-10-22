@@ -7,7 +7,7 @@ app can show next to the live replay:
   baseline    clean-data accuracy of each model on chronological test folds
   grid        the 4 conditions x with/without fix (windows 3-7, 5-seed means)
   overTime    the combined condition's error and P90 coverage per simulated window
-  unseen      defects the fix was not designed around, plus the no-reference-flight failure
+  unseen      defects the fix was not designed around, plus the no-check-flight failure
 
 Nothing is recomputed here; every number is copied (and rounded) from the metrics files.
 
@@ -25,12 +25,12 @@ WEB_DATA = Path(sys.argv[2] if len(sys.argv) > 2 else "web/public/data")
 
 CONDITIONS = {"reference": "Clean", "stale": "Stale", "low_quality": "Low quality", "combined": "Both"}
 UNSEEN = {
-    "unseen_bias_20pct": "Feed reads 20% low",
+    "unseen_bias_20pct": "Damaged sensors read 20% low",
     "unseen_drifting_bias": "Bias drifts each window",
     "unseen_offset": "Fixed 2.5 A offset",
-    "unseen_overreading": "Feed reads 10% high",
+    "unseen_overreading": "Damaged sensors read 10% high",
 }
-FAILURE = ("failure_no_reference_flights", "No reference flights")
+FAILURE = ("failure_no_reference_flights", "No check flights")
 
 
 def r(x, n=2):
@@ -96,7 +96,8 @@ def main():
         ],
         "failure": {"key": FAILURE[0], "label": FAILURE[1],
                     "off": cell(unseen_src[f"{FAILURE[0]}/no_fix"]), "on": cell(unseen_src[f"{FAILURE[0]}/fix"])},
-        "cost": cm["countermeasure"]["cost"],
+        # Reference flights are presented as check flights flown with a known-good backup sensor.
+        "cost": cm["countermeasure"]["cost"].replace("dual-logged reference flights", "check flights with a known-good backup sensor"),
     }
     path = WEB_DATA / "results.json"
     path.write_text(json.dumps(out, indent=1) + "\n")

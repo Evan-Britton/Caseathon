@@ -163,7 +163,7 @@
  "unseen": [
   {
    "key": "unseen_bias_20pct",
-   "label": "Feed reads 20% low",
+   "label": "Damaged sensors read 20% low",
    "off": {
     "maeWh": 0.87,
     "biasWh": -0.62,
@@ -223,7 +223,7 @@
   },
   {
    "key": "unseen_overreading",
-   "label": "Feed reads 10% high",
+   "label": "Damaged sensors read 10% high",
    "off": {
     "maeWh": 0.83,
     "biasWh": 0.7,
@@ -244,7 +244,7 @@
  ],
  "failure": {
   "key": "failure_no_reference_flights",
-  "label": "No reference flights",
+  "label": "No check flights",
   "off": {
    "maeWh": 0.84,
    "biasWh": -0.65,
@@ -262,5 +262,5 @@
    "deferred": 173.8
   }
  },
- "cost": "3 dual-logged reference flights per window (about 12% of flights)"
+ "cost": "3 check flights with a known-good backup sensor per window (about 12% of flights)"
 }

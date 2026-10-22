@@ -138,6 +138,8 @@ export interface ScenarioHealth {
   unverifiedRecords?: number;
   auditedWindows?: number;
   estimatedFeedRatio?: number | null;
+  /** How the fixed model's P90 was calibrated: "trusted_recent_flights", or a fallback when too few were available. */
+  calibration?: string;
 }
 
 export interface ScenarioDemo {
@@ -180,4 +182,30 @@ export interface LabState {
   on: boolean;
   condition: ScenarioCondition;
   fix: boolean;
+}
+
+/** How a SYNTHETIC heavy-payload flight was made from a real one (scripts/export_web_synthetic.py). */
+export interface SyntheticInfo {
+  basedOn: number; // the real CMU flight it was scaled from
+  sourcePayloadG: number;
+  currentFactor: number; // battery current multiplier while the motors run
+  packWh: number; // usable battery for the mission, from a stated rule
+  packRule: string;
+  window: number; // simulated window it flies in
+  launchP90Wh: Record<string, number>; // launch forecast by condition/fix
+}
+
+export interface SyntheticIndex {
+  synthetic: boolean;
+  note: string;
+  scaling: {
+    m0G: number; // aircraft with battery, g
+    exponent: number; // fitted on the real 0-500 g flights
+    fitFlights: number;
+    maxTakeoffG: number;
+    check: { flight: number; peers: number; energyErrPct: { min: number; mean: number; max: number } };
+  };
+  /** Heaviest payload in each condition's training data, g (key: condition/on|off). */
+  trainedMaxPayloadG: Record<string, number>;
+  flights: (FlightMeta & { synthetic: SyntheticInfo })[];
 }
