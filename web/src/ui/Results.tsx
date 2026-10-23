@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { useStore } from "../store";
 import type { ResultCell, ResultsSummary } from "../types";
 import { fmtNum } from "./format";
@@ -75,15 +76,22 @@ export function Results() {
           </thead>
           <tbody>
             {r.grid.map((g) => (
-              <tr key={g.key} className={g.key === "combined" ? "res-key-row" : undefined}>
-                <th scope="row">
-                  {g.label}
-                  {CONDITION_NOTE[g.key] && <small>{CONDITION_NOTE[g.key]}</small>}
-                </th>
-                <Change off={g.off} on={g.on} metric="maeWh" clean={cleanMae} fmt={(v) => fmtNum(v, 2)} />
-                <Change off={g.off} on={g.on} metric="p90" clean={cleanMae} fmt={pct} />
-                <Change off={g.off} on={g.on} metric="unsafe" clean={cleanMae} fmt={(v) => fmtNum(v, 1)} />
-              </tr>
+              <Fragment key={g.key}>
+                <tr className={g.key === "combined" ? "res-key-row" : undefined}>
+                  <th scope="row">
+                    {g.label}
+                    {CONDITION_NOTE[g.key] && <small>{CONDITION_NOTE[g.key]}</small>}
+                  </th>
+                  <Change off={g.off} on={g.on} metric="maeWh" clean={cleanMae} fmt={(v) => fmtNum(v, 2)} />
+                  <Change off={g.off} on={g.on} metric="p90" clean={cleanMae} fmt={pct} />
+                  <Change off={g.off} on={g.on} metric="unsafe" clean={cleanMae} fmt={(v) => fmtNum(v, 1)} />
+                </tr>
+                {CONDITION_DETAIL[g.key] && (
+                  <tr className="res-detail-row">
+                    <td colSpan={4}>{CONDITION_DETAIL[g.key]}</td>
+                  </tr>
+                )}
+              </Fragment>
             ))}
           </tbody>
         </table>
@@ -156,6 +164,14 @@ const CONDITION_NOTE: Record<string, string> = {
   stale: "Right but old: uploads stopped",
   low_quality: "New but wrong: sensors read 12% low",
   combined: "Only bad logs arrive",
+};
+
+/** The full story behind a condition, on its own line under the row. */
+const CONDITION_DETAIL: Record<string, string> = {
+  stale:
+    "The healthy drones' log uploads stopped after the first window. The data the model has is accurate, but it's out of date, so the model misses newer kinds of flights, like heavier payloads.",
+  low_quality:
+    "Logs keep arriving, but a growing share of drones have damaged current sensors. These read about 12% low and log twice as often, so the bad records outnumber the good ones. The model learns that flights use less energy than they really do.",
 };
 
 function Stat({ value, unit, label }: { value: string; unit?: string; label: string }) {
