@@ -15,6 +15,8 @@ Ground tests (routes A1-A3) are skipped since the drone never leaves the ground.
 Usage: python3 scripts/build_web_data.py [raw_dir] [out_dir]
 """
 
+from __future__ import annotations
+
 import json
 import sys
 from pathlib import Path

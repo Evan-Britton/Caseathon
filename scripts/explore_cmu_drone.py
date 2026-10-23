@@ -7,6 +7,8 @@ Reads the untouched raw copy in data/raw/cmu_drone/ and writes:
 Usage: python3 scripts/explore_cmu_drone.py [raw_dir] [out_dir]
 """
 
+from __future__ import annotations
+
 import json
 import sys
 from pathlib import Path

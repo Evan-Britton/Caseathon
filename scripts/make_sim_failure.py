@@ -18,6 +18,8 @@ web/public/data/index.json. "npm run data" runs it after rebuilding the index.
 Usage: python3 scripts/make_sim_failure.py
 """
 
+from __future__ import annotations
+
 import json
 import math
 from pathlib import Path

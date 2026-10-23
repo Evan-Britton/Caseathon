@@ -37,6 +37,8 @@ the same histogram gradient-boosting algorithm as LightGBM and avoids an extra
 dependency.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from pathlib import Path
 

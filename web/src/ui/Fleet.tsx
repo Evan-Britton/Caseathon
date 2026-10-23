@@ -162,7 +162,7 @@ function OpsBar({ views }: { views: DroneView[] }) {
       <dl className="ops-stats">
         <div className={alerts ? "alert" : ""}><dt>Alerts</dt><dd className="num">{alerts}</dd></div>
         <div><dt>Your decisions</dt><dd className="num">{decisions.length}</dd></div>
-        <div className={crashed ? "alert" : ""}><dt>Crashed</dt><dd className="num">{crashed}</dd></div>
+        <div className={crashed ? "alert" : ""}><dt>Drones lost</dt><dd className="num">{crashed}</dd></div>
       </dl>
 
       <div className="ops-clock">
@@ -323,25 +323,30 @@ function StoryBanner({ loaded, views }: { loaded: LoadedDrone[]; views: DroneVie
   let text: string;
   // Count the end like the scoreboard: a recalled drone that got home isn't a delivery.
   const recalled = views.filter((v, i) => !v.crashed && s.decisions[loaded[i].slot.flight]?.action === "return").length;
-  const delivered = views.filter((v) => !v.crashed).length - recalled;
   const recallNote = recalled ? `, ${recalled} recalled` : "";
   if (s.story === "run1") {
     const down = nums((v) => v.crashed);
+    const lostAfter = nums((v) => v.crashed && v.delivered);
+    const lostBefore = nums((v) => v.crashed && !v.delivered);
+    const delivered = nums((v) => v.delivered);
     const asking = nums((v) => v.needsDecision);
-    const late = nums((v) => /too late to turn back/i.test(v.status));
+    const late = nums((v) => /^Delivered, but/.test(v.status));
     const unsure = s.log.filter((l) => l.auto).map((l) => loaded.findIndex((d) => d.slot.flight === l.flight) + 1);
     if (done) {
       tone = "bad";
-      text = `Run 1: ${down.length} of ${loaded.length} drones crashed. Only ${delivered} ${delivered === 1 ? "delivery" : "deliveries"} made${recallNote}.`;
+      text = `Run 1: ${delivered.length} of ${loaded.length} packages delivered, but ${down.length} ${down.length === 1 ? "drone was" : "drones were"} lost${recallNote}.`;
     } else if (down.length) {
       tone = "bad";
-      text = `${droneList(down)} crashed: the battery ran dry on the way home.`;
+      text = [
+        lostAfter.length ? `${droneList(lostAfter)} delivered, then ran out of battery on the way home.` : "",
+        lostBefore.length ? `${droneList(lostBefore)} ran out of battery before delivering.` : "",
+      ].filter(Boolean).join(" ");
     } else if (asking.length) {
       tone = "warn";
       text = `The AI isn't sure about ${droneList(asking).toLowerCase()}. ${s.held ? "The clock is held. " : ""}Your call.`;
     } else if (late.length) {
       tone = "warn";
-      text = `Past the halfway point the AI realizes it was wrong: ${droneList(late).toLowerCase()} ${late.length === 1 ? "doesn't" : "don't"} have the energy to get home. Too late to turn back.`;
+      text = `${droneList(late)} delivered, but the AI now realizes ${late.length === 1 ? "it doesn't" : "they don't"} have the energy to get home. It's too late to turn back.`;
     } else if (unsure.length) {
       const one = unsure.length === 1;
       text = `The AI calls ${droneList(unsure).toLowerCase()} "too close to call", but its best guess says ${one ? "it'll" : "they'll"} make it. The operator keeps ${one ? "it" : "them"} flying.`;
@@ -356,13 +361,14 @@ function StoryBanner({ loaded, views }: { loaded: LoadedDrone[]; views: DroneVie
       (p) => loaded.findIndex((d) => d.slot.flight === p.flight) + 1,
     );
     const down = nums((v) => v.crashed);
+    const delivered = nums((v) => v.delivered);
     if (done) {
       tone = down.length ? "bad" : "good";
       text = down.length
-        ? `Run 2: ${down.length} crashed. ${delivered} ${delivered === 1 ? "delivery" : "deliveries"} made${recallNote}.`
-        : delivered === loaded.length
-        ? `Run 2: all ${loaded.length} deliveries made, no crashes.`
-        : `Run 2: no crashes. ${delivered} ${delivered === 1 ? "delivery" : "deliveries"} made${recallNote}.`;
+        ? `Run 2: ${delivered.length} of ${loaded.length} packages delivered, ${down.length} ${down.length === 1 ? "drone" : "drones"} lost${recallNote}.`
+        : delivered.length === loaded.length
+        ? `Run 2: all ${loaded.length} packages delivered, no drones lost.`
+        : `Run 2: ${delivered.length} of ${loaded.length} packages delivered, no drones lost${recallNote}.`;
     } else if (!s.charge) {
       tone = "warn";
       text = `Before launch, the fixed model says ${droneList(planned).toLowerCase()} need more charge than usual. Review and approve the charge plan.`;
@@ -399,7 +405,7 @@ function StoryBanner({ loaded, views }: { loaded: LoadedDrone[]; views: DroneVie
               <td className="good">{r2.delivered}</td>
             </tr>
             <tr>
-              <th scope="row">Drones crashed</th>
+              <th scope="row">Drones lost</th>
               <td className="bad">{r1.crashed}</td>
               <td className="good">{r2.crashed}</td>
             </tr>

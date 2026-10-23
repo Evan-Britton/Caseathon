@@ -25,6 +25,8 @@ Live-sensor defects (input stage, for the stage comparison)
   biased sensor      the live current sensor reads low, like source B
 """
 
+from __future__ import annotations
+
 import numpy as np
 import pandas as pd
 
