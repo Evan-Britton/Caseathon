@@ -217,8 +217,8 @@
  "simulated": {
   "900": {
    "basedOn": 142,
-   "budgetWh": 11.76,
-   "note": "Simulated depleted pack: power is lost after about 11.8 Wh. The forecast is flight 142's, since the path and sensors are the same."
+   "budgetWh": 10.88,
+   "note": "Simulated depleted pack: power is lost after about 10.9 Wh. The forecast is flight 142's, since the path and sensors are the same."
   }
  }
 }

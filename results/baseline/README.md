@@ -13,7 +13,7 @@ At a checkpoint every 10 s during a flight, it predicts **how much more energy (
 | Part | Method |
 |---|---|
 | Energy used so far | Physics: Coulomb counting, the integral of voltage × current |
-| Time left on the route | Physics: climb + cruise distance left ÷ planned speed + descent. Rates are fitted on training flights (mean error 3.9 s) |
+| Time left on the route | Physics: climb + cruise distance left ÷ planned speed + descent. Rates are fitted on training flights |
 | Power over that time | ML: gradient-boosted quantile model (scikit-learn `HistGradientBoostingRegressor`, the same algorithm as LightGBM) predicting P50 and P90 power |
 | Energy needed | predicted power × time left |
 | P90 calibration | Split-conformal: the P90 is scaled so that 90% of outcomes on the most recent 20% of training flights fall under it |
@@ -71,7 +71,7 @@ Spread across seeds is at most 0.005 Wh MAE, so which flights end up in the test
 - **Performance already drifts in the real timeline.** Hybrid MAE is 0.32 Wh in July but 0.64 in September and 0.78 in October, and P90 coverage falls to 0.73–0.78. Only 11 test flights fall in Sep–Oct, so treat this as a lead, not a finding. It's a candidate "unseen period" for testing the countermeasure.
 - The usable-energy budget and the halfway deadline are simulation choices, not measured battery limits.
 - The anemometer reading mixes wind with the drone's own motion. There is no true airspeed or temperature, and no battery ID, so the data can't support claims about battery aging.
-- Planned route length is the median distance flown on that route, standing in for the mission plan.
+- Planned route length is a mission-plan parameter the operator knows before take-off. The data has no plan, so it is approximated by the median distance flown on that route, over all flights, test flights included. On R1 (182 flights) one flight barely moves the median, but routes R2, R3 and R4 have one flight each, so there the median *is* that flight's own distance, which sets its distance left, route fraction and halfway deadline. This is a mild leak confined to those few flights: R2–R4 only ever fall in training here, and the test flights it touches are R6's 5 and R7's 2 (whose median is the average of its two flights), 7 of 116.
 - Mostly one route (R1, 182 of 196 flights) and one aircraft.
 - 185 flights show small negative current readings near zero at rest. This is a defect already in the source, left as is; it is not an injected one.
 

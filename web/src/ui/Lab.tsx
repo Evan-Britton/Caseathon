@@ -55,7 +55,9 @@ export function LabControls() {
             <p className="lab-note">
               {m.meta.route === "H"
                 ? "Hover tests have no route, so there's no forecast to poison."
-                : `Flight ${m.meta.id} is in window 0, the first training window. There's nothing earlier to poison; try a heavy-payload demo below.`}
+                : window === 0
+                  ? `Flight ${m.meta.id} is in window 0, the first training window. There's nothing earlier to poison; try a heavy-payload demo below.`
+                  : "No lab scenarios are available for this flight."}
             </p>
           )}
         </>

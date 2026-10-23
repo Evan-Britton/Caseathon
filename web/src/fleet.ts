@@ -226,6 +226,8 @@ export interface Decision {
   at: number;
   /** Wall-clock seconds the operator took, from the request appearing to the click. */
   seconds: number;
+  /** Run 1: the console followed the AI's best guess; no person chose this. */
+  auto?: boolean;
 }
 
 export type Verdict =

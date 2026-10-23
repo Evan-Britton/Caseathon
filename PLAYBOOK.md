@@ -199,7 +199,7 @@ As any flight plays, the app decides in real time whether the drone will make it
 
 **Demo moments:**
 - **Flight 142 at 20 Wh:** "Turn back" at 0:19. Drag the battery to 24 Wh and it flips to "On track". The hindsight confirms both calls were right (21.2 Wh really used).
-- **Flight 900 (simulated battery failure):** the check calls for a return at 0:19, **72 s before the simulated pack cuts out**. Its battery is fixed at 11.8 Wh (the slider is locked), and the hindsight says the full mission takes 21.2 Wh, 9.4 Wh more than the pack had.
+- **Flight 900 (simulated battery failure):** the check calls for a return at 0:19, **72 s before the simulated pack cuts out**. Its battery is fixed at 10.9 Wh (the slider is locked), and the hindsight says the full mission takes 21.2 Wh, 10.3 Wh more than the pack had.
 
 **How it works:**
 - `scripts/export_web_model.py` (`npm run model`, about 10 s) uses the same hybrid model as `results/`.

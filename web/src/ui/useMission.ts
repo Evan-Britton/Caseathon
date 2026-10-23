@@ -23,7 +23,10 @@ export function useMission() {
   const state = missionState(forecast, meta, budget, deadline, uiTime);
   const sim = meta ? model?.simulated[String(meta.id)] ?? null : null;
   // A cleared mission whose pack runs dry before the recording ends (the simulated failure flight has its own).
-  const emptyS = useMemo(() => (series && call && !meta?.simulated ? dryAt(series, call, budget) : null), [series, call, budget, meta]);
+  const emptyS = useMemo(
+    () => (series && forecast && call && !meta?.simulated ? dryAt(series, forecast, call, budget) : null),
+    [series, forecast, call, budget, meta],
+  );
 
   return { forecast, meta, model, budget, deadline, call, deadlineT, state, sim, uiTime, emptyS, lab, labActive, scenarios, scenarioIndex };
 }

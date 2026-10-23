@@ -23,6 +23,9 @@ import type {
  */
 export const clock = { time: 0 };
 
+/** Bumped on every flight selection, so a load that finishes after a newer one started is dropped. */
+let selectSeq = 0;
+
 interface State {
   index: DataIndex | null;
   meta: FlightMeta | null;
@@ -51,7 +54,8 @@ interface State {
   results: ResultsSummary | null;
   leftTab: LeftTab;
   init: () => Promise<void>;
-  selectFlight: (id: number) => Promise<void>;
+  /** Resolves true once this flight is showing, false if a newer selection superseded it. */
+  selectFlight: (id: number) => Promise<boolean>;
   stepFlight: (dir: 1 | -1) => void;
   seek: (time: number) => void;
   setUiTime: (time: number) => void;
@@ -155,7 +159,8 @@ export const useStore = create<State>((set, get) => ({
 
   selectFlight: async (id) => {
     const meta = get().index?.flights.find((f) => f.id === id);
-    if (!meta) return;
+    if (!meta) return false;
+    const seq = ++selectSeq;
     set({ loading: true, playing: false, error: null });
     try {
       const { model, scenarioIndex } = get();
@@ -166,11 +171,16 @@ export const useStore = create<State>((set, get) => ({
         rated ? loadForecast(id).catch(() => null) : Promise.resolve(null),
         hasScenarios ? loadScenarios(id).catch(() => null) : Promise.resolve(null),
       ]);
+      // A newer selection owns the loading flag and will clear it; this one just bows out.
+      if (seq !== selectSeq) return false;
       clock.time = 0;
       window.history.replaceState(null, "", `#flight=${id}`);
       set({ meta, series, forecast, scenarios, uiTime: 0, loading: false });
+      return true;
     } catch (e) {
+      if (seq !== selectSeq) return false;
       set({ error: (e as Error).message, loading: false });
+      return false;
     }
   },
 
@@ -213,7 +223,8 @@ export const useStore = create<State>((set, get) => ({
   runDemo: async (demo) => {
     set({ lab: { on: true, condition: demo.condition, fix: false }, leftTab: "mission" });
     get().setBudget(demo.budgetWh);
-    if (get().meta?.id !== demo.flight) await get().selectFlight(demo.flight);
+    // Reload even the shown flight if another one is still loading, so that load can't replace the demo.
+    if (get().meta?.id !== demo.flight || get().loading) await get().selectFlight(demo.flight);
     else get().seek(0);
   },
 }));

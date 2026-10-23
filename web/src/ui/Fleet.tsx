@@ -44,13 +44,23 @@ export function Fleet() {
       acc += (now - last) / 1000;
       last = now;
       if (acc >= 0.066) {
-        useFleet.getState().tick(acc);
+        // Cap each step so a stalled frame never skips a decision window.
+        useFleet.getState().tick(Math.min(acc, 0.25));
         acc = 0;
       }
       raf = requestAnimationFrame(loop);
     };
+    // rAF pauses in a hidden tab; start counting afresh when it comes back.
+    const onVisible = () => {
+      last = performance.now();
+      acc = 0;
+    };
+    document.addEventListener("visibilitychange", onVisible);
     raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, [s.open]);
 
   const views = useMemo(
@@ -118,14 +128,18 @@ function openInReplay(d: LoadedDrone) {
   const st = useStore.getState();
   st.setLab({ on: true, condition: f.condition, fix: f.fix });
   st.setBudget(d.budgetWh);
-  void st.selectFlight(d.slot.flight).then(() => useStore.getState().seek(f.t));
+  // Seek only if this selection won; a newer pick or an unknown id leaves the replay alone.
+  void st.selectFlight(d.slot.flight).then((ok) => {
+    if (ok) useStore.getState().seek(f.t);
+  });
   f.closeConsole();
 }
 
 function OpsBar({ views }: { views: DroneView[] }) {
   const s = useFleet();
   const end = s.loaded ? fleetEnd(s.loaded) : 0;
-  const decisions = s.log.filter((l) => l.kind === "decision");
+  // Only what a person did: their own calls and the charge-plan approval, not the console's auto-answers.
+  const decisions = s.log.filter((l) => (l.kind === "decision" && !l.auto) || l.kind === "plan");
   const alerts = views.filter((v) => v.needsDecision).length;
   const crashed = views.filter((v) => v.crashed).length;
 
@@ -307,6 +321,10 @@ function StoryBanner({ loaded, views }: { loaded: LoadedDrone[]; views: DroneVie
   const nums = (pick: (v: DroneView, i: number) => boolean) => views.flatMap((v, i) => (pick(v, i) ? [i + 1] : []));
   let tone: "info" | "warn" | "bad" | "good" = "info";
   let text: string;
+  // Count the end like the scoreboard: a recalled drone that got home isn't a delivery.
+  const recalled = views.filter((v, i) => !v.crashed && s.decisions[loaded[i].slot.flight]?.action === "return").length;
+  const delivered = views.filter((v) => !v.crashed).length - recalled;
+  const recallNote = recalled ? `, ${recalled} recalled` : "";
   if (s.story === "run1") {
     const down = nums((v) => v.crashed);
     const asking = nums((v) => v.needsDecision);
@@ -314,7 +332,7 @@ function StoryBanner({ loaded, views }: { loaded: LoadedDrone[]; views: DroneVie
     const unsure = s.log.filter((l) => l.auto).map((l) => loaded.findIndex((d) => d.slot.flight === l.flight) + 1);
     if (done) {
       tone = "bad";
-      text = `Run 1: ${down.length} of ${loaded.length} drones crashed. Only ${loaded.length - down.length} deliveries made.`;
+      text = `Run 1: ${down.length} of ${loaded.length} drones crashed. Only ${delivered} ${delivered === 1 ? "delivery" : "deliveries"} made${recallNote}.`;
     } else if (down.length) {
       tone = "bad";
       text = `${droneList(down)} crashed: the battery ran dry on the way home.`;
@@ -340,7 +358,11 @@ function StoryBanner({ loaded, views }: { loaded: LoadedDrone[]; views: DroneVie
     const down = nums((v) => v.crashed);
     if (done) {
       tone = down.length ? "bad" : "good";
-      text = down.length ? `Run 2: ${down.length} crashed.` : `Run 2: all ${loaded.length} deliveries made, no crashes.`;
+      text = down.length
+        ? `Run 2: ${down.length} crashed. ${delivered} ${delivered === 1 ? "delivery" : "deliveries"} made${recallNote}.`
+        : delivered === loaded.length
+        ? `Run 2: all ${loaded.length} deliveries made, no crashes.`
+        : `Run 2: no crashes. ${delivered} ${delivered === 1 ? "delivery" : "deliveries"} made${recallNote}.`;
     } else if (!s.charge) {
       tone = "warn";
       text = `Before launch, the fixed model says ${droneList(planned).toLowerCase()} need more charge than usual. Review and approve the charge plan.`;
@@ -478,7 +500,11 @@ function Detail({ d, v }: { d: LoadedDrone; v: DroneView }) {
         </Health>
       )}
 
-      {decision ? (
+      {decision?.auto ? (
+        <p className="fd-chose">
+          Followed the AI's best guess: <strong>continued</strong> at {fmtClock(decision.at)}.
+        </p>
+      ) : decision ? (
         <p className="fd-chose">
           You chose <strong>{decision.action === "return" ? "Return now" : "Continue anyway"}</strong> at {fmtClock(decision.at)}
           {decision.seconds > 0 && <> after {fmtNum(decision.seconds)} s</>}.

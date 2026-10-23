@@ -152,7 +152,25 @@ export const useFleet = create<FleetState>((set, get) => ({
     set(restart ? { ...fresh, playing: true, tickedAt: performance.now() } : { playing, held: false, tickedAt: performance.now() });
   },
   setRate: (rate) => set({ rate }),
-  setHold: (hold) => set({ hold }),
+  setHold: (hold) => {
+    const s = get();
+    if (!s.loaded) return set({ hold });
+    const deadline = useStore.getState().model?.deadlineFrac ?? 0.5;
+    // Turning hold on with a request already waiting stops the clock now, not at the next request.
+    if (hold && !s.held) {
+      const pending = s.loaded.some((d) => {
+        const f = d.slot.flight;
+        return droneView(d, s.condition, s.fix, deadline, s.t, s.decisions[f], s.charge?.[f]).needsDecision;
+      });
+      return set(pending && s.playing ? { hold, held: true, playing: false } : { hold });
+    }
+    // Turning it off lets a held clock run again, unless the run is over.
+    if (!hold && s.held) {
+      const over = s.t >= fleetEnd(s.loaded);
+      return set({ hold, held: false, playing: !over, tickedAt: performance.now() });
+    }
+    set({ hold });
+  },
   select: (selected) => set({ selected }),
   restart: () => set({ ...fresh }),
 
@@ -172,7 +190,7 @@ export const useFleet = create<FleetState>((set, get) => ({
       // Run 1: when the AI says "too close to call", the operator follows its best guess and keeps flying.
       // With "Hold for decisions" on, nothing is answered for them: the clock stops and the call is theirs.
       if (s.story === "run1" && !s.hold && v.needsDecision && v.call.type === "review") {
-        decisions[f] = { action: "continue", at: t, seconds: 0 };
+        decisions[f] = { action: "continue", at: t, seconds: 0, auto: true };
         log.push({ id: nextId++, kind: "decision", flight: f, at: t, ai: "review", action: "continue", seconds: null, auto: true });
         continue;
       }
@@ -207,7 +225,7 @@ export const useFleet = create<FleetState>((set, get) => ({
     if (!d) return;
     const deadline = useStore.getState().model?.deadlineFrac ?? 0.5;
     const v = droneView(d, s.condition, s.fix, deadline, s.t, undefined, s.charge?.[flight]);
-    if (v.settled || v.state.phase === "standby") return;
+    if (v.settled || v.crashed || v.state.phase === "standby") return;
     const asked = s.askedAt[flight];
     const decision: Decision = { action, at: s.t, seconds: asked === undefined ? 0 : (performance.now() - asked) / 1000 };
     const decisions = { ...s.decisions, [flight]: decision };
@@ -216,7 +234,8 @@ export const useFleet = create<FleetState>((set, get) => ({
       kind: "decision",
       flight,
       at: s.t,
-      ai: v.state.live,
+      // What the operator was actually asked, not the forecast that has moved on since.
+      ai: v.call.type,
       action,
       seconds: asked === undefined ? null : decision.seconds,
     };

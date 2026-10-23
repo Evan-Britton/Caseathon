@@ -81,12 +81,14 @@ export function missionCall(fc: FlightForecast, budget: number, deadlineFrac: nu
 
 /**
  * When a mission the check cleared runs its pack dry: the first recorded moment the flight has used more
- * than the battery holds. Null if the check called for a return or review, or the battery lasts the flight.
+ * than the battery holds. Null if the check called for a return or review, or the mission fits the battery.
+ * Judged on mission energy (rotors on to off) like the hindsight, so ground idle after landing never counts.
  */
-export function dryAt(series: FlightSeries, call: MissionCall, budget: number): number | null {
-  if (call.type !== "continue") return null;
-  const k = series.energyWh.findIndex((e) => e > budget);
-  return k < 0 ? null : series.t[k];
+export function dryAt(series: FlightSeries, fc: FlightForecast, call: MissionCall, budget: number): number | null {
+  if (call.type !== "continue" || fc.totalWh <= budget) return null;
+  const k = series.energyWh.findIndex((e, i) => series.t[i] <= fc.tOff && e > budget);
+  // The mission overran the pack, so it was dry by rotor-off even if no recorded sample before it shows that.
+  return k < 0 ? fc.tOff : series.t[k];
 }
 
 export function estimateAt(fc: FlightForecast, i: number, budget: number): Estimate {

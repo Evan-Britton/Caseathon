@@ -106,6 +106,9 @@ export function Dock() {
           }}
           onPointerMove={(e) => scrubbing.current && seekFromPointer(e)}
           onPointerUp={() => (scrubbing.current = false)}
+          // A cancelled touch or pen gesture never sends pointerup; without these the next hover would seek.
+          onPointerCancel={() => (scrubbing.current = false)}
+          onLostPointerCapture={() => (scrubbing.current = false)}
         >
           <defs>
             <linearGradient id="powerfill" x1="0" y1="0" x2="0" y2="1">

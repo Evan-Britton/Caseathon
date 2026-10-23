@@ -49,7 +49,7 @@ import build_web_data as bwd  # noqa: E402
 import countermeasure as cm  # noqa: E402
 import degrade as dg  # noqa: E402
 import hybrid_model as hm  # noqa: E402
-from export_web_scenarios import CONDITIONS, STALE_AFTER, key, r  # noqa: E402
+from export_web_scenarios import CONDITIONS, key, r  # noqa: E402
 
 RAW_DIR = Path(sys.argv[1] if len(sys.argv) > 1 else "data/raw/cmu_drone")
 WEB_DATA = Path(sys.argv[2] if len(sys.argv) > 2 else "web/public/data")
@@ -59,6 +59,8 @@ WINDOW = 7
 M0_G = 2355.0  # DJI Matrice 100 with TB47D battery
 MAX_TAKEOFF_G = 3600.0
 CHECK_FLIGHT = 76  # the one real 750 g flight
+TRIM_S = 30.0  # s cut from each end of motor time to leave the cruise
+MIN_CRUISE_N = 80  # samples (16 s at 5 Hz) of cruise left after the trim, else the flight is skipped
 # (synthetic id, source flight, payload g, battery rule)
 SYNTH = [
     (1001, 97, 1200, "between"),
@@ -73,10 +75,12 @@ def mean_power(df: pd.DataFrame) -> pd.DataFrame:
     for fid, g in df.groupby("flight"):
         p = (g["battery_voltage"] * g["battery_current"]).to_numpy()
         on = np.flatnonzero(p > hm.MOTOR_ON_W)
-        if len(on) < 80:
+        if len(on) < 2:
             continue
         t = g["time"].to_numpy()
-        mid = p[on[30]:on[-30]]
+        mid = p[(t >= t[on[0]] + TRIM_S) & (t <= t[on[-1]] - TRIM_S)]
+        if len(mid) < MIN_CRUISE_N:
+            continue
         f = g.iloc[0]
         rows.append({"flight": fid, "payload": float(f["payload"]), "group": f"{f['speed']}/{f['altitude']}/{f['route']}",
                      "p_mean": float(mid.mean()), "energy": float(np.trapezoid(p[on], t[on]) / 3600)})

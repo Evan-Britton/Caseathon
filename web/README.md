@@ -19,7 +19,7 @@ Built with React 19, three.js (via React Three Fiber) and Vite. It deploys to Cl
   - a **battery slider** (the usable energy for this mission, remembered between visits);
   - a hindsight line comparing the call with what the flight really used.
 
-  The timeline shades the decision window and flags the call, and the drone's reticle and ground ring turn amber or red. Hover tests have no route, so they show "Not rated". Simulated flight 900 uses its own depleted pack (11.8 Wh) instead of the slider.
+  The timeline shades the decision window and flags the call, and the drone's reticle and ground ring turn amber or red. Hover tests have no route, so they show "Not rated". Simulated flight 900 uses its own depleted pack (10.9 Wh) instead of the slider.
 - **Poisoning lab (simulated).** Replays the same flight with the model each training-data condition would have produced, from the simulated timeline in `results/countermeasure` (seed 0). Every element is labelled SIMULATED.
   - **Training data:**
     - Clean.

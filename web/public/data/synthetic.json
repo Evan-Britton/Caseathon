@@ -4,16 +4,16 @@
  "scaling": {
   "massKgFormula": "P_new = P_recorded x ((M0 + new payload) / (M0 + recorded payload)) ^ b",
   "m0G": 2355.0,
-  "exponent": 0.947,
+  "exponent": 0.954,
   "fitFlights": 195,
   "maxTakeoffG": 3600.0,
   "check": {
    "flight": 76,
    "peers": 7,
    "energyErrPct": {
-    "min": 0.5,
-    "mean": 5.6,
-    "max": 9.8
+    "min": 0.6,
+    "mean": 5.7,
+    "max": 10.0
    }
   }
  },
@@ -37,7 +37,7 @@
    "date": "2019-06-19",
    "time": "17:25",
    "durationS": 236.4,
-   "energyWh": 38.57,
+   "energyWh": 38.63,
    "pathM": 468.0,
    "maxUpM": 81.2,
    "maxGapS": 0.22,
@@ -50,7 +50,7 @@
    "synthetic": {
     "basedOn": 97,
     "sourcePayloadG": 500.0,
-    "currentFactor": 1.2308,
+    "currentFactor": 1.2327,
     "packWh": 30.4,
     "packRule": "between",
     "window": 7,
@@ -75,7 +75,7 @@
    "date": "2019-07-10",
    "time": "9:12",
    "durationS": 249.9,
-   "energyWh": 42.05,
+   "energyWh": 42.11,
    "pathM": 465.2,
    "maxUpM": 101.3,
    "maxGapS": 0.3,
@@ -88,7 +88,7 @@
    "synthetic": {
     "basedOn": 184,
     "sourcePayloadG": 500.0,
-    "currentFactor": 1.2308,
+    "currentFactor": 1.2327,
     "packWh": 33.3,
     "packRule": "between",
     "window": 7,
@@ -100,7 +100,7 @@
      "low_quality/off": 32.55,
      "low_quality/on": 34.71,
      "combined/off": 31.25,
-     "combined/on": 34.76
+     "combined/on": 34.77
     }
    }
   },
@@ -113,7 +113,7 @@
    "date": "2019-06-25",
    "time": "11:13",
    "durationS": 262.5,
-   "energyWh": 42.19,
+   "energyWh": 42.24,
    "pathM": 479.5,
    "maxUpM": 101.3,
    "maxGapS": 1.0,
@@ -126,7 +126,7 @@
    "synthetic": {
     "basedOn": 126,
     "sourcePayloadG": 500.0,
-    "currentFactor": 1.1651,
+    "currentFactor": 1.1664,
     "packWh": 36.6,
     "packRule": "above_clean",
     "window": 7,

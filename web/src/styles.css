@@ -2217,6 +2217,22 @@ select {
     bottom: auto;
     left: 12px;
   }
+
+  /* The operator console keeps the full-screen layout: the scene behind, the console grid filling the viewport. */
+  .hud.fleet-on {
+    display: block;
+    height: 100dvh;
+    overflow: hidden;
+    padding-bottom: 0;
+  }
+
+  .hud.fleet-on > .scene,
+  .hud.fleet-on > .ops {
+    position: absolute;
+    inset: 0;
+    height: auto;
+    margin: 0;
+  }
 }
 
 /* Short desktop windows: slimmer telemetry so the left column fits without scrolling. */

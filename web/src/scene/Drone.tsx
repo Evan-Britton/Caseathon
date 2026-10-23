@@ -92,7 +92,7 @@ export function Drone({ series, meta }: { series: FlightSeries; meta: FlightMeta
   const emptyS = useMemo(() => {
     if (meta.simulated || !fc) return null;
     const budget = budgetFor(model, meta, budgetWh);
-    return dryAt(series, missionCall(fc, budget, model?.deadlineFrac ?? 0.5), budget);
+    return dryAt(series, fc, missionCall(fc, budget, model?.deadlineFrac ?? 0.5), budget);
   }, [fc, model, meta, budgetWh, series]);
   const bodyAt = useMemo(
     () =>

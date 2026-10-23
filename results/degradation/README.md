@@ -53,7 +53,7 @@ Same comparison for the direct-ML model: MAE 0.49 / 0.72 / 0.68 / 0.90 Wh. It ma
 | 6 | 0.29 / 96% | 0.40 / 96% | 0.53 / 78% (57%) | 1.02 / 61% (71%) |
 | 7 | 0.32 / 93% | 0.45 / 100% | 0.68 / 69% (64%) | **1.23 / 34%** (77%) |
 
-In the stale condition, the newest training data stays at window 1, so by window 7 it is 6 windows old. Window 1 is weak in every condition (one unsafe continue each) because the first retrain has only 25 flights.
+In the stale condition, the newest training data stays at window 1, so by window 7 it is 6 windows old. Window 1 is weak in every condition (2 unsafe continues each, summed over the six budgets as in the table above: one at 22 Wh and one at 24 Wh, in every seed; 0.8 for direct ML) because the first retrain has only 25 flights.
 
 ## What this shows
 

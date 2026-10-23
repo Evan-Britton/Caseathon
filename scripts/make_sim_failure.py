@@ -49,7 +49,7 @@ def main() -> None:
 
     out = {k: [] for k in src}
     cut = None
-    # 5 s moving average, so one noisy dip can't trip the cutoff
+    # 10 s centred moving average (5 s either side), so one noisy dip can't trip the cutoff
     w = max(1, round(n / src["t"][-1] * 5))
     smooth = [sum(src["voltage"][max(0, i - w) : i + w + 1]) / len(src["voltage"][max(0, i - w) : i + w + 1]) for i in range(n)]
     for i in range(n):
@@ -62,6 +62,14 @@ def main() -> None:
         out["voltage"][-1] = r(v, 3)
     if cut is None:
         raise SystemExit("Battery never reached the cutoff; raise EXTRA_V_PER_WH or lower START_V.")
+    # Power and energy follow the rewritten voltage (the sag rule above still runs on flight 142's
+    # recorded energy). Same trapezoid integration as build_web_data.py.
+    out["power"] = [r(v * c, 1) for v, c in zip(out["voltage"], out["current"])]
+    energy = 0.0
+    out["energyWh"] = [0.0]
+    for i in range(1, len(out["t"])):
+        energy += (out["t"][i] - out["t"][i - 1]) * (out["voltage"][i] * out["current"][i] + out["voltage"][i - 1] * out["current"][i - 1]) / 2 / 3600
+        out["energyWh"].append(r(energy, 4))
 
     t_cut = out["t"][-1]
     e, nn, up = out["east"][-1], out["north"][-1], out["up"][-1]

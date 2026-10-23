@@ -310,6 +310,9 @@ function ForecastChart({
         }}
         onPointerMove={(e) => scrubbing.current && seekFrom(e)}
         onPointerUp={() => (scrubbing.current = false)}
+        // A cancelled touch or pen gesture never sends pointerup; without these the next hover would seek.
+        onPointerCancel={() => (scrubbing.current = false)}
+        onLostPointerCapture={() => (scrubbing.current = false)}
       >
         <defs>
           <clipPath id="fc-past">
