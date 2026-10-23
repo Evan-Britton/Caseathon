@@ -218,7 +218,7 @@ function EnergyBar({ state, budget, forecast, done }: { state: MissionState; bud
         </div>
         <div>
           <dt><i className="sw sw-need" />{done ? "Forecast" : "Total forecast"}</dt>
-          <dd>{done || !est ? "–" : `${fmtNum(n50)} (P90 ${fmtNum(n90)})`}</dd>
+          <dd>{done || !est ? "–" : `${fmtNum(n50)} (cautious ${fmtNum(n90)})`}</dd>
         </div>
         <div>
           <dt><i className="sw sw-budget" />Battery</dt>
@@ -348,7 +348,9 @@ function ForecastChart({
         <line x1={playX} x2={playX} y1={0} y2={CH} className="playhead" />
       </svg>
       <div className="fchart-key">
-        <span><i className="sw sw-band" />Forecast, P50–P90</span>
+        <span title="From the likely total up to the cautious one, which should cover the real energy 90% of the time">
+          <i className="sw sw-band" />Forecast: likely to cautious
+        </span>
         <span><i className="sw sw-budgetline" />Battery</span>
         {actualWh !== null ? (
           <span><i className="sw sw-actual" />Actual (hindsight)</span>

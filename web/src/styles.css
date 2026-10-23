@@ -1268,8 +1268,29 @@ select {
   color: var(--text);
 }
 
+/* One-line plain meaning under a row or column name. */
+.res-grid th small {
+  display: block;
+  margin-top: 1px;
+  font-size: 9.5px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+  color: var(--muted);
+}
+
+.res-grid tbody th small {
+  max-width: 112px;
+  line-height: 1.25;
+}
+
+.res-grid thead th + th {
+  padding-left: 8px;
+}
+
 .res-grid td {
-  padding: 3px 0;
+  padding: 3px 0 3px 8px;
   font-family: var(--num);
   font-weight: 600;
   white-space: nowrap;

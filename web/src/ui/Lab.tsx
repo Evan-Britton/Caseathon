@@ -364,11 +364,12 @@ export function Health({
   const stale = health.uploadAgeWindows > 1;
   const cheap = health.cheapFeedShare > 0;
   const statusText: Record<ScenarioHealth["status"], string> = {
-    unmonitored: "Not monitored",
+    unmonitored: "None",
     green: "Green",
     amber: "Amber",
     red: "Red",
   };
+  const learnedFrom = window > 1 ? `windows 0–${window - 1}` : "window 0";
   const findings: string[] = [];
   if (fix) {
     if (health.recalibratedRecords && health.estimatedFeedRatio)
@@ -380,26 +381,26 @@ export function Health({
 
   return (
     <div className="lab-health">
-      <p className="lab-window">
-        Window {window} of {idx.windows - 1} · trained on {health.trainFlights} flights
+      <p className="lab-window" title="SIMULATED timeline: the flights are split into time windows, and the model retrains at the start of each one on everything that arrived before it">
+        This flight is in window {window} of {idx.windows - 1} · the model learned from {learnedFrom} ({health.trainFlights} flights)
       </p>
       <dl>
         <div className={stale ? "bad" : "ok"}>
-          <dt>Newest healthy-drone upload</dt>
+          <dt>Last good upload</dt>
           <dd>
             {health.newestAutoUploadWindow === null ? "none" : `window ${health.newestAutoUploadWindow}`}
-            {stale && <span> · {health.uploadAgeWindows} windows old</span>}
+            {stale ? <span> · {health.uploadAgeWindows} windows behind</span> : health.newestAutoUploadWindow !== null && <span> · up to date</span>}
           </dd>
         </div>
         <div className={cheap ? "bad" : "ok"}>
-          <dt>Damaged-sensor records</dt>
+          <dt>Logs from damaged sensors</dt>
           <dd>
-            {Math.round(health.cheapFeedShare * 100)}%
-            {cheap && <span> · reads {Math.round((1 - idx.feed.currentFactor) * 100)}% low</span>}
+            {cheap ? `${Math.round(health.cheapFeedShare * 100)}%` : "none"}
+            {cheap && <span> · read {Math.round((1 - idx.feed.currentFactor) * 100)}% low</span>}
           </dd>
         </div>
         <div className={`status-${health.status}`}>
-          <dt>Data health check</dt>
+          <dt>Data checks</dt>
           <dd>
             {statusText[health.status]}
             {!fix && (stale || cheap) && <span> · nothing flags it</span>}
@@ -429,7 +430,7 @@ function WindowCharts({ idx, condition, fix, window }: { idx: ScenarioIndex; con
   const wx = x(window - 1);
   const charts = [
     { title: "Forecast error", unit: "Wh", key: "maeWh" as const, top: maeTop, bottom: 0, fmt: (v: number) => fmtNum(v, 2) },
-    { title: "P90 really holds", unit: "%", key: "p90Coverage" as const, top: 1, bottom: 0.2, fmt: (v: number) => `${Math.round(v * 100)}` },
+    { title: "Safety margin held", unit: "%", key: "p90Coverage" as const, top: 1, bottom: 0.2, fmt: (v: number) => `${Math.round(v * 100)}` },
   ];
 
   return (

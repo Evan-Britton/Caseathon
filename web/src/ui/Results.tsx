@@ -59,15 +59,27 @@ export function Results() {
           <thead>
             <tr>
               <th scope="col" />
-              <th scope="col" title="How far off the energy forecast is, on average">Miss (Wh)</th>
-              <th scope="col" title="How often the safety margin really covered the energy needed (target 90%)">Margin held</th>
-              <th scope="col" title={`Continue calls on flights that would have run out, out of ${r.decisions.total} flight-battery calls`}>Unsafe calls</th>
+              <th scope="col" title="How far off the energy forecast is, on average">
+                Miss (Wh)
+                <small>lower = better</small>
+              </th>
+              <th scope="col" title="How often the safety margin really covered the energy needed (target 90%)">
+                Margin held
+                <small>target 90%</small>
+              </th>
+              <th scope="col" title={`Continue calls on flights that would have run out, out of ${r.decisions.total} flight-battery calls`}>
+                Unsafe calls
+                <small>target 0</small>
+              </th>
             </tr>
           </thead>
           <tbody>
             {r.grid.map((g) => (
               <tr key={g.key} className={g.key === "combined" ? "res-key-row" : undefined}>
-                <th scope="row">{g.label}</th>
+                <th scope="row">
+                  {g.label}
+                  {CONDITION_NOTE[g.key] && <small>{CONDITION_NOTE[g.key]}</small>}
+                </th>
                 <Change off={g.off} on={g.on} metric="maeWh" clean={cleanMae} fmt={(v) => fmtNum(v, 2)} />
                 <Change off={g.off} on={g.on} metric="p90" clean={cleanMae} fmt={pct} />
                 <Change off={g.off} on={g.on} metric="unsafe" clean={cleanMae} fmt={(v) => fmtNum(v, 1)} />
@@ -75,7 +87,6 @@ export function Results() {
             ))}
           </tbody>
         </table>
-        <p className="res-note">Stale: the healthy drones' uploads broke · Low quality: damaged sensors · Both: the two at once</p>
         <p className="res-note">
           Windows {r.windows[0]}–{r.windows[r.windows.length - 1]} · {r.seeds} seeds · {r.decisions.total} calls, {r.decisions.shouldReturn} should turn back
         </p>
@@ -138,6 +149,14 @@ function Block({ reqs, title, tag, children }: { reqs: number[]; title: string; 
     </div>
   );
 }
+
+/** What each training-data condition means, in a few words under its name. */
+const CONDITION_NOTE: Record<string, string> = {
+  reference: "All logs arrive, all sensors OK",
+  stale: "Right but old: uploads stopped",
+  low_quality: "New but wrong: sensors read 12% low",
+  combined: "Only bad logs arrive",
+};
 
 function Stat({ value, unit, label }: { value: string; unit?: string; label: string }) {
   return (

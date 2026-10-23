@@ -107,7 +107,7 @@ export const useFleet = create<FleetState>((set, get) => ({
   error: null,
   condition: "combined",
   fix: false,
-  rate: 4,
+  rate: 8,
   hold: false,
   selected: FLEET[0].flight,
   story: "run1",

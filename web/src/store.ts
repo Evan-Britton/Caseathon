@@ -73,7 +73,8 @@ interface State {
 }
 
 
-const DEFAULT_FLIGHT = 142;
+/** The presentation's opening demo: the app starts on this heavy-payload flight with the damaged-sensor model. */
+const DEFAULT_FLIGHT = 268;
 const BUDGET_KEY = "mission-budget-wh";
 
 function savedBudget(): number | null {
@@ -150,6 +151,13 @@ export const useStore = create<State>((set, get) => ({
       const budgetWh = savedBudget() ?? model?.budget.default ?? 20;
       set({ index, model, budgetWh, scenarioIndex, results });
       const wanted = flightFromHash() ?? DEFAULT_FLIGHT;
+      // Open (or reopen, on a refresh) the default flight at its demo battery, starting on healthy sensors.
+      const demo = wanted === DEFAULT_FLIGHT ? scenarioIndex?.demos.find((d) => d.flight === DEFAULT_FLIGHT && d.condition === "combined") : undefined;
+      if (demo) {
+        await get().runDemo(demo);
+        get().setLab({ on: false });
+        return;
+      }
       const id = index.flights.some((f) => f.id === wanted) ? wanted : index.flights[0].id;
       await get().selectFlight(id);
     } catch (e) {
