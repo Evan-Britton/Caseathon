@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { loadSynthetic } from "./data";
-import { FLEET, chargePlan, droneView, loadFleet } from "./fleet";
+import { FLEET, chargePlan, droneView, loadFleet, slotsFor } from "./fleet";
+import type { FleetMode } from "./fleet";
 import type { Decision, LoadedDrone, OperatorAction } from "./fleet";
 import type { CallType } from "./mission";
 import { useStore } from "./store";
@@ -44,6 +45,10 @@ interface FleetState {
   loaded: LoadedDrone[] | null;
   /** How the SYNTHETIC heavy-payload flights were made, for the console's labels. */
   synth: SyntheticIndex | null;
+  /** Which flights the fleet flies: the mixed story, or real recordings only. */
+  mode: FleetMode;
+  /** Switch the fleet's data. Reloads the five drones and restarts the guided demo. */
+  setMode: (mode: FleetMode) => Promise<void>;
   error: string | null;
   condition: ScenarioCondition;
   fix: boolean;
@@ -104,6 +109,7 @@ export const useFleet = create<FleetState>((set, get) => ({
   open: false,
   loaded: null,
   synth: null,
+  mode: "mixed",
   error: null,
   condition: "combined",
   fix: false,
@@ -126,7 +132,21 @@ export const useFleet = create<FleetState>((set, get) => ({
     }
     try {
       const synth = await loadSynthetic();
-      set({ loaded: await loadFleet(index.flights, scenarioIndex.flightWindow, synth), synth, error: null });
+      set({ loaded: await loadFleet(index.flights, scenarioIndex.flightWindow, synth, get().mode), synth, error: null });
+    } catch (e) {
+      set({ error: (e as Error).message });
+    }
+  },
+  setMode: async (mode) => {
+    const s = get();
+    if (mode === s.mode) return;
+    const { index, scenarioIndex } = useStore.getState();
+    if (!index || !scenarioIndex || !s.synth) return;
+    // A different fleet is a different demo: back to the start of Run 1 with nothing carried over.
+    set({ mode, loaded: null, story: "run1", condition: "combined", fix: false, charge: null, planShownAt: null, results: {}, selected: slotsFor(mode)[0].flight, ...fresh });
+    try {
+      const loaded = await loadFleet(index.flights, scenarioIndex.flightWindow, s.synth, mode);
+      if (get().mode === mode) set({ loaded, error: null });
     } catch (e) {
       set({ error: (e as Error).message });
     }

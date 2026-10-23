@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { lerpAt, sampleAt } from "../data";
-import { CHARGE_RESERVE, FLEET, VERDICT_TEXT, callLabel, chargePlan, crashAt, droneView, pathTime } from "../fleet";
+import { CHARGE_RESERVE, REAL_PACK_MINUS_WH, VERDICT_TEXT, callLabel, chargePlan, crashAt, droneView, pathTime } from "../fleet";
+import type { FleetMode } from "../fleet";
 import type { DroneView, LoadedDrone } from "../fleet";
 import type { StoryRun } from "../fleetStore";
 import { fleetEnd, fleetStatus, useFleet } from "../fleetStore";
@@ -101,7 +102,14 @@ export function Fleet() {
           {mapCredits && <> · {mapCredits}</>}
           <br />
           Routes, destinations and the levelled hub are illustrative; speed, altitude, power and energy are from the flights.
-          {s.synth && (
+          {s.mode === "real" && (
+            <>
+              <br />
+              <strong className="syn-note">All real:</strong> five recorded CMU flights at their recorded payloads. One rule sets every battery: the clean
+              model's launch estimate minus {REAL_PACK_MINUS_WH} Wh.
+            </>
+          )}
+          {s.synth && s.loaded?.some((d) => d.synthetic) && (
             <>
               <br />
               <strong className="syn-note">Synthetic:</strong> drones 1, 3 and 5 fly real CMU flights re-run at 1.0–1.2 kg, with power scaled by a
@@ -153,7 +161,11 @@ function OpsBar({ views }: { views: DroneView[] }) {
         </div>
         <span
           className="sim-tag"
-          title="Five flights replayed together from the same launch site near Pittsburgh. Drones 2 and 4 are real CMU flights; drones 1, 3 and 5 are SYNTHETIC heavy-payload versions of real flights. The data has one aircraft, so the fleet is staged. Cargo, destinations and the out-and-back routes are illustrative; the recorded flights are all one triangle."
+          title={
+            s.mode === "real"
+              ? "Five real CMU flights replayed together from the same launch site near Pittsburgh, at their recorded payloads. The data has one aircraft, so the fleet is staged. Cargo, destinations, battery sizes and the out-and-back routes are illustrative; the recorded flights are all one triangle."
+              : "Five flights replayed together from the same launch site near Pittsburgh. Drones 2 and 4 are real CMU flights; drones 1, 3 and 5 are SYNTHETIC heavy-payload versions of real flights. The data has one aircraft, so the fleet is staged. Cargo, destinations and the out-and-back routes are illustrative; the recorded flights are all one triangle."
+          }
         >
           Simulated fleet
         </span>
@@ -213,7 +225,8 @@ function Scenario() {
           <span>Fixed model</span>
         </button>
       </div>
-      {s.story ? <p className="run-desc">{s.hold && s.story === "run1" ? RUN1_HELD_TEXT : RUN_TEXT[s.story]}</p> : <StoryNote story={storyOf(s.condition, s.fix)} note={idx.note} compact />}
+      <FleetDataSwitch />
+      {s.story ? <p className="run-desc">{runText(s.story, s.mode, s.hold)}</p> : <StoryNote story={storyOf(s.condition, s.fix)} note={idx.note} compact />}
       {s.story === "run2" && s.loaded && <ChargePlanBox loaded={s.loaded} />}
       <details className="ops-more">
         <summary>Presenter controls</summary>
@@ -254,14 +267,48 @@ function Scenario() {
   );
 }
 
-/** Run 1's description while "Hold for decisions" is on: the operator is not following the AI, they decide. */
-const RUN1_HELD_TEXT =
-  "The model learned from damaged-sensor data, and today's medical kits (1.0–1.2 kg) are heavier than anything it has seen. Hold is on: when the AI is unsure, the clock stops and you make the call.";
+const HOLD_NOTE = "Hold is on: when the AI is unsure, the clock stops and you make the call.";
 
-const RUN_TEXT: Record<StoryRun, string> = {
-  run1: "The model learned from damaged-sensor data, and today's medical kits (1.0–1.2 kg) are heavier than anything it has seen. The operator follows the AI's call.",
-  run2: "Same drones, same kits. The sensor check corrected the bad readings, and the forecast is corrected for the heavier kits. Before launch, it plans each drone's charge.",
-};
+/** What each guided run says about itself, for the fleet's data. Run 1 with Hold on leaves the call to the operator. */
+function runText(run: StoryRun, mode: FleetMode, hold: boolean): string {
+  if (mode === "real") {
+    if (run === "run1")
+      return `Five real recorded flights at their recorded payloads (0.25–0.5 kg), all inside what the model was trained on. It learned from damaged-sensor data. Every pack is the clean model's estimate minus ${REAL_PACK_MINUS_WH} Wh. ${hold ? HOLD_NOTE : "The operator follows the AI's call."}`;
+    return "Same five real flights and packs. The sensor check corrected the bad readings. Before launch, it plans each drone's charge.";
+  }
+  if (run === "run1")
+    return `The model learned from damaged-sensor data, and today's medical kits (1.0–1.2 kg) are heavier than anything it has seen. ${hold ? HOLD_NOTE : "The operator follows the AI's call."}`;
+  return "Same drones, same kits. The sensor check corrected the bad readings, and the forecast is corrected for the heavier kits. Before launch, it plans each drone's charge.";
+}
+
+/** Whether the fleet is the mixed story or real recordings only. Switching reloads the drones and restarts the demo. */
+function FleetDataSwitch() {
+  const mode = useFleet((s) => s.mode);
+  const setMode = useFleet((s) => s.setMode);
+  return (
+    <div className="ops-row">
+      <span className="lab-label">Fleet data</span>
+      <div className="seg" role="radiogroup" aria-label="Fleet data">
+        <button
+          role="radio"
+          aria-checked={mode === "mixed"}
+          onClick={() => void setMode("mixed")}
+          title="Drones 2 and 4 are real flights; drones 1, 3 and 5 are SYNTHETIC heavy-payload versions of real flights"
+        >
+          Real + synthetic
+        </button>
+        <button
+          role="radio"
+          aria-checked={mode === "real"}
+          onClick={() => void setMode("real")}
+          title={`Five real recorded flights at their recorded payloads. One rule sets every battery: the clean model's launch estimate minus ${REAL_PACK_MINUS_WH} Wh`}
+        >
+          All real
+        </button>
+      </div>
+    </div>
+  );
+}
 
 /** "Drone 1", "Drones 1 and 3", "Drones 1, 3 and 5". */
 function droneList(nums: number[]): string {
@@ -534,7 +581,8 @@ function Detail({ d, v }: { d: LoadedDrone; v: DroneView }) {
 
 function Log() {
   const log = useFleet((s) => s.log);
-  const name = (f: number) => FLEET.find((x) => x.flight === f)?.callsign ?? `Flight ${f}`;
+  const loaded = useFleet((s) => s.loaded);
+  const name = (f: number) => loaded?.find((d) => d.slot.flight === f)?.slot.callsign ?? `Flight ${f}`;
   return (
     <details className="ops-panel ops-log">
       <summary>
