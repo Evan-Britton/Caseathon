@@ -20,6 +20,10 @@ import type { FlightForecast, FlightMeta, FlightScenarios, FlightSeries, Scenari
  *
  * Destinations are made up. Each route is redrawn as an out-and-back (see fleetRoutes.ts); the
  * recorded flights are all the same triangle.
+ *
+ * Fleet data has two modes. "mixed" is the story above. "real" flies the same five routes as real
+ * recordings only (FLEET_REAL), at their recorded payloads, with every battery set by one rule for
+ * all five drones (REAL_PACK_MINUS_WH), not chosen per drone or per outcome.
  */
 export interface FleetSlot {
   flight: number;
@@ -34,6 +38,32 @@ export interface FleetSlot {
 }
 
 export const HUB_NAME = "Central supply hub";
+
+/** Which flights the fleet flies: the mixed story, or real recordings only. */
+export type FleetMode = "mixed" | "real";
+
+/**
+ * All-real fleet: the same five routes, flown by the real flights the synthetic ones are made from (and the
+ * two real controls), at their recorded 250-500 g payloads. No battery is hand-set: see REAL_PACK_MINUS_WH.
+ */
+export const FLEET_REAL: FleetSlot[] = [
+  { flight: 97, callsign: "Drone 1", cargo: "Blood units", destination: "Ridgeline Clinic", bearing: 25 },
+  { flight: 136, callsign: "Drone 2", cargo: "Insulin", destination: "Harlan Creek Health Post", bearing: 320 },
+  { flight: 184, callsign: "Drone 3", cargo: "Antivenom", destination: "Millbrook Rural Clinic", bearing: 75 },
+  { flight: 153, callsign: "Drone 4", cargo: "Lab specimens", destination: "Valley Diagnostic Lab", bearing: 250 },
+  { flight: 126, callsign: "Drone 5", cargo: "Vaccine cooler", destination: "Cedar Hollow Outreach Site", bearing: 150 },
+];
+
+/**
+ * The all-real fleet's one battery rule, the same for every drone: the pack is the clean model's launch
+ * estimate (its cautious P90) minus this many Wh, rounded to 0.5 Wh. Real flights never ran dry (the real
+ * pack is 99.9 Wh), so a pack size is a scenario setting; this one rule sets all five.
+ */
+export const REAL_PACK_MINUS_WH = 1.0;
+
+export function slotsFor(mode: FleetMode): FleetSlot[] {
+  return mode === "real" ? FLEET_REAL : FLEET;
+}
 
 export const FLEET: FleetSlot[] = [
   { flight: 1001, callsign: "Drone 1", cargo: "Blood units", destination: "Ridgeline Clinic", bearing: 25 },
@@ -86,19 +116,23 @@ export async function loadFleet(
   flights: FlightMeta[],
   flightWindow: Record<string, number>,
   synth: SyntheticIndex,
+  mode: FleetMode = "mixed",
 ): Promise<LoadedDrone[]> {
   return Promise.all(
-    FLEET.map(async (slot) => {
+    slotsFor(mode).map(async (slot) => {
       const made = synth.flights.find((f) => f.id === slot.flight);
       const meta = made ?? flights.find((f) => f.id === slot.flight);
       if (!meta) throw new Error(`Flight ${slot.flight} isn't in the data.`);
-      const budgetWh = made?.synthetic.packWh ?? slot.budgetWh;
-      if (budgetWh === undefined) throw new Error(`Drone ${slot.callsign} has no battery size.`);
       const [forecast, scenarios, series] = await Promise.all([
         loadForecast(slot.flight),
         loadScenarios(slot.flight),
         loadFlight(slot.flight),
       ]);
+      // A battery is set by the flight's own rule, or a hand-set size, or (all-real) the one rule for every drone.
+      const budgetWh =
+        made?.synthetic.packWh ??
+        slot.budgetWh ??
+        Math.round((forecast.used[0] + scenarios.runs["reference/off"].e90[0] - REAL_PACK_MINUS_WH) * 2) / 2;
       const routed = reroute(series, slot.bearing);
       return {
         slot,
