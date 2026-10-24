@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { loadSynthetic } from "./data";
-import { FLEET, chargePlan, droneView, loadFleet, slotsFor } from "./fleet";
+import { chargePlan, droneView, loadFleet, slotsFor } from "./fleet";
 import type { FleetMode } from "./fleet";
 import type { Decision, LoadedDrone, OperatorAction } from "./fleet";
 import type { CallType } from "./mission";
@@ -109,13 +109,14 @@ export const useFleet = create<FleetState>((set, get) => ({
   open: false,
   loaded: null,
   synth: null,
-  mode: "mixed",
+  // The console opens on the real recordings, at 4x, with the clock held for every decision.
+  mode: "real",
   error: null,
   condition: "combined",
   fix: false,
-  rate: 8,
-  hold: false,
-  selected: FLEET[0].flight,
+  rate: 4,
+  hold: true,
+  selected: slotsFor("real")[0].flight,
   story: "run1",
   charge: null,
   planShownAt: null,
