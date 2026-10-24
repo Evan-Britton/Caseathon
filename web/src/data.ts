@@ -1,4 +1,4 @@
-import type { DataIndex, FlightForecast, FlightScenarios, FlightSeries, ModelIndex, ResultsSummary, ScenarioIndex, SyntheticIndex } from "./types";
+import type { DataIndex, EnvelopeData, FlightForecast, FlightScenarios, FlightSeries, ModelIndex, ResultsSummary, ScenarioIndex, SyntheticIndex } from "./types";
 
 const base = import.meta.env.BASE_URL;
 const flightCache = new Map<number, Promise<FlightSeries>>();
@@ -45,6 +45,10 @@ export function loadSynthetic(): Promise<SyntheticIndex> {
 
 export function loadResults(): Promise<ResultsSummary> {
   return getJson<ResultsSummary>("data/results.json", "npm run results");
+}
+
+export function loadEnvelope(): Promise<EnvelopeData> {
+  return getJson<EnvelopeData>("data/envelope.json", "npm run envelope");
 }
 
 export function loadScenarioIndex(): Promise<ScenarioIndex> {

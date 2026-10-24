@@ -5,6 +5,7 @@ import { reticle } from "./scene/Drone";
 import { Scene } from "./scene/Scene";
 import { useStore } from "./store";
 import { Dock } from "./ui/Dock";
+import { Envelope } from "./ui/Envelope";
 import { Fleet } from "./ui/Fleet";
 import { FleetTags } from "./ui/FleetTags";
 import { Mission } from "./ui/Mission";
@@ -52,6 +53,7 @@ export default function App() {
       </section>
       <Dock />
       <Attribution />
+      <Envelope />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useStore } from "../store";
 import type { ScenarioCondition, ScenarioDemo, ScenarioHealth, ScenarioIndex } from "../types";
+import { EnvelopeLink } from "./Envelope";
 import { fmtNum } from "./format";
 import { useMission } from "./useMission";
 
@@ -33,7 +34,12 @@ export function LabControls() {
   return (
     <div className="mlab">
       <StoryControls story={story} onStory={pick} rowClass="lab-row" />
-      {!lab.on && <StoryNote story="healthy" note={idx.note} />}
+      {!lab.on && (
+        <>
+          <StoryNote story="healthy" note={idx.note} />
+          <EnvelopeLink />
+        </>
+      )}
 
       {lab.on && (
         <>

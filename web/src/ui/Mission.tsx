@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
-import { outcome, type MissionCall, type MissionState, type OutcomeKind } from "../mission";
+import { classify, estimateAt, outcome, type CallType, type Estimate, type MissionCall, type MissionState, type OutcomeKind } from "../mission";
 import { useStore } from "../store";
 import type { FlightForecast, FlightMeta } from "../types";
 import { fmtClock, fmtNum } from "./format";
@@ -23,6 +23,7 @@ export function Mission() {
   useEffect(() => setShowHindsight(false), [m.meta?.id]);
 
   if (!m.meta) return null;
+  const launch = m.forecast ? launchCheck(m.forecast, m.budget) : null;
   const dry = m.emptyS !== null && m.uiTime >= m.emptyS;
   const head = dry
     ? {
@@ -31,8 +32,10 @@ export function Mission() {
         title: "Battery empty",
         detail: `The check cleared this mission, but the pack ran dry at ${fmtClock(m.emptyS!)}. This is a recorded flight, so it keeps its real path; the smoke marks where the battery gave out.`,
       }
-    : headline(m.state, m.call, m.budget, m.deadlineT, m.uiTime, m.meta, !!m.forecast, modelError);
+    : headline(m.state, m.call, m.budget, m.deadlineT, m.uiTime, m.meta, !!m.forecast, modelError, launch);
   const done = m.state.phase === "landed" || m.state.phase === "lost" || dry;
+  // Before takeoff the gauge shows the launch forecast, with nothing used yet.
+  const barState = m.state.phase === "standby" && launch ? { ...m.state, est: { ...launch.est, used: 0 } } : m.state;
   const result = m.forecast && m.call ? outcome(m.forecast, m.call, m.budget) : null;
 
   return (
@@ -63,7 +66,7 @@ export function Mission() {
 
       {m.forecast && (
         <>
-          <EnergyBar state={m.state} budget={m.budget} forecast={m.forecast} done={done} />
+          <EnergyBar state={barState} budget={m.budget} forecast={m.forecast} done={done} />
           <ForecastChart
             forecast={m.forecast}
             budget={m.budget}
@@ -126,6 +129,12 @@ function hindsightText(kind: OutcomeKind, total: number, spare: number): string 
   }
 }
 
+/** The check before takeoff, from the model's first forecast for the mission: the same launch check the operator console shows. */
+function launchCheck(fc: FlightForecast, budget: number): { call: CallType; est: Estimate } {
+  const est = estimateAt(fc, 0, budget);
+  return { call: classify(est.used, fc.e50[0], fc.e90[0], budget), est };
+}
+
 function headline(
   st: MissionState,
   call: MissionCall | null,
@@ -135,6 +144,7 @@ function headline(
   meta: FlightMeta,
   rated: boolean,
   modelError: string | null,
+  launch: { call: CallType; est: Estimate } | null,
 ): Headline {
   if (!rated) {
     if (meta.route === "H") return { tone: "idle", icon: "off", title: "Not rated", detail: "Hover test: there's no delivery route to finish." };
@@ -144,7 +154,30 @@ function headline(
   const range = est ? `${fmtNum(est.need50)}–${fmtNum(est.need90)} Wh` : "";
   const madeAt = call ? fmtClock(call.t) : "";
 
-  if (st.phase === "standby") return { tone: "idle", icon: "wait", title: "Waiting for takeoff", detail: "The first forecast comes 5 s after the rotors start." };
+  if (st.phase === "standby") {
+    if (!launch) return { tone: "idle", icon: "wait", title: "Waiting for takeoff", detail: "No launch forecast for this flight." };
+    const need = `${fmtNum(launch.est.need50)}–${fmtNum(launch.est.need90)} Wh`;
+    if (launch.call === "continue")
+      return {
+        tone: "go",
+        icon: "check",
+        title: "Cleared for launch",
+        detail: `Before takeoff, the model expects this mission to need ${need}. Even the cautious end fits the ${fmtNum(budget)} Wh battery. It rechecks every second in flight.`,
+      };
+    if (launch.call === "return")
+      return {
+        tone: "stop",
+        icon: "back",
+        title: "Not enough battery",
+        detail: `Before takeoff, the model expects this mission to need about ${fmtNum(launch.est.need50)} Wh, more than the ${fmtNum(budget)} Wh battery.`,
+      };
+    return {
+      tone: "warn",
+      icon: "review",
+      title: "Too close to call",
+      detail: `Before takeoff, the model expects ${need} against a ${fmtNum(budget)} Wh battery. An operator should decide whether to launch, or charge it more.`,
+    };
+  }
 
   if (st.phase === "lost") {
     if (call && call.type !== "continue")

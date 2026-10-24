@@ -209,3 +209,28 @@ export interface SyntheticIndex {
   trainedMaxPayloadG: Record<string, number>;
   flights: (FlightMeta & { synthetic: SyntheticInfo })[];
 }
+
+/** The conditions the energy model was trained on, for the 3D envelope view (scripts/export_web_envelope.py). */
+export type EnvelopeAxis = "payload" | "speed" | "wind";
+
+export interface EnvelopePoint {
+  payload: number; // g
+  speed: number; // planned cruise speed, m/s
+  wind: number; // mean onboard anemometer reading while flying, m/s (wind plus the drone's own motion)
+}
+
+export interface EnvelopeData {
+  note: string;
+  axes: Record<EnvelopeAxis, { label: string; unit: string }>;
+  /** Trained range on each axis: [min, max]. */
+  ranges: Record<EnvelopeAxis, [number, number]>;
+  /** How close a training flight must be on every axis to count as similar (half a step of the CMU test plan). */
+  near: Record<EnvelopeAxis, number>;
+  flights: (EnvelopePoint & { id: number; altitude: string; route: string })[];
+  /** The operator console's SYNTHETIC heavy-payload flights. */
+  synthetic: (EnvelopePoint & { id: number; basedOn: number })[];
+  syntheticNote: string;
+  /** SIMULATED poisoned records, for illustration only. */
+  injected: EnvelopePoint[];
+  injectedNote: string;
+}

@@ -128,6 +128,14 @@ npm run synthetic
 
 The console's countermeasure adds a **range guard** for any payload heavier than the heaviest one in the fixed model's training data (750 g). A tree model can't forecast past what it has seen, so the guard scales its forecast up from 750 g to the real payload with the same fitted weight-to-power rule. It also sends close calls to a person. Before takeoff, this turns the heavy drones' launch check into "Not enough battery". Because the synthetic flights were built with that same rule, the correction isn't independent evidence on them; it still comes out 2–4 Wh low. The Results tab experiments don't include the guard.
 
+### Training envelope
+
+The **Open 3D view** button on the Mission check's Healthy sensors tab shows the conditions the energy model was trained on: every real cruise flight by payload, planned speed and mean wind (the onboard anemometer, which mixes wind with the drone's own motion), with the trained range drawn as a box. A pre-launch check flags a mission when any condition is outside that range, or when no training flight flew within 125 g, 1 m/s and 1 m/s of wind of it (half a step of the CMU test plan), which catches empty corners such as 750 g at 12 m/s. The console's heavy kits are shown for contrast, and a toggle adds **SIMULATED** poisoned records, made-up points far outside the envelope that are not part of any measured result. Only the payload limit (the range guard) acts on the console's launch check; the wind and speed limits are shown in this view. `public/data/envelope.json` is written by:
+
+```bash
+npm run envelope
+```
+
 ### Results scorecard
 
 `public/data/results.json` holds the headline numbers for the Results tab, copied (not recomputed) from `results/baseline/metrics.json` and `results/countermeasure/metrics.json`. After rerunning those experiments, refresh it with:

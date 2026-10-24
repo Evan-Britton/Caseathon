@@ -3321,3 +3321,384 @@ select {
 .scoreboard td.good {
   color: var(--go);
 }
+
+/* ---------- training envelope: full-screen 3D view ---------- */
+
+.env-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(6, 6, 10, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.env-card {
+  width: min(1120px, 100%);
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  padding: 18px 20px 20px;
+}
+
+.env-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.env-head h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--display);
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.env-head p {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.env-loading {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--muted);
+}
+
+.env-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 1fr);
+  gap: 20px;
+}
+
+.env-plot {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  background: radial-gradient(90% 80% at 50% 45%, #17162200, rgba(0, 0, 0, 0.25)), var(--inset);
+  border: 1px solid var(--inset-edge);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.env-plot:active {
+  cursor: grabbing;
+}
+
+.env-grid {
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 1;
+}
+
+.env-axis {
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 1;
+}
+
+.env-face {
+  fill: rgba(var(--accent-rgb), 0.07);
+  stroke: none;
+}
+
+.env-edge {
+  stroke: rgba(var(--accent-rgb), 0.55);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.env-pt.train {
+  fill: var(--accent);
+}
+
+.env-pt.synth {
+  fill: var(--stop);
+  stroke: rgba(0, 0, 0, 0.4);
+}
+
+.env-pt.inject line {
+  stroke: var(--warn);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.env-mission.good,
+.env-foot.good {
+  fill: var(--go);
+}
+
+.env-mission.bad,
+.env-foot.bad {
+  fill: var(--stop);
+}
+
+.env-mission {
+  stroke: #0a0a0e;
+  stroke-width: 2;
+}
+
+.env-halo {
+  fill: none;
+  stroke-width: 2;
+  opacity: 0.55;
+}
+
+.env-halo.good {
+  stroke: var(--go);
+}
+
+.env-halo.bad {
+  stroke: var(--stop);
+}
+
+.env-drop {
+  stroke-width: 1.2;
+  stroke-dasharray: 3 3;
+}
+
+.env-drop.good {
+  stroke: var(--go);
+}
+
+.env-drop.bad {
+  stroke: var(--stop);
+}
+
+.env-tick {
+  font-family: var(--num);
+  font-size: 10px;
+  fill: var(--muted);
+}
+
+.env-axis-name {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--text);
+}
+
+.env-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.env-legend span,
+.env-legend label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.env-legend label {
+  cursor: pointer;
+  color: var(--text);
+}
+
+.env-key {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+}
+
+.env-key.train {
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.env-key.box {
+  border: 1px dashed rgba(var(--accent-rgb), 0.8);
+  background: rgba(var(--accent-rgb), 0.12);
+}
+
+.env-key.synth {
+  width: 9px;
+  height: 9px;
+  background: var(--stop);
+  transform: rotate(45deg);
+}
+
+.env-key.inject {
+  background:
+    linear-gradient(45deg, transparent 42%, var(--warn) 42% 58%, transparent 58%),
+    linear-gradient(-45deg, transparent 42%, var(--warn) 42% 58%, transparent 58%);
+}
+
+.sim-tag.inline {
+  margin-left: 2px;
+  padding: 0 6px;
+  font-size: 9.5px;
+}
+
+.env-note {
+  margin-top: 8px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.env-note.warn {
+  color: var(--warn);
+}
+
+.env-side h3 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.env-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 12px;
+}
+
+.env-slider {
+  margin-bottom: 10px;
+}
+
+.env-slider label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.env-slider label .bad {
+  color: var(--stop);
+}
+
+.env-slider input[type="range"] {
+  width: 100%;
+  margin: 6px 0 2px;
+  accent-color: var(--accent);
+}
+
+.env-range {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.env-verdict {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.env-verdict.good {
+  border: 1px solid rgba(62, 232, 168, 0.35);
+  background: rgba(62, 232, 168, 0.07);
+}
+
+.env-verdict.bad {
+  border: 1px solid rgba(255, 79, 94, 0.4);
+  background: rgba(255, 79, 94, 0.08);
+}
+
+.env-verdict-title {
+  margin-bottom: 4px;
+  font-family: var(--display);
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.env-verdict.good .env-verdict-title {
+  color: var(--go);
+}
+
+.env-verdict.bad .env-verdict-title {
+  color: var(--stop);
+}
+
+.env-verdict ul {
+  margin: 4px 0 0 16px;
+}
+
+.env-verdict-sub {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.mission-envelope {
+  margin: 10px 16px 2px;
+  padding: 10px 12px 11px;
+  border-radius: 12px;
+  border: 1px solid rgba(var(--accent-rgb), 0.28);
+  background: rgba(var(--accent-rgb), 0.06);
+}
+
+.mission-envelope-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.mission-envelope-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.mission-envelope-title svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+}
+
+.mission-envelope-btn {
+  flex: none;
+  height: 26px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: #120f24;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mission-envelope-btn:hover {
+  background: #b0a5ff;
+}
+
+.mission-envelope p {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+@media (max-width: 860px) {
+  .env-overlay {
+    padding: 10px;
+  }
+
+  .env-body {
+    grid-template-columns: 1fr;
+  }
+}

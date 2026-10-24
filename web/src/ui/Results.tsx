@@ -29,8 +29,7 @@ const pct = (v: number) => `${Math.round(v * 100)}%`;
  */
 export function Results() {
   const r = useStore((s) => s.results);
-  const feed = useStore((s) => s.scenarioIndex?.feed);
-  if (!r) return null;
+  const feed = useStore((s) => s.scenarioIndex?.feed);  if (!r) return null;
   const clean = r.grid.find((g) => g.key === "reference")!;
   const both = r.grid.find((g) => g.key === "combined")!;
   const cleanMae = clean.off.maeWh;

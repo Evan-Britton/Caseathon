@@ -68,6 +68,9 @@ interface State {
   setBudget: (wh: number) => void;
   setLab: (lab: Partial<LabState>) => void;
   setLeftTab: (tab: LeftTab) => void;
+  /** The full-screen 3D view of the model's training envelope. */
+  envelopeOpen: boolean;
+  setEnvelopeOpen: (open: boolean) => void;
   /** Jump to a demo case: its flight, battery and poisoned condition, with the fix off. */
   runDemo: (demo: ScenarioDemo) => Promise<void>;
 }
@@ -228,6 +231,8 @@ export const useStore = create<State>((set, get) => ({
   // Opening the lab shows its effect in the mission check, so bring that tab forward.
   setLab: (lab) => set({ lab: { ...get().lab, ...lab }, ...(lab.on ? { leftTab: "mission" as const } : {}) }),
   setLeftTab: (leftTab) => set({ leftTab }),
+  envelopeOpen: false,
+  setEnvelopeOpen: (envelopeOpen) => set({ envelopeOpen }),
   runDemo: async (demo) => {
     set({ lab: { on: true, condition: demo.condition, fix: false }, leftTab: "mission" });
     get().setBudget(demo.budgetWh);

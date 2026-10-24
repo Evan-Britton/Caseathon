@@ -12,7 +12,8 @@
     "model": "cd .. && python3 scripts/export_web_model.py",
     "scenarios": "cd .. && python3 scripts/export_web_scenarios.py",
     "results": "cd .. && python3 scripts/export_web_results.py",
-    "synthetic": "cd .. && python3 scripts/export_web_synthetic.py"
+    "synthetic": "cd .. && python3 scripts/export_web_synthetic.py",
+    "envelope": "cd .. && python3 scripts/export_web_envelope.py"
   },
   "dependencies": {
     "@react-three/fiber": "9.8.2",
