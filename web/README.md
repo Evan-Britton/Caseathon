@@ -1,8 +1,8 @@
 # Drone flight replay
 
-A 3D replay of the CMU package-delivery quadcopter flights, with a live **mission check**: as each flight plays, the hybrid energy model (`scripts/hybrid_model.py`) forecasts the energy the mission still needs, and the app decides whether the drone will make it or should turn back. The degradation and countermeasure experiments aren't in the app yet.
+A 3D replay of the CMU package-delivery quadcopter flights, with a live **mission check**: as each flight plays, the hybrid energy model (`scripts/hybrid_model.py`) forecasts the energy the mission still needs, and the app decides whether the drone will make it or should turn back. It also replays the degradation and countermeasure experiments, runs a five-drone operator console, and shows the model's training envelope in 3D. The project overview is in the [root README](../README.md).
 
-Built with React 19, three.js (via React Three Fiber) and Vite. It deploys to Cloudflare Workers as static assets.
+Built with React 19, three.js (via React Three Fiber) and Vite. It's a static site: the live demo runs on Vercel, and it also deploys to Cloudflare Workers.
 
 ## What's on screen
 
@@ -27,7 +27,7 @@ Built with React 19, three.js (via React Three Fiber) and Vite. It deploys to Cl
     - Low quality: accidentally damaged current sensors (hard landing, moisture, a loose connector) on a growing share of drones, reading 12% low and logging twice as often.
     - Both.
   - **Countermeasure switch:** the reference-flight audit, recalibration and trusted P90 calibration.
-  - **Health rows:** what the training data really contains (age of the newest healthy-drone upload, the damaged sensors' share), and what the fix's health check reports. Without the fix it reads "Not monitored · nothing flags it".
+  - **Health rows:** what the training data really contains (age of the newest healthy-drone upload, the damaged sensors' share), and what the fix's health check reports. Without the fix it reads "None · nothing flags it".
   - **Two charts by window:** forecast error and how often the P90 really holds, for clean, poisoned and fixed.
   - **Demo buttons:** jump to flights where poisoning flips the call. In the top case, flight 268 with a 28.5 Wh battery, the poisoned model says continue while the flight really comes up 0.15 Wh short; the clean and fixed models both say it's too close to call.
 
@@ -144,7 +144,19 @@ npm run envelope
 npm run results
 ```
 
-## Deploy to Cloudflare Workers
+## Deploy
+
+### Vercel (the live demo)
+
+The `caseathon` Vercel project builds this folder with Vite's defaults (`npm run build`, output `dist/`). From `web/`:
+
+```bash
+npx vercel deploy --prod
+```
+
+Vercel only deploys a commit whose author is a member of the project, so if the newest commit on `main` came from someone else, the deploy is blocked until a member's commit is on top.
+
+### Cloudflare Workers
 
 `wrangler.jsonc` serves `dist/` as static assets, with single-page-app fallback. No Worker script is needed. `public/_headers` sets long-lived caching for hashed JS/CSS and one-hour caching for flight data.
 
