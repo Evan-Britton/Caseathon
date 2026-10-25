@@ -19,7 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-The CMU flight data in data/raw/cmu_drone/ is not covered by this license. It is
-"Data Collected with Package Delivery Quadcopter Drone" by Rodrigues et al.,
-Carnegie Mellon University (doi:10.1184/R1/12683453.v1), licensed CC BY 4.0.
